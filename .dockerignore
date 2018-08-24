@@ -1,0 +1,9 @@
+*
+!src
+!assets
+!index.html
+!package.json
+!elm.json
+!package-lock.json
+!yarn.lock
+!MAKEFILE
