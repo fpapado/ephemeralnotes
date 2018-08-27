@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 // webpack.config.js
 module.exports = {
-  entry: ["./dist/js/elm.js", "./src/styles/index.css"],
+  entry: ["./src/index.js", "./src/styles/index.css"],
   output: {
     path: __dirname + "/dist",
     filename: "index.js"

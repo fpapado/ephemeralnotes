@@ -1,16 +1,61 @@
+/* Normalize */
+body {
+  margin: 0;
+}
+
 /* Custom stuff */
+/* wildberry-bold - latin */
 @font-face {
   font-family: 'Wildberry';
-  src: url('/fonts/Wildberry-v0.2-Bold-Web.woff2') format('woff2'),
-    url('/fonts/Wildberry-v0.2-Bold-Web.woff') format('woff');
+  font-style: normal;
+  font-weight: 700;
   /* TODO: some day, use a multi-stage strategy */
   font-display: swap;
+  src: url('/assets/fonts/Wildberry-v0.2-Bold-Web.woff2') format('woff2'),
+    url('/assets/fonts/Wildberry-v0.2-Bold-Web.woff') format('woff');
+}
+
+/* Fade in animation */
+.animated {
+  -webkit-animation-duration: 500ms;
+  animation-duration: 500ms;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+.delay-short {
+  -webkit-animation-delay:500ms;
+  animation-delay: 500ms;
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
 }
 
 /* TODO: font weights for this (bold only atm) */
 .f-wildberry {
-  font-family: Wildberry, -apple-system, BlinkMacSystemFont, avenir next, avenir,
-    helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  font-family: Wildberry, Arial, Helvetica, sans-serif;
 }
 
 /*! TACHYONS v4.11.1 | http://tachyons.io */

@@ -7,34 +7,11 @@
 </head>
 
 <body>
-  <div class="flex justify-center items-center sans-serif bg-lightest-blue near-black">
-    <h1 class="f2 lh-title f-wildberry">
-      Loading...
+  <div class="min-vh-100 flex justify-center items-center sans-serif bg-lightest-blue near-black">
+    <h1 class="f2 lh-title f-wildberry animated fadeIn delay-short">
+      Ephemeral
     </h1>
   </div>
-
-  <script>
-    const storageKey = "ephemeral-store";
-    const app = Elm.Main.init(/*{ flags: flags }*/);
-
-    // app.ports.storeCache.subscribe(val => {
-    //   if (val === null) {
-    //     localStorage.removeItem(storageKey);
-    //   } else {
-    //     localStorage.setItem(storageKey, JSON.stringify(val));
-    //   }
-
-    //   // Report that the new session was stored succesfully.
-    //   setTimeout(() => { app.ports.onStoreChange.send(val); }, 0);
-    // });
-
-    // Whenever localStorage changes in another tab, report it if necessary.
-    // window.addEventListener("storage", event => {
-    //   if (event.storageArea === localStorage && event.key === storageKey) {
-    //     app.ports.onStoreChange.send(event.newValue);
-    //   }
-    // }, false);
-  </script>
 </body>
 
 </html>

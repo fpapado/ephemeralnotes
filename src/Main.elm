@@ -75,13 +75,18 @@ subscriptions _ =
 
 
 -- VIEW
+-- NOTE: should be the same as the shell in index.html, to avoid flashes
+
+
+viewShell children =
+    div [ class "min-vh-100 flex justify-center items-center sans-serif bg-lightest-blue near-black" ] [ div [ class "animated fadeIn" ] children ]
 
 
 view : Model -> Browser.Document Msg
 view model =
     { title = "Ephemeral"
     , body =
-        [ div [ class "sans-serif f5 lh-title" ]
+        [ viewShell
             [ text "The current URL is: "
             , b [] [ text (Url.toString model.url) ]
             , ul []
