@@ -1,3 +1,18 @@
+/* Custom stuff */
+@font-face {
+  font-family: 'Wildberry';
+  src: url('/fonts/Wildberry-v0.2-Bold-Web.woff2') format('woff2'),
+    url('/fonts/Wildberry-v0.2-Bold-Web.woff') format('woff');
+  /* TODO: some day, use a multi-stage strategy */
+  font-display: swap;
+}
+
+/* TODO: font weights for this (bold only atm) */
+.f-wildberry {
+  font-family: Wildberry, -apple-system, BlinkMacSystemFont, avenir next, avenir,
+    helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+}
+
 /*! TACHYONS v4.11.1 | http://tachyons.io */
 .aspect-ratio {
   height: 0;

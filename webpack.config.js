@@ -24,12 +24,10 @@ module.exports = {
     // Inline critical (well, all) css preload fonts
     new Critters({
       // Outputs: <link rel="preload" onload="this.rel='stylesheet'"> and LoadCSS fallback
-      //preload: "js",
-      preload: "swap"
-
-      // Don't inline critical font-face rules, but preload the font URLs:
-      // preloadFonts: true
-      // font: true
+      preload: "js",
+      // Inline critical font-face rules, and preload the font URLs
+      inlineFonts: true,
+      preloadFonts: true
     }),
     // Track bundle size
     new SizePlugin()
