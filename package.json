@@ -8,11 +8,11 @@
   "scripts": {
     "dev": "npm-run-all clean setup build:copy-assets dev:elm",
     "dev:elm": "elm-live src/Main.elm --output=dist/js/elm.js --pushstate --dir=dist",
-    "build": "npm-run-all clean setup build:elm build:uglify build:webpack",
+    "build": "npm-run-all clean setup build:copy-assets build:elm build:uglify build:webpack",
     "build:webpack": "webpack",
     "build:elm": "elm make --optimize src/Main.elm --output=dist/js/elm.js",
     "build:uglify": "uglifyjs dist/js/elm.js --compress 'pure_funcs=\"F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9\",pure_getters,keep_fargs=false,unsafe_comps,unsafe' | uglifyjs --mangle --output=dist/js/elm.js",
-    "build:copy-assets": "cp index.html dist && cp assets -r dist",
+    "build:copy-assets": "cp assets -r dist",
     "setup": "mkdir dist",
     "clean": "rimraf dist",
     "deploy": "npx now",
