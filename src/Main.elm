@@ -81,14 +81,16 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "Ephemeral"
     , body =
-        [ text "The current URL is: "
-        , b [] [ text (Url.toString model.url) ]
-        , ul []
-            [ viewLink "/home"
-            , viewLink "/profile"
-            , viewLink "/reviews/the-century-of-the-self"
-            , viewLink "/reviews/public-opinion"
-            , viewLink "/reviews/shah-of-shahs"
+        [ div [ class "sans-serif f5 lh-title" ]
+            [ text "The current URL is: "
+            , b [] [ text (Url.toString model.url) ]
+            , ul []
+                [ viewLink "/home"
+                , viewLink "/profile"
+                , viewLink "/reviews/the-century-of-the-self"
+                , viewLink "/reviews/public-opinion"
+                , viewLink "/reviews/shah-of-shahs"
+                ]
             ]
         ]
     }
