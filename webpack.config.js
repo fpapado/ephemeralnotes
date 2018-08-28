@@ -38,13 +38,15 @@ module.exports = {
       chunkFilename: "[id].css"
     }),
     // Inline critical (well, all) css preload fonts
-    new Critters({
-      // Outputs: <link rel="preload" onload="this.rel='stylesheet'"> and LoadCSS fallback
-      preload: "js",
-      // Inline critical font-face rules, and preload the font URLs
-      inlineFonts: true,
-      preloadFonts: true
-    }),
+    ifProduction(
+      new Critters({
+        // Outputs: <link rel="preload" onload="this.rel='stylesheet'"> and LoadCSS fallback
+        preload: "js",
+        // Inline critical font-face rules, and preload the font URLs
+        inlineFonts: true,
+        preloadFonts: true
+      })
+    ),
     // Track bundle size
     new SizePlugin(),
     new WorkboxPlugin.InjectManifest({
