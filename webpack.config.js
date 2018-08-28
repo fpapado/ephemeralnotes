@@ -4,14 +4,29 @@ const SizePlugin = require("size-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WorkboxPlugin = require("workbox-webpack-plugin");
 
+// Utils
+const removeEmpty = items => items.filter(i => i !== null && i !== undefined);
+const propIf = (envVal, value, alt) => (envVal ? value : alt);
+const propIfNot = (envVal, value, alt) => (!envVal ? value : alt);
+const makeIfProp = envValue => (value, alt) =>
+  isUndefined(value) ? envValue : propIf(envValue, value, alt);
+const makeIfNotProp = envValue => (value, alt) =>
+  isUndefined(value) ? !envValue : propIfNot(envValue, value, alt);
+
+// Env setup
+const isProduction = process.env.NODE_ENV == "production";
+const ifProduction = makeIfProp(isProduction);
+const ifNotProduction = makeIfNotProp(isProduction);
+
 // webpack.config.js
 module.exports = {
+  mode: ifProduction("production", "development"),
   entry: ["./src/index.js", "./src/styles/index.css"],
   output: {
     path: __dirname + "/dist",
     filename: "index.js"
   },
-  plugins: [
+  plugins: removeEmpty([
     // Place things in template
     new HtmlWebpackPlugin({
       template: "index.html"
@@ -36,7 +51,7 @@ module.exports = {
       swSrc: "./src/sw.js",
       importWorkboxFrom: "local"
     })
-  ],
+  ]),
   module: {
     rules: [
       {
@@ -56,3 +71,7 @@ module.exports = {
     ]
   }
 };
+
+function isUndefined(val) {
+  return typeof val === "undefined";
+}
