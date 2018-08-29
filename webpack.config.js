@@ -27,7 +27,8 @@ module.exports = {
   entry: ["./src/index.js", "./src/styles/index.css"],
   output: {
     path: __dirname + "/dist",
-    filename: "index.js"
+    chunkFilename: "[name]-[contenthash].js",
+    filename: ifProduction("[name]-[contenthash].js", "[name].js")
   },
   plugins: removeEmpty([
     // Place things in template
@@ -46,8 +47,8 @@ module.exports = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: ifNotProduction("[name].css", "[name].[contenthash].css"),
-      chunkFilename: ifNotProduction("[id].css", "[id].[hash].css")
+      filename: ifNotProduction("[name].css", "[name]-[contenthash].css"),
+      chunkFilename: ifNotProduction("[id].css", "[id]-[hash].css")
     }),
     // Inline critical css, preload fonts
     ifProduction(
@@ -55,9 +56,9 @@ module.exports = {
         // Outputs: <link rel="preload" onload="this.rel='stylesheet'"> and LoadCSS fallback
         preload: "js",
         // Inline critical font-face rules, and preload the font URLs
-        // inlineFonts: false,
+        inlineFonts: true
         // preloadFonts: false
-        fonts: true
+        // fonts: true
       })
     ),
     new WorkboxPlugin.InjectManifest({
