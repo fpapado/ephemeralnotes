@@ -2,7 +2,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const Critters = require("critters-webpack-plugin");
 const SizePlugin = require("size-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const WorkboxPlugin = require("workbox-webpack-plugin");
+
+const cssnano = require("cssnano");
 
 // Utils
 const removeEmpty = items => items.filter(i => i !== null && i !== undefined);
@@ -31,13 +34,22 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "index.html"
     }),
+    new OptimizeCssAssetsPlugin({
+      cssProcessor: cssnano,
+      cssProcessorOptions: {
+        discardComments: {
+          removeAll: true
+        }
+      },
+      canPrint: false
+    }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: "[name].css",
-      chunkFilename: "[id].css"
+      filename: ifNotProduction("[name].css", "[name].[contenthash].css"),
+      chunkFilename: ifNotProduction("[id].css", "[id].[hash].css")
     }),
-    // Inline critical (well, all) css preload fonts
+    // Inline critical css, preload fonts
     ifProduction(
       new Critters({
         // Outputs: <link rel="preload" onload="this.rel='stylesheet'"> and LoadCSS fallback
@@ -61,7 +73,10 @@ module.exports = {
         test: /\.css$/,
         use: [
           {
-            loader: MiniCssExtractPlugin.loader,
+            loader: ifNotProduction(
+              "style-loader",
+              MiniCssExtractPlugin.loader
+            ),
             options: {
               // you can specify a publicPath here
               // by default it use publicPath in webpackOptions.output
