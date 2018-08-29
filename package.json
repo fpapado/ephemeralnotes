@@ -17,7 +17,9 @@
     "build:copy-assets": "cp assets -r dist",
     "setup": "mkdir dist",
     "clean": "rimraf dist",
+    "release": "npm-run-all deploy alias",
     "deploy": "npx now",
+    "alias": "npx now alias",
     "test": "elm-test"
   },
   "bundlesize": [
