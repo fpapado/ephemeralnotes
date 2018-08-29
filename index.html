@@ -1,14 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="fonts-not-asked">
 
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
   <title>Ephemeral</title>
+
+  <script>
+    (function () {
+      'use strict';
+      var r = document.documentElement;
+
+      // optimise repeat views
+      if (sessionStorage.fontsLoaded) {
+        r.classList.add('fonts-loaded');
+        return;
+      } else if ('fonts' in document) {
+        document.fonts.load('700 1em Wildberry')
+          .then(function () {
+            r.classList.add('fonts-loaded');
+          })
+          .catch(function (e) { console.error('Stage 1 failed', e); });
+      } else {
+        // if no font API, then let the browser do its loading as usual
+        sessionStorage.fontsLoaded = true;
+        r.classList.add('fonts-loaded');
+      }
+    })();
+  </script>
+  <noscript>
+    <style>
+      .fonts-not-asked .f-wildberry {
+        font-family: 'Wildberry', Arial, Helvetica, sans-serif;
+      }
+    </style>
+  </noscript>
 </head>
 
 <body>
   <div class="min-vh-100 flex justify-center items-center sans-serif bg-lightest-blue near-black">
-    <h1 class="f2 lh-title f-wildberry animated fadeIn delay-short">
+    <h1 class="f2 lh-title f-wildberry">
       Ephemeral
     </h1>
   </div>

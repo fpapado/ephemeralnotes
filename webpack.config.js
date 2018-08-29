@@ -43,16 +43,17 @@ module.exports = {
         // Outputs: <link rel="preload" onload="this.rel='stylesheet'"> and LoadCSS fallback
         preload: "js",
         // Inline critical font-face rules, and preload the font URLs
-        inlineFonts: true,
-        preloadFonts: true
+        // inlineFonts: false,
+        // preloadFonts: false
+        fonts: true
       })
     ),
-    // Track bundle size
-    new SizePlugin(),
     new WorkboxPlugin.InjectManifest({
       swSrc: "./src/sw.js",
       importWorkboxFrom: "local"
-    })
+    }),
+    // Track bundle size
+    new SizePlugin()
   ]),
   module: {
     rules: [

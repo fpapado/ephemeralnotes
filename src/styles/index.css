@@ -9,10 +9,22 @@ body {
   font-family: 'Wildberry';
   font-style: normal;
   font-weight: 700;
-  /* TODO: some day, use a multi-stage strategy */
-  font-display: swap;
   src: url('/assets/fonts/Wildberry-v0.2-Bold-Web.woff2') format('woff2'),
     url('/assets/fonts/Wildberry-v0.2-Bold-Web.woff') format('woff');
+}
+
+/* NOTE: the use of fonts is gated on these classes, to enable the loading strategy. */
+/* Set as a hack to get the critical CSS @font-face to be inlined */
+.f-wildberry {
+  font-family: 'Wildberry', Arial, Helvetica, sans-serif;
+}
+
+.fonts-not-asked .f-wildberry {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.fonts-loaded .f-wildberry {
+  font-family: 'Wildberry', Arial, Helvetica, sans-serif;
 }
 
 /* Fade in animation */
@@ -51,11 +63,6 @@ body {
 .fadeIn {
   -webkit-animation-name: fadeIn;
   animation-name: fadeIn;
-}
-
-/* TODO: font weights for this (bold only atm) */
-.f-wildberry {
-  font-family: Wildberry, Arial, Helvetica, sans-serif;
 }
 
 /*! TACHYONS v4.11.1 | http://tachyons.io */
