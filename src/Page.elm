@@ -48,7 +48,7 @@ container attrs children =
 viewHeader : Page -> Html msg
 viewHeader activePage =
     header [ class "pv2 navy bg-white shadow-1" ]
-        [ nav [ class "tc" ] [ a [ Route.href Route.Home, class "link navy" ] [ span [ class "f3 tc f-wildberry" ] [ text "Ephemeral" ] ] ]
+        [ nav [ class "tc" ] [ a [ Route.href Route.Home, class "link navy" ] [ span [ class "f3 tc fw7 f-wildberry" ] [ text "Ephemeral" ] ] ]
         ]
 
 
