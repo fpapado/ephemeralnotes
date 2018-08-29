@@ -3,6 +3,7 @@
 - index.html with inlined critical CSS
 - Font and font loading strategy
 - Github PR pipeline
+- Script preload
 
 # MVP
 - localstorage and Port architecture
