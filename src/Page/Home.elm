@@ -4,7 +4,7 @@ module Page.Home exposing (Model, Msg(..), init, subscriptions, update, view, vi
 -}
 
 import Html exposing (..)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, href)
 import Task exposing (Task)
 import Time
 
@@ -39,6 +39,7 @@ view model =
         div
             [ class "home-page" ]
             [ viewBanner
+            , a [ href "/404" ] [ text "404 page" ]
             ]
     }
 
@@ -47,7 +48,7 @@ viewBanner : Html msg
 viewBanner =
     div [ class "banner" ]
         [ div [ class "container" ]
-            [ h1 [ class "logo-font" ] [ text "Ephemeral" ]
+            [ h1 [ class "f2 f1-ns lh-title f-wildberry" ] [ text "Ephemeral" ]
             , p [] [ text "Write down words as you encounter them." ]
             ]
         ]

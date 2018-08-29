@@ -66,6 +66,15 @@ body {
   animation-name: fadeIn;
 }
 
+/* Vertical spacing */
+.vs3 > * + * {
+  margin-top: 1rem;
+}
+
+.vs4 > * + * {
+  margin-top: 2rem;
+}
+
 /*! TACHYONS v4.11.1 | http://tachyons.io */
 .aspect-ratio {
   height: 0;

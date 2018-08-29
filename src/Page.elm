@@ -31,7 +31,7 @@ in the header. (This comes up during slow page transitions.)
 view : Page -> { title : String, content : Html msg } -> Document msg
 view activePage { title, content } =
     { title = title ++ " | Ephemeral"
-    , body = [ viewShell [ viewHeader activePage, main_ [] [ container [] [ content ] ], viewFooter ] ]
+    , body = [ viewShell [ viewHeader activePage, main_ [ class "flex-auto" ] [ container [] [ content ] ], viewFooter ] ]
     }
 
 
@@ -55,7 +55,7 @@ viewHeader activePage =
 viewFooter : Html msg
 viewFooter =
     footer []
-        [ container []
+        [ container [ class "tc" ]
             [ span [] [ text "Made by Fotis Papadogeorgopoulos" ]
             ]
         ]
