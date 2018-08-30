@@ -4,6 +4,8 @@
 - Font and font loading strategy
 - Github PR pipeline
 - Script preload
+- Brotli compression and type
+- namespace (filespace?) js/css assets
 
 # MVP
 - localstorage and Port architecture

@@ -1,5 +1,18 @@
 {
   "name": "ephemeral-v2",
   "alias": "ephemeral-v2",
-  "type": "static"
+  "type": "static",
+  "static": {
+    "headers": [
+      {
+        "source": "main-*.@(css|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000,immutable"
+          }
+        ]
+      }
+    ]
+  }
 }
