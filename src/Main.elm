@@ -1,9 +1,11 @@
 module Main exposing (main)
 
 import Browser exposing (Document)
+import Browser.Dom as Dom
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
+import Log
 import Page exposing (Page)
 import Page.Blank as Blank
 import Page.Home as Home
@@ -72,6 +74,7 @@ type Msg
     | ChangedRoute (Maybe Route)
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
+    | GotFocusResult (Result Dom.Error ())
     | GotHomeMsg Home.Msg
 
 
@@ -86,6 +89,11 @@ changeRouteTo maybeRoute model =
                 |> updateWith (\m -> { model | page = Home m }) GotHomeMsg model
 
 
+focus : String -> Cmd Msg
+focus id =
+    Task.attempt GotFocusResult (Dom.focus id)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model ) of
@@ -96,13 +104,21 @@ update msg model =
             case urlRequest of
                 Browser.Internal url ->
                     ( model
-                    , Nav.pushUrl model.navKey (Url.toString url)
+                    , Cmd.batch [ Nav.pushUrl model.navKey (Url.toString url), focus "main" ]
                     )
 
                 Browser.External href ->
                     ( model
                     , Nav.load href
                     )
+
+        ( GotFocusResult res, _ ) ->
+            case res of
+                Ok () ->
+                    ( model, Cmd.none )
+
+                Err (Dom.NotFound id) ->
+                    ( model, Log.error ("Dom.Error.NotFound" ++ id) )
 
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) model

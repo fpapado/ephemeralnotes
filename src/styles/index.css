@@ -18,7 +18,9 @@ body {
 
 /* Assume we know what we are doing for programmatic focus */
 :focus[tabindex="-1"] {
-  outline: none;
+  /* outline: none; */
+  /* Debug */
+  outline: 4px solid red;
 }
 
 /* Skip Link */

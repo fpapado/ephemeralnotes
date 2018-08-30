@@ -1,7 +1,7 @@
 module Page.NotFound exposing (view)
 
 import Html exposing (Html, a, div, h1, img, p, text)
-import Html.Attributes exposing (alt, class, id, src, tabindex)
+import Html.Attributes exposing (alt, class, src)
 import Route exposing (Route)
 
 
@@ -13,7 +13,7 @@ view : { title : String, content : Html msg }
 view =
     { title = "Page Not Found"
     , content =
-        div [ id "content", class "center", tabindex -1 ]
+        div [ class "center" ]
             [ div
                 [ class "tc measure center vs4" ]
                 [ h1 [ class "mv4 f2 f1-ns lh-title f-wildberry" ] [ text "Not Found :(" ]

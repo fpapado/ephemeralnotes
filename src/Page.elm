@@ -2,7 +2,7 @@ module Page exposing (Page(..), view, viewErrors)
 
 import Browser exposing (Document)
 import Html exposing (Html, a, button, div, footer, h1, header, i, img, li, main_, nav, p, span, text, ul)
-import Html.Attributes exposing (class, classList, href, id, style)
+import Html.Attributes exposing (class, classList, href, id, style, tabindex)
 import Html.Events exposing (onClick)
 import Route exposing (Route)
 
@@ -31,7 +31,7 @@ in the header. (This comes up during slow page transitions.)
 view : Page -> { title : String, content : Html msg } -> Document msg
 view activePage { title, content } =
     { title = title ++ " | Ephemeral"
-    , body = [ viewShell [ viewHeader activePage, main_ [ id "main", class "flex-auto" ] [ container [] [ content ] ], viewFooter ] ]
+    , body = [ viewShell [ viewHeader activePage, main_ [ id "main", class "flex-auto", tabindex -1 ] [ container [] [ content ] ], viewFooter ] ]
     }
 
 
