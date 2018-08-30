@@ -1,8 +1,5 @@
 module Log exposing (error)
 
-import Debug exposing (log)
-
-
 {-| This is a placeholder API for how we might do logging through
 some service like <http://rollbar.com> (which is what we use at work).
 Whenever you see Log.error used in this code base, it means
@@ -13,10 +10,8 @@ what happened later."
 a placeholder anyway, I didn't bother making this function accept actual
 diagnostic info, authentication tokens, etc.)
 -}
+
+
 error : String -> Cmd msg
 error err =
-    let
-        _ =
-            log err
-    in
     Cmd.none
