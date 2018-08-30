@@ -2,7 +2,7 @@ module Page exposing (Page(..), view, viewErrors)
 
 import Browser exposing (Document)
 import Html exposing (Html, a, button, div, footer, h1, header, i, img, li, main_, nav, p, span, text, ul)
-import Html.Attributes exposing (class, classList, href, style)
+import Html.Attributes exposing (class, classList, href, id, style)
 import Html.Events exposing (onClick)
 import Route exposing (Route)
 
@@ -31,7 +31,7 @@ in the header. (This comes up during slow page transitions.)
 view : Page -> { title : String, content : Html msg } -> Document msg
 view activePage { title, content } =
     { title = title ++ " | Ephemeral"
-    , body = [ viewShell [ viewHeader activePage, main_ [ class "flex-auto" ] [ container [] [ content ] ], viewFooter ] ]
+    , body = [ viewShell [ viewHeader activePage, main_ [ id "main", class "flex-auto" ] [ container [] [ content ] ], viewFooter ] ]
     }
 
 
@@ -48,7 +48,8 @@ container attrs children =
 viewHeader : Page -> Html msg
 viewHeader activePage =
     header [ class "pv2 navy bg-white shadow-1" ]
-        [ nav [ class "tc" ] [ a [ Route.href Route.Home, class "f3 fw7 link navy tc ttu f-wildberry" ] [ text "Ephemeral" ] ]
+        [ skipLink
+        , nav [ class "tc" ] [ a [ Route.href Route.Home, class "f3 fw7 link navy tc ttu f-wildberry" ] [ text "Ephemeral" ] ]
         ]
 
 
@@ -96,3 +97,7 @@ viewErrors dismissErrors errors =
         <|
             List.map (\error -> p [] [ text error ]) errors
                 ++ [ button [ onClick dismissErrors ] [ text "Ok" ] ]
+
+
+skipLink =
+    a [ href "#main", class "pa3 tc near-white bg-blue skip-link" ] [ text "skip to content" ]

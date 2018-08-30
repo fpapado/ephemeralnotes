@@ -1,27 +1,55 @@
 /* Normalize */
+html {
+	box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
 body {
   margin: 0;
 }
 
 /* Assume we know what we are doing for programmatic focus */
 :focus[tabindex="-1"] {
-  outline: none
+  outline: none;
+}
+
+/* Skip Link */
+.skip-link {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+.skip-link:focus {
+  width: auto;
+  height: auto;
+  z-index: 111;
+  clip: auto;
 }
 
 /* Custom stuff */
 /* wildberry-bold - latin */
 @font-face {
-  font-family: 'Wildberry';
+  font-family: "Wildberry";
   font-style: normal;
   font-weight: 700;
-  src: url('/assets/fonts/Wildberry-v0.2-Bold-Web.woff2') format('woff2'),
-    url('/assets/fonts/Wildberry-v0.2-Bold-Web.woff') format('woff');
+  src: url("/assets/fonts/Wildberry-v0.2-Bold-Web.woff2") format("woff2"),
+    url("/assets/fonts/Wildberry-v0.2-Bold-Web.woff") format("woff");
 }
 
 /* NOTE: the use of fonts is gated on these classes, to enable the loading strategy. */
 /* Set as a hack to get the critical CSS @font-face to be inlined */
 .f-wildberry {
-  font-family: 'Wildberry', Arial, Helvetica, sans-serif;
+  font-family: "Wildberry", Arial, Helvetica, sans-serif;
 }
 
 .fonts-not-asked .f-wildberry {
@@ -30,7 +58,7 @@ body {
 
 .fonts-loaded .f-wildberry {
   /* Important is needed for the styles to override the inlned .fonts-not-asked style :( */
-  font-family: 'Wildberry', Arial, Helvetica, sans-serif !important;
+  font-family: "Wildberry", Arial, Helvetica, sans-serif !important;
 }
 
 /* Fade in animation */
@@ -549,7 +577,7 @@ img {
 }
 .cf:after,
 .cf:before {
-  content: ' ';
+  content: " ";
   display: table;
 }
 .cf:after {
@@ -2642,7 +2670,7 @@ code {
   transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 .shadow-hover:after {
-  content: '';
+  content: "";
   box-shadow: 0 0 16px 2px rgba(0, 0, 0, 0.2);
   border-radius: inherit;
   opacity: 0;
