@@ -23,7 +23,7 @@
         ]
       },
       {
-        "source": "precace-manifest.*.js",
+        "source": "precache-manifest.*.js",
         "headers": [
           {
             "key": "Cache-Control",
