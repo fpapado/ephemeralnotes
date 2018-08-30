@@ -12,6 +12,24 @@
             "value": "max-age=31536000,immutable"
           }
         ]
+      },
+      {
+        "source": "workbox-*/*.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000,immutable"
+          }
+        ]
+      },
+      {
+        "source": "precace-manifest.*.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000,immutable"
+          }
+        ]
       }
     ]
   }
