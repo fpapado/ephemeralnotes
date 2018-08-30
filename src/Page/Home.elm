@@ -39,7 +39,7 @@ view model =
         div
             [ class "home-page" ]
             [ viewBanner
-            , a [ href "/404" ] [ text "404 page" ]
+            , a [ class "link underline", href "/404" ] [ text "404 page" ]
             ]
     }
 

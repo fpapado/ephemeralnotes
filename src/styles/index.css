@@ -3,6 +3,11 @@ body {
   margin: 0;
 }
 
+/* Assume we know what we are doing for programmatic focus */
+:focus[tabindex="-1"] {
+  outline: none
+}
+
 /* Custom stuff */
 /* wildberry-bold - latin */
 @font-face {
@@ -931,7 +936,24 @@ code {
   transition: color 0.15s ease-in, background-color 0.15s ease-in;
 }
 .link:focus {
-  outline: 1px dotted currentColor;
+  outline: 4px solid rgb(3, 102, 214);
+  outline-offset: 2px;
+}
+.button-link {
+  text-decoration: none;
+}
+.button-link,
+.button-link:active,
+.button-link:focus,
+.button-link:hover,
+.button-link:link,
+.button-link:visited {
+  transition: color 0.15s ease-in, background-color 0.15s ease-in;
+}
+.button-link:focus {
+  /* Enhance outline that follows border */
+  outline: none;
+  box-shadow: inset 0 0 0 0.2em rgba(3, 102, 214, 0.85);
 }
 .list {
   list-style-type: none;
