@@ -928,7 +928,7 @@ code {
 .link:hover,
 .link:link,
 .link:visited {
-  transition: color 0.15s ease-in;
+  transition: color 0.15s ease-in, background-color 0.15s ease-in;
 }
 .link:focus {
   outline: 1px dotted currentColor;
