@@ -3,11 +3,14 @@ html {
 	box-sizing: border-box;
 }
 
+/* FIXME: Critters does not compile this */
+/*
 *,
-*::before,
-*::after {
+*:before,
+*:after {
 	box-sizing: inherit;
 }
+*/
 
 body {
   margin: 0;
