@@ -1,13 +1,13 @@
-import { Elm } from "../dist/js/elm.js";
-import { InstallBanner } from "./installBanner";
-import styles from "./styles/index.css";
+import {Elm} from '../dist/js/elm.js';
+import {InstallBanner} from './customElements/installBanner';
+import styles from './styles/index.css';
 
-console.log({ styles });
-
-const storageKey = "ephemeral-store";
+const storageKey = 'ephemeral-store';
 const app = Elm.Main.init(/*{ flags: flags }*/);
 
-customElements.define("install-banner", InstallBanner);
+if ('customElements' in window) {
+  customElements.define('install-banner', InstallBanner);
+}
 
 // app.ports.storeCache.subscribe(val => {
 //   if (val === null) {

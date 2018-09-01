@@ -17,7 +17,7 @@ export class InstallBanner extends HTMLElement {
 
     // Create a Shadow Root and fill it with the template
     // Playing hide-and-seek with the VDOM
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({mode: 'open'});
 
     // Create the web component's template
     // TODO: consider "title" "description" and "buttonText" attrs
@@ -133,50 +133,50 @@ export class InstallBanner extends HTMLElement {
 
   connectedCallback() {
     // Hide the banner by default
-    this.shadowRoot.host.style.display = "none";
+    this.shadowRoot.host.style.display = 'none';
 
     // Get a reference to the buttons
-    const installButton = this.shadowRoot.getElementById("install-button");
-    const dismissButton = this.shadowRoot.getElementById("dismiss-button");
+    const installButton = this.shadowRoot.getElementById('install-button');
+    const dismissButton = this.shadowRoot.getElementById('dismiss-button');
 
     // Show interface for installation
     // TODO: clean up in disconnectedCallback()
-    window.addEventListener("beforeinstallprompt", e => {
+    window.addEventListener('beforeinstallprompt', e => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
       // Stash the event so it can be triggered later.
       this._deferredPrompt = e;
 
       // Dispatch a custom event, in case the caller wants to do something
-      this.dispatchEvent(new CustomEvent("beforeInstallPrompt"));
+      this.dispatchEvent(new CustomEvent('beforeInstallPrompt'));
 
       // Show the banner
-      this.shadowRoot.host.style.display = "block";
+      this.shadowRoot.host.style.display = 'block';
     });
 
-    installButton.addEventListener("click", e => {
+    installButton.addEventListener('click', e => {
       // Hide the banner, since we can only prompt once
-      this.shadowRoot.host.style.display = "none";
+      this.shadowRoot.host.style.display = 'none';
 
       // Show the prompt
       this._deferredPrompt.prompt();
 
       // Wait for the user to respond to the prompt
       this._deferredPrompt.userChoice.then(choiceResult => {
-        if (choiceResult.outcome === "accepted") {
-          this.dispatchEvent(new CustomEvent("installAccepted"));
-          console.log("User accepted the A2HS prompt");
+        if (choiceResult.outcome === 'accepted') {
+          this.dispatchEvent(new CustomEvent('installAccepted'));
+          console.log('User accepted the A2HS prompt');
         } else {
-          this.dispatchEvent(new CustomEvent("installDismissed"));
-          console.log("User dismissed the A2HS prompt");
+          this.dispatchEvent(new CustomEvent('installDismissed'));
+          console.log('User dismissed the A2HS prompt');
         }
         this._deferredPrompt = null;
       });
     });
 
-    dismissButton.addEventListener("click", _e => {
+    dismissButton.addEventListener('click', _e => {
       // Hide the banner, the user doesn't like it
-      this.shadowRoot.host.style.display = "none";
+      this.shadowRoot.host.style.display = 'none';
     });
   }
 
