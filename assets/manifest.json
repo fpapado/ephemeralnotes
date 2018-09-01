@@ -4,7 +4,7 @@
   "name": "Ephemeral",
   "scope": "/",
   "display": "standalone",
-  "start_url": "http://localhost:5000/",
+  "start_url": "https://ephemeral-v2.now.sh/",
   "short_name": "Ephemeral",
   "theme_color": "transparent",
   "description": "Ephemeral is an app for writing down words and their translations, as you encounter them.",
