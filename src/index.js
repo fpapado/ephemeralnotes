@@ -6,6 +6,9 @@ const storageKey = 'ephemeral-store';
 const app = Elm.Main.init(/*{ flags: flags }*/);
 
 if ('customElements' in window) {
+  // The install banner is only needed in Chrome > 68, so no
+  // need to polyfill CEs atm. See `docs/browser_support.md`
+  // for guidance.
   customElements.define('install-banner', InstallBanner);
 }
 

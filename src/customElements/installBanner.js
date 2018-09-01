@@ -10,7 +10,6 @@
  *    This would mean only showing the button with the onClick,
  *    and relying on the view above to fill in the rest.
 */
-
 export class InstallBanner extends HTMLElement {
   constructor() {
     super();
