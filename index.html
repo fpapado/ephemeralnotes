@@ -87,6 +87,8 @@
   <script>
     // Check that service workers are registered
     if ('serviceWorker' in navigator) {
+      let deferredPrompt;
+
       // Use the window load event to keep the page load performant
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(registration => {
@@ -94,6 +96,11 @@
         }).catch(registrationError => {
           console.log('SW registration failed: ', registrationError);
         });
+      });
+
+      // Log if the app was installed
+      window.addEventListener('appinstalled', (evt) => {
+        app.logEvent('a2hs', 'installed');
       });
     }
   </script>

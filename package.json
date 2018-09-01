@@ -10,6 +10,8 @@
     "dev:watch": "npm-run-all --parallel dev:watch-elm dev:webpack",
     "dev:webpack": "webpack-serve",
     "dev:watch-elm": "chokidar 'src/**/*.elm' -c 'elm make src/Main.elm --output dist/js/elm.js --debug' --initial",
+    "prod": "npm-run-all build serve-prod",
+    "serve-prod": "npx serve dist/",
     "build": "NODE_ENV=production npm-run-all clean setup build:copy-assets build:elm build:uglify build:webpack",
     "build:webpack": "webpack",
     "build:elm": "elm make --optimize src/Main.elm --output=dist/js/elm.js",

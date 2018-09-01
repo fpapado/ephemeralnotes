@@ -31,8 +31,28 @@ in the header. (This comes up during slow page transitions.)
 view : Page -> { title : String, content : Html msg } -> Document msg
 view activePage { title, content } =
     { title = title ++ " | Ephemeral"
-    , body = [ viewShell [ viewHeader activePage, main_ [ id "main", class "flex-auto", tabindex -1 ] [ container [] [ content ] ], viewFooter ] ]
+    , body =
+        [ viewShell
+            [ viewHeader activePage
+            , main_
+                [ id "main"
+                , class "flex-auto"
+                , tabindex -1
+                ]
+                [ container []
+                    [ content
+                    ]
+                ]
+            , viewFooter
+            , viewInstallBanner
+            ]
+        ]
     }
+
+
+viewInstallBanner : Html msg
+viewInstallBanner =
+    Html.node "install-banner" [] []
 
 
 viewShell children =
