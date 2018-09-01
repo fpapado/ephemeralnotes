@@ -52,7 +52,11 @@ view activePage { title, content } =
 
 viewInstallBanner : Html msg
 viewInstallBanner =
-    Html.node "install-banner" [] []
+    div [ class "absolute bottom-0 w-100" ]
+        [ div [ class "mw7 center" ]
+            [ Html.node "install-banner" [] []
+            ]
+        ]
 
 
 viewShell children =

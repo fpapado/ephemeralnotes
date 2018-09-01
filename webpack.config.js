@@ -24,11 +24,12 @@ const ifNotProduction = makeIfNotProp(isProduction);
 // webpack.config.js
 module.exports = {
   mode: ifProduction("production", "development"),
-  entry: ["./src/index.js", "./src/styles/index.css"],
+  entry: ["./src/index.js"],
   output: {
     path: __dirname + "/dist",
     chunkFilename: "[name]-[contenthash].js",
-    filename: ifProduction("[name]-[contenthash].js", "[name].js")
+    filename: ifProduction("[name]-[contenthash].js", "[name].js"),
+    publicPath: "/"
   },
   plugins: removeEmpty([
     // Place things in template
