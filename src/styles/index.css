@@ -66,51 +66,54 @@ body {
   font-family: "Wildberry", Arial, Helvetica, sans-serif !important;
 }
 
-/* Fade in animation */
-.animated {
-  -webkit-animation-duration: 500ms;
-  animation-duration: 500ms;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
+/* ANIMATIONS */
+@-webkit-keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+  }
 
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+.fadeInUp {
+  -webkit-animation-name: fadeInUp;
+  animation-name: fadeInUp;
+}
 .delay-short {
   -webkit-animation-delay: 500ms;
   animation-delay: 500ms;
 }
-
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+.animated {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
 }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+@media (prefers-reduced-motion) {
+  .animated {
+    -webkit-animation: unset !important;
+    animation: unset !important;
+    -webkit-transition: none !important;
+    transition: none !important;
   }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.fadeIn {
-  -webkit-animation-name: fadeIn;
-  animation-name: fadeIn;
-}
-
-/* Vertical spacing */
-.vs3 > * + * {
-  margin-top: 1rem;
-}
-
-.vs4 > * + * {
-  margin-top: 2rem;
 }
 
 /*! TACHYONS v4.11.1 | http://tachyons.io */
@@ -6860,4 +6863,13 @@ code {
   .v-btm-l {
     vertical-align: bottom;
   }
+}
+
+/* Vertical spacing */
+.vs3 > * + * {
+  margin-top: 1rem;
+}
+
+.vs4 > * + * {
+  margin-top: 2rem;
 }

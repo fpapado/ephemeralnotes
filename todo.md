@@ -1,4 +1,5 @@
 # Static
+
 - Build pipeline just with npm commands and some light bundling, perhaps
 - index.html with inlined critical CSS
 - Font and font loading strategy
@@ -6,8 +7,10 @@
 - Script preload
 - Brotli compression and type
 - namespace (filespace?) js/css assets
+- postcss
 
 # MVP
+
 - localstorage and Port architecture
 - Data structures
 - simple viewer

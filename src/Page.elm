@@ -5,6 +5,7 @@ import Html exposing (Html, a, button, div, footer, h1, header, i, img, li, main
 import Html.Attributes exposing (class, classList, href, id, style, tabindex)
 import Html.Events exposing (onClick)
 import Route exposing (Route)
+import Ui
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -52,10 +53,8 @@ view activePage { title, content } =
 
 viewInstallBanner : Html msg
 viewInstallBanner =
-    div [ class "absolute bottom-0 w-100" ]
-        [ div [ class "mw7 center" ]
-            [ Html.node "install-banner" [] []
-            ]
+    Ui.bottomBanner []
+        [ Html.node "install-banner" [] []
         ]
 
 

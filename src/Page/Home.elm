@@ -9,7 +9,7 @@ import Html.Events exposing (onClick)
 import ServiceWorker as SW
 import Task exposing (Task)
 import Time
-import Ui exposing (heading, paragraph)
+import Ui exposing (bottomBanner, heading, paragraph)
 
 
 
@@ -59,10 +59,14 @@ viewUpdatePrompt swUpdate =
     SW.viewSwUpdate swUpdate
         { none = div [] []
         , available =
-            div []
-                [ paragraph [ class "measure" ] [ text "An update is available" ]
-                , button [ onClick AcceptUpdate ] [ text "Accept" ]
-                , button [ onClick DeferUpdate ] [ text "Later" ]
+            bottomBanner []
+                [ div [ class "pa3 flex justify-center items-center bg-white near-black shadow-1 animated fadeInUp" ]
+                    [ h2 [ class "mr3 mv0 f5 fw7 lh-title" ] [ text "Update available" ]
+                    , div [ class "hs3" ]
+                        [ button [ onClick AcceptUpdate ] [ text "Accept" ]
+                        , button [ onClick DeferUpdate ] [ text "Later" ]
+                        ]
+                    ]
                 ]
         , accepted = div [] []
         , defered = div [] []
