@@ -8,6 +8,7 @@
 - Brotli compression and type
 - namespace (filespace?) js/css assets
 - postcss
+- move SW state to top-level
 
 # MVP
 
