@@ -41,7 +41,7 @@ navigator.serviceWorker.addEventListener('controllerchange', () => {
   // This works around a bug in "force update on reload".
   if (preventDevToolsReloadLoop) return;
   preventDevToolsReloadLoop = true;
-  console.log('Controller loaded');
+  console.log('SW controller loaded, will reload window.');
   window.location.reload();
 });
 

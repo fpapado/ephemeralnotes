@@ -11,7 +11,7 @@ export function listenForWaitingSW(registration, cb) {
 
   // SW is waiting to activate. Can occur if multiple clients are open and
   // one of the clients is refreshed.
-  if (registration.waiting) return cb(reg);
+  if (registration.waiting) return cb(registration);
 
   if (registration.installing) awaitStateChange();
 
