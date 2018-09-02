@@ -9,7 +9,7 @@ heading attrs children =
 
 
 bottomBanner attrs children =
-    div [ class "fixed bottom-0 left-0 w-100 br1" ]
+    div (class "fixed bottom-0 left-0 w-100 br1" :: attrs)
         [ div [ class "mw7 center" ] children
         ]
 
