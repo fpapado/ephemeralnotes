@@ -2,9 +2,17 @@ workbox.precaching.precacheAndRoute(self.__precacheManifest || []);
 workbox.routing.registerNavigationRoute('/');
 
 // Listen for postMessage(), well, mesages
-addEventListener('message', messageEvent => {
+self.addEventListener('message', messageEvent => {
+  if (!messageEvent.data) {
+    return;
+  }
+
   switch (messageEvent.data) {
     case 'SkipWaiting':
-      return skipWaiting();
+      self.skipWaiting();
+      break;
+    default:
+      // NOOP
+      break;
   }
 });
