@@ -1,5 +1,18 @@
-port module ServiceWorker exposing (FromElm, ToElm(..), Update(..), send, sub)
+port module ServiceWorker exposing
+    ( SwUpdate
+    , ToElm(..)
+    , acceptUpdate
+    , deferUpdate
+    , send
+    , sub
+    , updateAccepted
+    , updateAvailable
+    , updateDefered
+    , updateNone
+    , viewSwUpdate
+    )
 
+import Html exposing (Html)
 import Json.Decode as D
 import Json.Encode as E
 
@@ -29,21 +42,15 @@ type ToElm
     | DecodingError D.Error
 
 
-type Update
-    = None
-    | Available
-    | Accepted
-    | Rejected
-
-
 type FromElm
     = -- The user has accepted the update
       UpdateAccepted
+      -- The user has postponed the update
+    | UpdateDefered
 
 
 
--- TODO: Consider exposing these more granularly, so we don't have to
--- expose the type constructor at all
+-- OUT
 
 
 send : FromElm -> Cmd msg
@@ -51,6 +58,20 @@ send msgOut =
     msgOut
         |> encodeFromElm
         |> swFromElm
+
+
+acceptUpdate : Cmd msg
+acceptUpdate =
+    send UpdateAccepted
+
+
+deferUpdate : Cmd msg
+deferUpdate =
+    send UpdateDefered
+
+
+
+--IN
 
 
 sub : Sub ToElm
@@ -68,6 +89,52 @@ port swFromElm : E.Value -> Cmd msg
 
 
 port swToElm : (D.Value -> msg) -> Sub msg
+
+
+
+-- SW UPDATE
+
+
+type SwUpdate
+    = None
+    | Available
+    | Accepted
+    | Defered
+
+
+updateNone =
+    None
+
+
+updateAvailable =
+    Available
+
+
+updateAccepted =
+    Accepted
+
+
+updateDefered =
+    Defered
+
+
+{-| View function that accepts a separate view for each update state.
+Exhaustive and does not expose the SwUpdate constructor.
+-}
+viewSwUpdate : SwUpdate -> { none : Html msg, available : Html msg, accepted : Html msg, defered : Html msg } -> Html msg
+viewSwUpdate swUpdate { none, available, accepted, defered } =
+    case swUpdate of
+        None ->
+            none
+
+        Available ->
+            available
+
+        Accepted ->
+            accepted
+
+        Defered ->
+            defered
 
 
 
@@ -96,6 +163,12 @@ encodeFromElm data =
         UpdateAccepted ->
             E.object
                 [ ( "tag", E.string "UpdateAccepted" )
+                , ( "data", E.object [] )
+                ]
+
+        UpdateDefered ->
+            E.object
+                [ ( "tag", E.string "UpdateDefered" )
                 , ( "data", E.object [] )
                 ]
 

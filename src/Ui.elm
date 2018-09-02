@@ -1,11 +1,19 @@
-module Ui exposing (buttonLink, heading)
+module Ui exposing (buttonLink, heading, paragraph, textbox)
 
 import Html exposing (Html, a, div, h1, img, p)
 import Html.Attributes exposing (class)
 
 
 heading attrs children =
-    h1 (class "f2 f1-ns lh-title f-wildberry" :: attrs) children
+    h1 (class "mv0 f2 f1-ns lh-title f-wildberry" :: attrs) children
+
+
+paragraph attrs children =
+    p (class "mv0 f5 lh-copy" :: attrs) children
+
+
+textbox attrs children =
+    div (class "measure" :: attrs) children
 
 
 buttonLink attrs children =
