@@ -5,6 +5,7 @@ module Page.Home exposing (Model, Msg(..), init, subscriptions, update, view, vi
 
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
+import ServiceWorker as SW
 import Task exposing (Task)
 import Time
 import Ui exposing (heading)
@@ -16,12 +17,14 @@ import Ui exposing (heading)
 
 type alias Model =
     { timeZone : Time.Zone
+    , update : SW.Update
     }
 
 
 init : ( Model, Cmd Msg )
 init =
     ( { timeZone = Time.utc
+      , update = SW.None
       }
     , Cmd.batch
         [ Task.perform GotTimeZone Time.here
@@ -61,6 +64,7 @@ viewBanner =
 
 type Msg
     = GotTimeZone Time.Zone
+    | ServiceWorker SW.ToElm
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -69,6 +73,16 @@ update msg model =
         GotTimeZone tz ->
             ( { model | timeZone = tz }, Cmd.none )
 
+        ServiceWorker swMsg ->
+            case swMsg of
+                SW.UpdateAvailable ->
+                    ( { model | update = SW.Available }
+                    , Cmd.none
+                    )
+
+                SW.DecodingError err ->
+                    ( model, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
@@ -76,4 +90,4 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.map ServiceWorker SW.sub

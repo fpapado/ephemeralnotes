@@ -12,6 +12,15 @@ if ('customElements' in window) {
   customElements.define('install-banner', InstallBanner);
 }
 
+//app.ports.swFromElm.subscribe()
+const UpdateAvailable = {
+  tag: 'UpdateAvailable',
+  data: {},
+};
+
+// TEST
+app.ports.swToElm.send(UpdateAvailable);
+
 // app.ports.storeCache.subscribe(val => {
 //   if (val === null) {
 //     localStorage.removeItem(storageKey);
