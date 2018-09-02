@@ -24,16 +24,24 @@ const UpdateAvailable = {
 
 // Service Worker refresh
 // Get registration
-navigator.serviceWorker.getRegistration(reg =>
+navigator.serviceWorker.getRegistration().then(registration => {
+  console.log('Got registration', registration);
   // Prompt user to refresh the service worker, when there is one waiting
-  listenForWaitingSW(reg, app.ports.swToElm.send(UpdateAvailable))
-);
+  listenForWaitingSW(registration, () => {
+    console.log('Found waiting SW');
+    app.ports.swToElm.send(UpdateAvailable);
+  });
+});
 
 // Reload once the new Service Worker starts activating
-let refreshing;
+// When the user asks to refresh the UI, we'll need to reload the window
+let preventDevToolsReloadLoop;
 navigator.serviceWorker.addEventListener('controllerchange', () => {
-  if (refreshing) return;
-  refreshing = true;
+  // Ensure refresh is only called once.
+  // This works around a bug in "force update on reload".
+  if (preventDevToolsReloadLoop) return;
+  preventDevToolsReloadLoop = true;
+  console.log('Controller loaded');
   window.location.reload();
 });
 
@@ -47,9 +55,9 @@ app.ports.swFromElm.subscribe(msg => {
   switch (msg.tag) {
     // Post a message to the SW to skip waiting
     case 'UpdateAccepted':
-      navigator.serviceWorker.getRegistration(reg =>
-        reg.waiting.postMessage('SkipWaiting')
-      );
+      navigator.serviceWorker
+        .getRegistration()
+        .then(reg => reg.waiting.postMessage('SkipWaiting'));
       return;
     // Do nothing on deferred update
     case 'UpdateDeferred':
