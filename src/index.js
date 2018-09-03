@@ -1,18 +1,9 @@
 import {Elm} from '../dist/js/elm.js';
-import {InstallBanner} from './customElements/installBanner';
 import {listenForWaitingSW} from './sw-utils.js';
 import styles from './styles/index.css';
 
 // Start Elm app
 const app = Elm.Main.init(/*{ flags: flags }*/);
-
-// Install banner
-if ('customElements' in window) {
-  // The install banner is only needed in Chrome > 68, so no
-  // need to polyfill CEs atm. See `docs/browser_support.md`
-  // for guidance.
-  customElements.define('install-banner', InstallBanner);
-}
 
 // PORTS
 
@@ -22,8 +13,29 @@ const UpdateAvailable = {
   data: {},
 };
 
+const BeforeInstallPrompt = {
+  tag: 'BeforeInstallPrompt',
+  data: {},
+};
+
 // Service Worker <-> Elm
+// TO ELM
 if ('serviceWorker' in navigator) {
+  // Chrome App Install Banner
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', e => {
+    console.log('Before install prompt', e);
+
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+
+    // Notify the user
+    app.ports.swToElm.send(BeforeInstallPrompt);
+  });
+
   // Service Worker refresh
   // Get registration
   navigator.serviceWorker.getRegistration().then(registration => {
@@ -54,6 +66,10 @@ if ('serviceWorker' in navigator) {
       return;
     }
 
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('From Elm: ', msg);
+    }
+
     switch (msg.tag) {
       // Post a message to the waiting SW to skip waiting
       case 'UpdateAccepted':
@@ -65,6 +81,25 @@ if ('serviceWorker' in navigator) {
         return;
       // Do nothing on deferred update
       case 'UpdateDeferred':
+        return;
+      case 'InstallPromptAccepted': {
+        if (!deferredPrompt) return;
+
+        // Show the Chrome prompt
+        deferredPrompt.prompt();
+
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+          } else {
+            console.log('User dismissed the A2HS prompt');
+          }
+          deferredPrompt = null;
+        });
+        return;
+      }
+      case 'InstallPromptDefered':
         return;
     }
   });

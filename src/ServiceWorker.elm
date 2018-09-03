@@ -1,14 +1,20 @@
 port module ServiceWorker exposing
-    ( SwUpdate
+    ( InstallPrompt
+    , SwUpdate
     , ToElm(..)
+    , acceptInstallPrompt
     , acceptUpdate
+    , deferInstallPrompt
     , deferUpdate
+    , installPromptAvailable
+    , installPromptNone
     , send
     , sub
     , updateAccepted
     , updateAvailable
     , updateDefered
     , updateNone
+    , viewInstallPrompt
     , viewSwUpdate
     )
 
@@ -39,6 +45,7 @@ type alias OutsideData =
 type ToElm
     = -- An update is available to the app
       UpdateAvailable
+    | BeforeInstallPrompt
     | DecodingError D.Error
 
 
@@ -47,6 +54,8 @@ type FromElm
       UpdateAccepted
       -- The user has postponed the update
     | UpdateDefered
+    | InstallPromptAccepted
+    | InstallPromptDefered
 
 
 
@@ -68,6 +77,16 @@ acceptUpdate =
 deferUpdate : Cmd msg
 deferUpdate =
     send UpdateDefered
+
+
+acceptInstallPrompt : Cmd msg
+acceptInstallPrompt =
+    send InstallPromptAccepted
+
+
+deferInstallPrompt : Cmd msg
+deferInstallPrompt =
+    send InstallPromptDefered
 
 
 
@@ -138,6 +157,33 @@ viewSwUpdate swUpdate { none, available, accepted, defered } =
 
 
 
+-- INSTALL PROMPT
+
+
+type InstallPrompt
+    = NoInstallPrompt
+    | InstallPromptAvailable
+
+
+installPromptNone =
+    NoInstallPrompt
+
+
+installPromptAvailable =
+    InstallPromptAvailable
+
+
+viewInstallPrompt : InstallPrompt -> { none : Html msg, available : Html msg } -> Html msg
+viewInstallPrompt installPrompt { none, available } =
+    case installPrompt of
+        NoInstallPrompt ->
+            none
+
+        InstallPromptAvailable ->
+            available
+
+
+
 -- JSON
 
 
@@ -152,6 +198,9 @@ decodeToElmInner tag =
     case tag of
         "UpdateAvailable" ->
             D.succeed UpdateAvailable
+
+        "BeforeInstallPrompt" ->
+            D.succeed BeforeInstallPrompt
 
         _ ->
             D.fail ("Unknown message" ++ tag)
@@ -169,6 +218,18 @@ encodeFromElm data =
         UpdateDefered ->
             E.object
                 [ ( "tag", E.string "UpdateDefered" )
+                , ( "data", E.object [] )
+                ]
+
+        InstallPromptAccepted ->
+            E.object
+                [ ( "tag", E.string "InstallPromptAccepted" )
+                , ( "data", E.object [] )
+                ]
+
+        InstallPromptDefered ->
+            E.object
+                [ ( "tag", E.string "InstallPromptDefered" )
                 , ( "data", E.object [] )
                 ]
 

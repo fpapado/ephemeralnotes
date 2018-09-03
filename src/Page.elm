@@ -45,17 +45,9 @@ view activePage { title, content } =
                     ]
                 ]
             , viewFooter
-            , viewInstallBanner
             ]
         ]
     }
-
-
-viewInstallBanner : Html msg
-viewInstallBanner =
-    Ui.bottomBanner []
-        [ Html.node "install-banner" [] []
-        ]
 
 
 viewShell children =
