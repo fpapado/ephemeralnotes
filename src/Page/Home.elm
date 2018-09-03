@@ -9,7 +9,7 @@ import Html.Events exposing (onClick)
 import ServiceWorker as SW
 import Task exposing (Task)
 import Time
-import Ui exposing (bottomBanner, heading, paragraph)
+import Ui exposing (calloutContainer, heading, paragraph, prompt)
 
 
 
@@ -53,7 +53,7 @@ viewInner model =
         [ viewBanner
         , a [ class "link underline", href "/404" ] [ text "404 page" ]
         , viewUpdatePrompt model.swUpdate
-        , viewInstallPrompt model.installPrompt
+        , viewInstallPrompt SW.installPromptAvailable
         ]
 
 
@@ -62,8 +62,8 @@ viewUpdatePrompt swUpdate =
     SW.viewSwUpdate swUpdate
         { none = div [] []
         , available =
-            bottomBanner []
-                [ div [ class "pa3 flex justify-center items-center bg-white near-black shadow-1 animated fadeInUp" ]
+            calloutContainer []
+                [ prompt []
                     [ h2 [ class "mr3 mv0 f5 fw7 lh-title" ] [ text "Update available" ]
                     , div [ class "hs3" ]
                         [ button [ onClick AcceptUpdate ] [ text "Accept" ]
@@ -81,10 +81,10 @@ viewInstallPrompt installPrompt =
     SW.viewInstallPrompt installPrompt
         { none = div [] []
         , available =
-            bottomBanner []
-                [ div [ class "pa3 flex justify-center items-center bg-white near-black shadow-1 animated fadeInUp" ]
+            calloutContainer []
+                [ prompt []
                     [ div [ class "measure vs3" ]
-                        [ h2 [ class "mr3 mv0 f5 fw7 lh-title" ] [ text "Update available" ]
+                        [ h2 [ class "mr3 mv0 f5 fw7 lh-title" ] [ text "Add to homescreen" ]
                         , paragraph [] [ text "You can install Ephemeral to your homescreen for\n            quicker access and standalone use. It will still\n            be available offline through the browser if you\n            do not." ]
                         ]
                     , div [ class "hs3" ]
@@ -100,7 +100,7 @@ viewBanner : Html msg
 viewBanner =
     div [ class "banner" ]
         [ div [ class "container" ]
-            [ heading [] [ text "Ephemeral" ]
+            [ heading 1 [] [ text "Ephemeral" ]
             , p [] [ text "Write down words as you encounter them." ]
             ]
         ]

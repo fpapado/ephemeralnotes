@@ -9,6 +9,7 @@
 - namespace (filespace?) js/css assets
 - postcss
 - move SW state to top-level
+- style installBanner
 
 # MVP
 
