@@ -9,7 +9,7 @@ import Html.Events exposing (onClick)
 import ServiceWorker as SW
 import Task exposing (Task)
 import Time
-import Ui exposing (calloutContainer, heading, paragraph, prompt)
+import Ui exposing (calloutContainer, heading, paragraph, prompt, styledButtonBlue)
 
 
 
@@ -53,7 +53,7 @@ viewInner model =
         [ viewBanner
         , a [ class "link underline", href "/404" ] [ text "404 page" ]
         , viewUpdatePrompt model.swUpdate
-        , viewInstallPrompt SW.installPromptAvailable
+        , viewInstallPrompt model.installPrompt
         ]
 
 
@@ -64,10 +64,10 @@ viewUpdatePrompt swUpdate =
         , available =
             calloutContainer []
                 [ prompt []
-                    [ h2 [ class "mr3 mv0 f5 fw7 lh-title" ] [ text "Update available" ]
-                    , div [ class "hs3" ]
-                        [ button [ onClick AcceptUpdate ] [ text "Accept" ]
-                        , button [ onClick DeferUpdate ] [ text "Later" ]
+                    [ h2 [ class "mr3 mv0 f5 fw4 lh-title" ] [ text "A new version is available. You can reload now to get it." ]
+                    , div [ class "flex" ]
+                        [ styledButtonBlue [ onClick AcceptUpdate, class "ma2" ] [ text "Reload" ]
+                        , styledButtonBlue [ onClick DeferUpdate, class "ma2" ] [ text "Later" ]
                         ]
                     ]
                 ]
@@ -84,12 +84,13 @@ viewInstallPrompt installPrompt =
             calloutContainer []
                 [ prompt []
                     [ div [ class "measure vs3" ]
-                        [ h2 [ class "mr3 mv0 f5 fw7 lh-title" ] [ text "Add to homescreen" ]
-                        , paragraph [] [ text "You can install Ephemeral to your homescreen for\n            quicker access and standalone use. It will still\n            be available offline through the browser if you\n            do not." ]
+                        [ h2 [ class "mr3 mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to home screen?" ]
+
+                        -- , paragraph [] [ text "You can install Ephemeral to your homescreen for\n            quicker access and standalone use. It will still\n            be available offline through the browser if you\n            do not." ]
                         ]
-                    , div [ class "hs3" ]
-                        [ button [ onClick AcceptInstallPrompt ] [ text "Install" ]
-                        , button [ onClick DeferInstallPrompt ] [ text "Dismiss" ]
+                    , div [ class "flex" ]
+                        [ styledButtonBlue [ onClick AcceptInstallPrompt, class "ma2" ] [ text "Add" ]
+                        , styledButtonBlue [ onClick DeferInstallPrompt, class "ma2" ] [ text "Dismiss" ]
                         ]
                     ]
                 ]

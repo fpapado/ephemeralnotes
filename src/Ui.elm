@@ -1,4 +1,4 @@
-module Ui exposing (buttonLink, calloutContainer, heading, paragraph, prompt, textbox)
+module Ui exposing (buttonLink, calloutContainer, heading, paragraph, prompt, styledButton, styledButtonBlue, textbox)
 
 import Html exposing (Html, a, button, div, h1, img, p)
 import Html.Attributes exposing (class)
@@ -13,17 +13,21 @@ heading level attrs children =
 
 
 styledButton attrs children =
-    button (class "db mw5 center pa3 button-link b bg-blue br2 near-white hover-bg-light-blue hover-near-black" :: attrs) children
+    button (class "pv2 ph3 button-reset focus-shadow br2 b" :: attrs) children
+
+
+styledButtonBlue attrs children =
+    styledButton (class "bg-blue near-white hover-bg-light-blue hover-near-black" :: attrs) children
 
 
 calloutContainer attrs children =
     div (class "fixed bottom-0 left-0 w-100 br1" :: attrs)
-        [ div [ class "mw7 center" ] children
+        [ div [ class "mw6 center" ] children
         ]
 
 
 prompt attrs children =
-    div (class "pa3 flex justify-center items-center bg-white near-black shadow-1 animated fadeInUp" :: attrs) children
+    div (class "pa3 flex justify-around items-center bg-white near-black shadow-1 animated fadeInUp" :: attrs) children
 
 
 paragraph attrs children =
@@ -35,4 +39,4 @@ textbox attrs children =
 
 
 buttonLink attrs children =
-    a (class "db mw5 center pa3 button-link b bg-blue br2 near-white hover-bg-light-blue hover-near-black" :: attrs) children
+    a (class "db mw5 center pa3 button-link b bg-blue br2 near-white hover-bg-light-blue hover-near-black focus-shadow" :: attrs) children
