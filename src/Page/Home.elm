@@ -51,7 +51,7 @@ viewInner model =
     div
         [ class "home-page" ]
         [ viewBanner
-        , a [ class "link underline", href "/404" ] [ text "404 page" ]
+        , a [ class "link underline", href "/404" ] [ text "Demo 404 page" ]
         , viewUpdatePrompt model.swUpdate
         , viewInstallPrompt model.installPrompt
         ]
