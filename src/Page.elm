@@ -51,7 +51,7 @@ view activePage { title, content } =
 
 
 viewShell children =
-    div [ class "min-vh-100 flex flex-column sans-serif bg-washed-blue near-black f-phantomsans" ] children
+    div [ class "min-vh-100 flex flex-column bg-washed-blue near-black f-phantomsans" ] children
 
 
 {-| Might have to pull this out of the layout in the future
