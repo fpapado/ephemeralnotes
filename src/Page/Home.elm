@@ -51,8 +51,10 @@ viewInner model =
     div [] [
         Ui.centeredContainer
             []
-            [ viewBanner
-            , a [ class "link underline", href "/404" ] [ text "Demo 404 page" ]
+            [ div [class "vs3"] [
+                viewBanner
+                , div [] [ a [ class "link underline", href "/404" ] [ text "Demo 404 page" ]]
+            ]
             , viewUpdatePrompt model.swUpdate
             , viewInstallPrompt model.installPrompt
             ]
@@ -101,11 +103,9 @@ viewInstallPrompt installPrompt =
 
 viewBanner : Html msg
 viewBanner =
-    div [ class "banner" ]
-        [ div [ class "container" ]
-            [ heading 1 [] [ text "Ephemeral" ]
-            , p [] [ text "Write down words as you encounter them." ]
-            ]
+    div [ class "vs3" ]
+        [ heading 1 [] [ text "Ephemeral" ]
+        , paragraph [] [ text "Write down words as you encounter them." ]
         ]
 
 
