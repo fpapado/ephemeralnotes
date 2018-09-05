@@ -41,7 +41,7 @@ init =
 
 view : Model -> { title : String, content : Html Msg }
 view model =
-    { title = "Ephemeral"
+    { title = "Home"
     , content = viewInner model
     }
 
