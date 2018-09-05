@@ -55,7 +55,7 @@ viewInner model =
             , a [ class "link underline", href "/404" ] [ text "Demo 404 page" ]
             , viewUpdatePrompt model.swUpdate
             , viewInstallPrompt model.installPrompt
-        ]
+            ]
     ]
 
 

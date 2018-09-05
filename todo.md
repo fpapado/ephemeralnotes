@@ -10,6 +10,9 @@
 - postcss
 - move SW state to top-level
 - style installBanner
+- inline all the CSS
+- font preload: use JS and feature-detect variable font support?
+  - On the other hand, `preload` and `variable-fonts` have some good overlap, so we are not wasting much...
 
 # MVP
 

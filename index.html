@@ -10,24 +10,25 @@
 
   <title>Ephemeral</title>
 
-  <link rel="manifest" href="/assets/manifest.json"></link>
+  <link rel="manifest" href="/assets/manifest.json">
+  <link rel="preload" href="/assets/fonts/phantom-sans-v4-variable.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 
 <body>
   <div class="min-vh-100 flex flex-column bg-washed-blue near-black f-phantomsans">
     <header class="pv2 navy bg-white shadow-1">
       <a href="#main" class="pa3 tc near-white bg-blue skip-link">
-        Skip to content
+        skip to content
       </a>
       <nav class="tc">
-        <a href="/" class="f3 fw7 link navy tc ttu f-phantomsans">Ephemeral</a>
+        <a href="/" class="f3 fw7 link navy tc">Ephemeral</a>
       </nav>
     </header>
-    <main id="main" class="flex-auto">
-      <div class="pa3 mw8 center">
+    <main id="main" class="pa3 flex flex-column flex-auto" tabindex="-1">
+      <div>
         <noscript>
           <div class="measure center vs4">
-            <h1 class="mv4 f3 f2-ns lh-title">Javascript is turned off :(</h1>
+            <h1 class="mv4 f3 f2-ns lh-title fw7">Javascript is turned off :(</h1>
             <p class="mv0 f5 f4-ns lh-copy">
               Sorry, Ephemeral requires Javascript to run. This is because it does everything on the client, after the initial hand-off
               from the server. I don't want to have people's data, and a server-only version would need that to be effective.
@@ -36,6 +37,9 @@
         </noscript>
       </div>
     </main>
+    <footer>
+      <div class="pa3 flex-auto tc"><span>Made by Fotis Papadogeorgopoulos</span></div>
+    </footer>
   </div>
 
   <script>
