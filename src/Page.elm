@@ -37,12 +37,10 @@ view activePage { title, content } =
             [ viewHeader activePage
             , main_
                 [ id "main"
-                , class "flex-auto"
+                , class "pa3 flex flex-column flex-auto"
                 , tabindex -1
                 ]
-                [ container []
-                    [ content
-                    ]
+                [ content
                 ]
             , viewFooter
             ]
@@ -57,14 +55,14 @@ viewShell children =
 {-| Might have to pull this out of the layout in the future
 -}
 container attrs children =
-    div ([ class "pa3 mw8 center" ] ++ attrs) children
+    div ([ class "pa3 flex-auto" ] ++ attrs) children
 
 
 viewHeader : Page -> Html msg
 viewHeader activePage =
     header [ class "pv2 navy bg-white shadow-1" ]
         [ skipLink
-        , nav [ class "tc" ] [ a [ Route.href Route.Home, class "f3 fw7 link navy tc ttu" ] [ text "Ephemeral" ] ]
+        , nav [ class "tc" ] [ a [ Route.href Route.Home, class "f3 fw7 link navy tc" ] [ text "Ephemeral" ] ]
         ]
 
 

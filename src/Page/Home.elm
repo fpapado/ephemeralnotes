@@ -48,13 +48,15 @@ view model =
 
 viewInner : Model -> Html Msg
 viewInner model =
-    div
-        [ class "home-page" ]
-        [ viewBanner
-        , a [ class "link underline", href "/404" ] [ text "Demo 404 page" ]
-        , viewUpdatePrompt model.swUpdate
-        , viewInstallPrompt model.installPrompt
+    div [] [
+        Ui.centeredContainer
+            []
+            [ viewBanner
+            , a [ class "link underline", href "/404" ] [ text "Demo 404 page" ]
+            , viewUpdatePrompt model.swUpdate
+            , viewInstallPrompt model.installPrompt
         ]
+    ]
 
 
 viewUpdatePrompt : SW.SwUpdate -> Html Msg

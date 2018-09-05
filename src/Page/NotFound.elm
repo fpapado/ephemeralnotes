@@ -14,7 +14,7 @@ view : { title : String, content : Html msg }
 view =
     { title = "Page Not Found"
     , content =
-        div [ class "center" ]
+        div [ class "flex flex-auto flex-column justify-center" ]
             [ div
                 [ class "tc measure center vs4" ]
                 [ heading 1 [] [ text "Not Found :(" ]
