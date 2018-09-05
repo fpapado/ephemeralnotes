@@ -71,17 +71,53 @@ body {
 }
 
 /* Custom stuff */
-/* PhantomSans-variable */
+
+/* PhantomSans */
+/* Variable and fallbacks.
+ * @see https://medium.com/clear-left-thinking/how-to-use-variable-fonts-in-the-real-world-e6d73065a604
+*/
+
+/* PhantomSansVariable
+ * Variable needs only woff2, since their support overlaps.
+*/
+@font-face {
+  font-family: 'PhantomSansVariable';
+  font-display: swap;
+  src: url(/assets/fonts/phantom-sans-v4-variable.woff2) format('woff2');
+  font-weight: 1 999;
+}
+
+/* PhantomSans-regular */
+@font-face {
+  font-family: 'PhantomSans';
+  /* TODO: reconsider font-display for these */
+  font-display: swap;
+  src: url(/assets/fonts/phantom-sans-v4-regular.woff2) format('woff2'),
+    url(/assets/fonts/phantom-sans-v4-regular.woff) format('woff');
+  font-weight: 400;
+}
+
+/* PhantomSans-bold */
 @font-face {
   font-family: 'PhantomSans';
   font-display: swap;
-  src: url(/assets/fonts/PhantomSansVariable04-subset.woff2) format('woff2'),
-    url(/assets/fonts/PhantomSansVariable04-subset.zopfli.woff) format('woff'),
-    url(/assets/fonts/PhantomSansVariable04-subset.ttf) format('truetype');
+  src: url(/assets/fonts/phantom-sans-v4-bold.woff2) format('woff2'),
+    url(/assets/fonts/phantom-sans-v4-bold.woff) format('woff');
+  font-weight: 700;
 }
 
+/* Use @supports to pick the correct fonts */
 .f-phantomsans {
   font-family: 'PhantomSans', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+@supports (font-variation-settings: normal) {
+  .f-phantomsans {
+    font-family: 'PhantomSansVariable', Arial, Helvetica, sans-serif;
+    /* Normalise font-weight if not specified */
+    font-variation-settings: 'wght' 400;
+  }
 }
 
 /* ANIMATIONS */
@@ -900,6 +936,44 @@ code {
 .fw9 {
   font-weight: 900;
 }
+
+/* Progressively enhance fwX classes to be variable */
+@supports (font-variation-settings: normal) {
+  .normal {
+    font-variation-settings: 'wght' 400;
+  }
+  .b {
+    font-variation-settings: 'wght' 700;
+  }
+  .fw1 {
+    font-variation-settings: 'wght' 100;
+  }
+  .fw2 {
+    font-variation-settings: 'wght' 200;
+  }
+  .fw3 {
+    font-variation-settings: 'wght' 300;
+  }
+  .fw4 {
+    font-variation-settings: 'wght' 400;
+  }
+  .fw5 {
+    font-variation-settings: 'wght' 500;
+  }
+  .fw6 {
+    font-variation-settings: 'wght' 600;
+  }
+  .fw7 {
+    font-variation-settings: 'wght' 700;
+  }
+  .fw8 {
+    font-variation-settings: 'wght' 800;
+  }
+  .fw9 {
+    font-variation-settings: 'wght' 900;
+  }
+}
+
 .input-reset {
   -webkit-appearance: none;
   -moz-appearance: none;
