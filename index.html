@@ -10,53 +10,7 @@
 
   <title>Ephemeral</title>
 
-  <link rel="manifest" href="/assets/manifest.json">
-  </link>
-
-  <script>
-    (function () {
-      'use strict';
-      var r = document.documentElement;
-
-      // Only preload the woff2 version, since
-      // the font loading API is not available in
-      // other browsers anyway
-      var wildberryBold = new FontFace(
-        'Wildberry',
-        'url(/assets/fonts/Wildberry-v0.2-Bold-Web.woff2)',
-        {
-          style: 'normal',
-          weight: '700'
-        }
-      );
-      document.fonts.add(wildberryBold);
-
-      // optimise repeat views
-      if (sessionStorage.fontsLoaded) {
-        r.classList.add('fonts-loaded');
-        console.log('Fonts: already loaded')
-        return;
-      } else if ('fonts' in document) {
-        wildberryBold.load()
-          .then(function () {
-            r.classList.add('fonts-loaded');
-            console.log('Fonts: loaded')
-          })
-          .catch(function (e) { console.error('Fonts: Stage 1 failed', e); });
-      } else {
-        // if no font API, then let the browser do its loading as usual
-        sessionStorage.fontsLoaded = true;
-        r.classList.add('fonts-loaded');
-      }
-    })();
-  </script>
-  <noscript>
-    <style>
-      .fonts-not-asked .f-wildberry {
-        font-family: 'Wildberry', Arial, Helvetica, sans-serif !important;
-      }
-    </style>
-  </noscript>
+  <link rel="manifest" href="/assets/manifest.json"></link>
 </head>
 
 <body>
@@ -66,14 +20,14 @@
         Skip to content
       </a>
       <nav class="tc">
-        <a href="/" class="f3 fw7 link navy tc ttu f-wildberry">Ephemeral</a>
+        <a href="/" class="f3 fw7 link navy tc ttu f-phantomsans">Ephemeral</a>
       </nav>
     </header>
     <main id="main" class="flex-auto">
       <div class="pa3 mw8 center">
         <noscript>
           <div class="measure center vs4">
-            <h1 class="mv4 f3 f2-ns lh-title f-wildberry">Javascript is turned off :(</h1>
+            <h1 class="mv4 f3 f2-ns lh-title">Javascript is turned off :(</h1>
             <p class="mv0 f5 f4-ns lh-copy">
               Sorry, Ephemeral requires Javascript to run. This is because it does everything on the client, after the initial hand-off
               from the server. I don't want to have people's data, and a server-only version would need that to be effective.

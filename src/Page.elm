@@ -51,7 +51,7 @@ view activePage { title, content } =
 
 
 viewShell children =
-    div [ class "min-vh-100 flex flex-column sans-serif bg-washed-blue near-black" ] children
+    div [ class "min-vh-100 flex flex-column sans-serif bg-washed-blue near-black f-phantomsans" ] children
 
 
 {-| Might have to pull this out of the layout in the future
@@ -64,7 +64,7 @@ viewHeader : Page -> Html msg
 viewHeader activePage =
     header [ class "pv2 navy bg-white shadow-1" ]
         [ skipLink
-        , nav [ class "tc" ] [ a [ Route.href Route.Home, class "f3 fw7 link navy tc ttu f-wildberry" ] [ text "Ephemeral" ] ]
+        , nav [ class "tc" ] [ a [ Route.href Route.Home, class "f3 fw7 link navy tc ttu" ] [ text "Ephemeral" ] ]
         ]
 
 

@@ -9,7 +9,7 @@ heading level attrs children =
         tagName =
             "h" ++ String.fromInt (clamp 1 6 level)
     in
-    Html.node tagName (class "mv0 f2 f1-ns lh-title f-wildberry" :: attrs) children
+    Html.node tagName (class "mv0 f2 f1-ns lh-title" :: attrs) children
 
 
 styledButton attrs children =
