@@ -116,7 +116,7 @@ body {
   .f-phantomsans {
     font-family: 'PhantomSansVariable', Arial, Helvetica, sans-serif;
     /* Normalise font-weight if not specified */
-    font-variation-settings: 'wght' 400;
+    font-variation-settings: 'wght' 1;
   }
 }
 
@@ -937,40 +937,43 @@ code {
   font-weight: 900;
 }
 
-/* Progressively enhance fwX classes to be variable */
+/* Progressively enhance fwX classes to be variable.
+ * NOTE: Phantom Sans v4 goes from Regular - Bold,
+ * so the scale 0 - 1000 is skewed along that range.
+*/
 @supports (font-variation-settings: normal) {
   .normal {
-    font-variation-settings: 'wght' 400;
+    font-variation-settings: 'wght' 1;
   }
   .b {
-    font-variation-settings: 'wght' 700;
+    font-variation-settings: 'wght' 999;
   }
   .fw1 {
-    font-variation-settings: 'wght' 100;
+    font-variation-settings: 'wght' 1;
   }
   .fw2 {
-    font-variation-settings: 'wght' 200;
+    font-variation-settings: 'wght' 1;
   }
   .fw3 {
-    font-variation-settings: 'wght' 300;
+    font-variation-settings: 'wght' 1;
   }
   .fw4 {
-    font-variation-settings: 'wght' 400;
+    font-variation-settings: 'wght' 1;
   }
   .fw5 {
-    font-variation-settings: 'wght' 500;
+    font-variation-settings: 'wght' 400;
   }
   .fw6 {
-    font-variation-settings: 'wght' 600;
-  }
-  .fw7 {
     font-variation-settings: 'wght' 700;
   }
+  .fw7 {
+    font-variation-settings: 'wght' 999;
+  }
   .fw8 {
-    font-variation-settings: 'wght' 800;
+    font-variation-settings: 'wght' 999;
   }
   .fw9 {
-    font-variation-settings: 'wght' 900;
+    font-variation-settings: 'wght' 999;
   }
 }
 
