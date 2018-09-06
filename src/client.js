@@ -3,7 +3,7 @@ import {listenForWaitingSW} from './sw-utils';
 
 export function runClient(Elm) {
   // Start Elm app
-  const app = Elm.Main.init(/*{ flags: flags }*/);
+  const app = Elm.Main.init({});
 
   // PORTS
 

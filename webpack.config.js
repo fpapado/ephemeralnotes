@@ -80,7 +80,7 @@ module.exports = {
         use: ifProduction(
           [{loader: 'elm-webpack-loader'}],
           [
-            // {loader: 'elm-hot-webpack-loader'},
+            {loader: 'elm-hot-webpack-loader'},
             {
               loader: 'elm-webpack-loader',
               options: {
