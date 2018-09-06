@@ -18,7 +18,7 @@ view =
             [ div
                 [ class "tc measure center vs4" ]
                 [ heading 1 [] [ text "Not Found :(" ]
-                , p [ class "mv0 f4 f3-ns lh-copy" ] [ text "Whoops, looks like the page you are looking for does not exist..." ]
+                , p [ class "mv0 f4 f3-ns lh-copy" ] [ text "Whoops, looks like the page you are looking for does not exist…" ]
                 , buttonLink [ Route.href Route.Home ] [ text "Go back to the homepage" ]
                 ]
             ]
