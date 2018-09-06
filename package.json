@@ -6,7 +6,7 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "npm-run-all clean setup build:copy-assets dev:watch",
+    "dev": "npm-run-all clean setup build:copy-assets dev:webpack",
     "dev:watch": "npm-run-all --parallel dev:watch-elm dev:webpack",
     "dev:webpack": "webpack-serve",
     "dev:watch-elm": "chokidar 'src/**/*.elm' -c 'elm make src/Main.elm --output dist/js/elm.js --debug' --initial",
@@ -42,8 +42,10 @@
     "css-loader": "^1.0.0",
     "cssnano": "^4.1.0",
     "elm": "^0.19.0-bugfix2",
+    "elm-hot-webpack-loader": "^1.0.0",
     "elm-live": "^3.0.0",
     "elm-test": "^0.18.12",
+    "elm-webpack-loader": "^5.0.0",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.4.2",
     "npm-run-all": "^4.1.3",

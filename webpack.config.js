@@ -4,6 +4,7 @@ const SizePlugin = require('size-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const cssnano = require('cssnano');
 
@@ -24,7 +25,7 @@ const ifNotProduction = makeIfNotProp(isProduction);
 // webpack.config.js
 module.exports = {
   mode: ifProduction('production', 'development'),
-  entry: ['./src/index.js'],
+  entry: ifProduction(['./src/index-prod.js'], ['./src/index-dev.js']),
   output: {
     path: __dirname + '/dist',
     chunkFilename: '[name]-[contenthash].js',
@@ -71,6 +72,24 @@ module.exports = {
   ]),
   module: {
     rules: [
+      {
+        test: /\.elm$/,
+        exclude: [/elm-stuff/, /node_modules/],
+        use: ifProduction(
+          [{loader: 'elm-webpack-loader'}],
+          [
+            // {loader: 'elm-hot-webpack-loader'},
+            {
+              loader: 'elm-webpack-loader',
+              options: {
+                // add Elm's debug overlay to output
+                debug: true,
+                forceWatch: true,
+              },
+            },
+          ]
+        ),
+      },
       {
         test: /\.css$/,
         use: [
