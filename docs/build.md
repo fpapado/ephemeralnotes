@@ -37,3 +37,5 @@ The `minimizer` option seemed promising, but nothing that I could use.
 If such a thing is possible, we should move everything inside of webpack.
 
 Let me know if you are aware of any such option :)
+
+[There was some discussion on the elm-webpack-loader PR tracker](https://github.com/elm-community/elm-webpack-loader/pull/142#issuecomment-416568288)

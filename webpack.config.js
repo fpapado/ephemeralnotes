@@ -4,7 +4,7 @@ const SizePlugin = require('size-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const history = require('koa-connect-history-api-fallback');
 
 const cssnano = require('cssnano');
 
@@ -63,12 +63,14 @@ module.exports = {
         // fonts: true
       })
     ),
-    new WorkboxPlugin.InjectManifest({
-      swSrc: './src/sw.js',
-      importWorkboxFrom: 'local',
-    }),
+    ifProduction(
+      new WorkboxPlugin.InjectManifest({
+        swSrc: './src/sw.js',
+        importWorkboxFrom: 'local',
+      })
+    ),
     // Track bundle size
-    new SizePlugin(),
+    ifProduction(new SizePlugin()),
   ]),
   module: {
     rules: [
@@ -85,6 +87,7 @@ module.exports = {
                 // add Elm's debug overlay to output
                 debug: true,
                 forceWatch: true,
+                cwd: __dirname,
               },
             },
           ]
@@ -108,6 +111,14 @@ module.exports = {
         ],
       },
     ],
+  },
+  serve: {
+    add: (app, _middleware, _options) => {
+      // routes /xyz -> /index.html
+      app.use(history());
+      // e.g.
+      // app.use(convert(proxy('/api', { target: 'http://localhost:5000' })));
+    },
   },
 };
 
