@@ -1819,7 +1819,7 @@ code {
   background-color: #00449e;
 }
 .bg-blue {
-  background-color: #357edd;
+  background-color: #0769d3;
 }
 .bg-light-blue {
   background-color: #96ccff;
@@ -2256,7 +2256,7 @@ code {
 }
 .hover-bg-blue:focus,
 .hover-bg-blue:hover {
-  background-color: #357edd;
+  background-color: #0769d3;
 }
 .hover-bg-light-blue:focus,
 .hover-bg-light-blue:hover {
