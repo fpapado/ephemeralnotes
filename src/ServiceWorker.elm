@@ -8,7 +8,6 @@ port module ServiceWorker exposing
     , deferUpdate
     , installPromptAvailable
     , installPromptNone
-    , send
     , sub
     , updateAccepted
     , updateAvailable

@@ -1,11 +1,9 @@
 module Location exposing
     ( LatLon
-    , Location
     , decode
     , decodeLat
     , decodeLon
     , encode
-    , fromLatLon
     , latFromFloat
     , latToFloat
     , lonFromFloat
@@ -20,10 +18,6 @@ import Json.Encode as E
 -- DATA TYPES
 
 
-type Location
-    = Location LatLon
-
-
 {-| Decimal degrees and Plus/minus—Latitude and longitude coordinates are
 represented as decimal numbers. The latitude is preceded by a minus
 sign ( – ) if it is south of the equator (a positive number implies north),
@@ -33,11 +27,6 @@ meridian (a positive number implies east); for example, 37.68455° –97.34110°
 -}
 type alias LatLon =
     { lat : Latitude, lon : Longitude }
-
-
-fromLatLon : LatLon -> Location
-fromLatLon latLon =
-    Location latLon
 
 
 {-| Latitude measures how far north or south of the equator a place is located.
@@ -95,8 +84,8 @@ lonToFloat (Longitude f) =
 -- JSON
 
 
-encode : Location -> E.Value
-encode (Location { lat, lon }) =
+encode : LatLon -> E.Value
+encode { lat, lon } =
     E.object
         [ ( "lat", E.float <| latToFloat lat )
         , ( "lon", E.float <| lonToFloat lon )
