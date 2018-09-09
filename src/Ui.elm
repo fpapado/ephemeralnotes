@@ -1,4 +1,14 @@
-module Ui exposing (buttonLink, calloutContainer, heading, paragraph, prompt, styledButton, styledButtonBlue, textbox, centeredContainer)
+module Ui exposing
+    ( buttonLink
+    , calloutContainer
+    , centeredContainer
+    , heading
+    , paragraph
+    , prompt
+    , styledButton
+    , styledButtonBlue
+    , textbox
+    )
 
 import Html exposing (Html, a, button, div, h1, img, p)
 import Html.Attributes exposing (class)
@@ -10,6 +20,7 @@ heading level attrs children =
             "h" ++ String.fromInt (clamp 1 6 level)
     in
     Html.node tagName (class "mv0 f2 f1-ns lh-title fw7" :: attrs) children
+
 
 centeredContainer attrs children =
     div (class "mw8 center" :: attrs) children

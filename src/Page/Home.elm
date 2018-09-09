@@ -1,11 +1,21 @@
-module Page.Home exposing (Model, Msg(..), init, subscriptions, update, view, viewBanner)
+module Page.Home exposing
+    ( Model
+    , Msg(..)
+    , init
+    , subscriptions
+    , update
+    , view
+    , viewBanner
+    )
 
 {-| The homepage. You can get here via either the / route.
 -}
 
+import Geolocation as Geo
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
+import Location as L
 import ServiceWorker as SW
 import Task exposing (Task)
 import Time
@@ -20,7 +30,13 @@ type alias Model =
     { timeZone : Time.Zone
     , swUpdate : SW.SwUpdate
     , installPrompt : SW.InstallPrompt
+    , location : GeolocationData
     }
+
+
+type GeolocationData
+    = NotAsked
+    | Got Geo.LocationResult
 
 
 init : ( Model, Cmd Msg )
@@ -28,6 +44,7 @@ init =
     ( { timeZone = Time.utc
       , swUpdate = SW.updateNone
       , installPrompt = SW.installPromptNone
+      , location = NotAsked
       }
     , Cmd.batch
         [ Task.perform GotTimeZone Time.here
@@ -51,14 +68,48 @@ viewInner model =
     div []
         [ Ui.centeredContainer
             []
-            [ div [ class "vs3" ]
-                [ viewBanner
-                , div [] [ a [ class "link underline", href "/404" ] [ text "Demo 404 page" ] ]
+            [ div [ class "vs4" ]
+                [ div [ class "vs3" ]
+                    [ viewBanner
+                    , div [] [ a [ class "link underline", href "/404" ] [ text "Demo 404 page" ] ]
+                    ]
+                , div [ class "vs3" ]
+                    [ Ui.styledButtonBlue [ onClick GetLocation ] [ text "Get Location" ]
+                    , viewLocation model.location
+                    ]
                 ]
             , viewUpdatePrompt model.swUpdate
             , viewInstallPrompt model.installPrompt
             ]
         ]
+
+
+viewLocation : GeolocationData -> Html Msg
+viewLocation locationData =
+    case locationData of
+        NotAsked ->
+            div [] []
+
+        Got locationRes ->
+            case locationRes of
+                Ok location ->
+                    div [ class "vs3" ]
+                        [ heading 2 [] [ text "Got location:" ]
+                        , div []
+                            [ text <|
+                                String.fromFloat (L.latToFloat location.lat)
+                                    ++ ", "
+                                    ++ String.fromFloat (L.lonToFloat location.lon)
+                            ]
+                        ]
+
+                Err error ->
+                    div [ class "vs3" ]
+                        [ heading 2 [] [ text "Error getting location:" ]
+                        , div []
+                            [ text "To-do: print the error..."
+                            ]
+                        ]
 
 
 viewUpdatePrompt : SW.SwUpdate -> Html Msg
@@ -115,11 +166,13 @@ viewBanner =
 
 type Msg
     = GotTimeZone Time.Zone
-    | ServiceWorker SW.ToElm
+    | FromServiceWorker SW.ToElm
+    | FromGeolocation Geo.ToElm
     | AcceptUpdate
     | DeferUpdate
     | AcceptInstallPrompt
     | DeferInstallPrompt
+    | GetLocation
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -128,7 +181,7 @@ update msg model =
         GotTimeZone tz ->
             ( { model | timeZone = tz }, Cmd.none )
 
-        ServiceWorker swMsg ->
+        FromServiceWorker swMsg ->
             case swMsg of
                 SW.UpdateAvailable ->
                     ( { model | swUpdate = SW.updateAvailable }
@@ -141,6 +194,14 @@ update msg model =
                     )
 
                 SW.DecodingError err ->
+                    ( model, Cmd.none )
+
+        FromGeolocation geoMsg ->
+            case geoMsg of
+                Geo.GotLocation locationRes ->
+                    ( { model | location = Got locationRes }, Cmd.none )
+
+                Geo.DecodingError err ->
                     ( model, Cmd.none )
 
         AcceptUpdate ->
@@ -156,6 +217,9 @@ update msg model =
         DeferInstallPrompt ->
             ( { model | installPrompt = SW.installPromptNone }, SW.deferInstallPrompt )
 
+        GetLocation ->
+            ( model, Geo.getLocation )
+
 
 
 -- SUBSCRIPTIONS
@@ -163,4 +227,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.map ServiceWorker SW.sub
+    Sub.batch
+        [ Sub.map FromServiceWorker SW.sub
+        , Sub.map FromGeolocation Geo.sub
+        ]

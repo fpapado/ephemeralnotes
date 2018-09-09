@@ -97,8 +97,8 @@ encode { lat, lon } =
 decode : D.Decoder LatLon
 decode =
     D.map2 LatLon
-        (D.field "lat" decodeLat)
-        (D.field "lon" decodeLon)
+        (D.field "latitude" decodeLat)
+        (D.field "longitude" decodeLon)
 
 
 {-| Decode a generic Float to a Latitude, or fail

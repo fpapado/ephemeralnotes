@@ -1,5 +1,8 @@
 port module Geolocation exposing
-    ( ToElm(..)
+    ( Error
+    , Geolocation
+    , LocationResult
+    , ToElm(..)
     , getLocation
     , sub
     )
@@ -24,8 +27,12 @@ type alias OutsideData =
 
 type ToElm
     = -- An update is available to the app
-      GotLocation (Result Error LatLon)
+      GotLocation LocationResult
     | DecodingError D.Error
+
+
+type alias LocationResult =
+    Result Error LatLon
 
 
 type Error
@@ -82,8 +89,8 @@ port geolocationToElm : (D.Value -> msg) -> Sub msg
 {-|
 
     @example
-    D.decodeValue decodeToElm {tag: "GotLocation", res: {tag: Ok, data: {lat: 0.15, lon: 12.3}}}
-    D.decodeValue decodeToElm {tag: "GotLocation", res: {tag: Err, error: "LocationUnavailable"}}
+    D.decodeValue decodeToElm {tag: "GotLocation", data: {tag: Ok, data: {lat: 0.15, lon: 12.3}}}
+    D.decodeValue decodeToElm {tag: "GotLocation", data: {tag: Err, data: "LocationUnavailable"}}
 
 -}
 decodeToElm : D.Decoder ToElm
@@ -96,7 +103,7 @@ decodeToElmInner : String -> D.Decoder ToElm
 decodeToElmInner tag =
     case tag of
         "GotLocation" ->
-            D.field "res" decodeGotLocation
+            D.field "data" decodeGotLocation
 
         _ ->
             D.fail ("Unknown message" ++ tag)
@@ -113,27 +120,31 @@ decodeGotLocation =
                             |> D.map (GotLocation << Ok)
 
                     "Err" ->
-                        D.field "error" D.string
-                            |> D.andThen decodeGotLocationErr
+                        D.field "data" decodeGotLocationErr
 
                     _ ->
                         D.fail ("Unknown result type" ++ tag)
             )
 
 
-decodeGotLocationErr err =
-    case err of
-        "PermissionDenied" ->
-            D.succeed (GotLocation <| Err PermissionDenied)
+decodeGotLocationErr =
+    D.field "tag" D.string
+        |> D.andThen
+            (\tag ->
+                case tag of
+                    -- TODO: capture "data" for logging
+                    "PermissionDenied" ->
+                        D.succeed (GotLocation <| Err PermissionDenied)
 
-        "LocationUnavailable" ->
-            D.succeed (GotLocation <| Err LocationUnavailable)
+                    "LocationUnavailable" ->
+                        D.succeed (GotLocation <| Err LocationUnavailable)
 
-        "Timeout" ->
-            D.succeed (GotLocation <| Err Timeout)
+                    "Timeout" ->
+                        D.succeed (GotLocation <| Err Timeout)
 
-        _ ->
-            D.fail ("Unknown error reason" ++ err)
+                    _ ->
+                        D.fail ("Unknown error reason: " ++ tag)
+            )
 
 
 encodeFromElm : FromElm -> E.Value
@@ -141,7 +152,7 @@ encodeFromElm data =
     case data of
         GetLocation ->
             E.object
-                [ ( "tag", E.string "UpdateAccepted" )
+                [ ( "tag", E.string "GetLocation" )
                 , ( "data", E.object [] )
                 ]
 

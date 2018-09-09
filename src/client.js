@@ -1,5 +1,6 @@
 import './styles/index.css';
 import {listenForWaitingSW} from './sw-utils';
+import {getLocation} from './Geolocation.js';
 
 export function runClient(Elm) {
   // Start Elm app
@@ -104,4 +105,32 @@ export function runClient(Elm) {
       }
     });
   }
+
+  // GEOLOCATION <-> ELM
+  const GotLocationMsg = data => ({
+    tag: 'GotLocation',
+    data,
+  });
+
+  app.ports.geolocationFromElm.subscribe(msg => {
+    if (!msg.tag) {
+      console.error('No tag for msg', msg);
+      return;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('From Elm: ', msg);
+    }
+
+    switch (msg.tag) {
+      // Post a message to the waiting SW to skip waiting
+      case 'GetLocation':
+        getLocation(
+          data =>
+            console.log(GotLocationMsg(data)) ||
+            app.ports.geolocationToElm.send(GotLocationMsg(data))
+        );
+        return;
+    }
+  });
 }
