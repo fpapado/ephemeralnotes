@@ -27,7 +27,7 @@ centeredContainer attrs children =
 
 
 styledButton attrs children =
-    button (class "pv2 ph3 button-reset focus-shadow br2 b" :: attrs) children
+    button (class "pv2 ph3 button-reset focus-shadow br2 fw5" :: attrs) children
 
 
 styledButtonBlue attrs children =
@@ -53,4 +53,4 @@ textbox attrs children =
 
 
 buttonLink attrs children =
-    a (class "db mw5 center pa3 button-link b bg-blue br2 near-white hover-bg-light-blue hover-near-black focus-shadow" :: attrs) children
+    a (class "db mw5 center pa3 button-link fw5 bg-blue br2 near-white hover-bg-light-blue hover-near-black focus-shadow" :: attrs) children
