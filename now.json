@@ -23,7 +23,7 @@
         ]
       },
       {
-        "source": "phantom-sans-v*",
+        "source": "phantom-sans-v*-*.woff*",
         "headers": [
           {
             "key": "Cache-Control",
