@@ -1,6 +1,7 @@
 port module Entry exposing (Entry, EntryId)
 
 import Html exposing (Html)
+import Location
 import Json.Decode as D
 import Json.Encode as E
 import Time
@@ -99,78 +100,6 @@ port swFromElm : E.Value -> Cmd msg
 
 port swToElm : (D.Value -> msg) -> Sub msg
 
-
-
--- SW UPDATE
-
-
-type SwUpdate
-    = None
-    | Available
-    | Accepted
-    | Defered
-
-
-updateNone =
-    None
-
-
-updateAvailable =
-    Available
-
-
-updateAccepted =
-    Accepted
-
-
-updateDefered =
-    Defered
-
-
-{-| View function that accepts a separate view for each update state.
-Exhaustive and does not expose the SwUpdate constructor.
--}
-viewSwUpdate : SwUpdate -> { none : Html msg, available : Html msg, accepted : Html msg, defered : Html msg } -> Html msg
-viewSwUpdate swUpdate { none, available, accepted, defered } =
-    case swUpdate of
-        None ->
-            none
-
-        Available ->
-            available
-
-        Accepted ->
-            accepted
-
-        Defered ->
-            defered
-
-
-
--- INSTALL PROMPT
-
-
-type InstallPrompt
-    = NoInstallPrompt
-    | InstallPromptAvailable
-
-
-installPromptNone =
-    NoInstallPrompt
-
-
-installPromptAvailable =
-    InstallPromptAvailable
-
-
-viewInstallPrompt : InstallPrompt -> { none : Html msg, available : Html msg } -> Html msg
-viewInstallPrompt installPrompt { none, available } =
-    case installPrompt of
-        NoInstallPrompt ->
-            none
-
-        InstallPromptAvailable ->
-            available
 
 
 

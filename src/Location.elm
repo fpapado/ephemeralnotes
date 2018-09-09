@@ -1,135 +1,145 @@
-port module Location exposing (Location, ToElm, getLocation, toTuple)
+module Location exposing
+    ( LatLon
+    , Location
+    , decode
+    , decodeLat
+    , decodeLon
+    , encode
+    , fromLatLon
+    , latFromFloat
+    , latToFloat
+    , lonFromFloat
+    , lonToFloat
+    )
 
 import Json.Decode as D
 import Json.Encode as E
 
 
 
--- DATA TYPE
+-- DATA TYPES
 
 
 type Location
     = Location LatLon
 
 
+{-| Decimal degrees and Plus/minus—Latitude and longitude coordinates are
+represented as decimal numbers. The latitude is preceded by a minus
+sign ( – ) if it is south of the equator (a positive number implies north),
+and the longitude is preceded by a minus sign if it is west of the prime
+meridian (a positive number implies east); for example, 37.68455° –97.34110°
+@see: <https://msdn.microsoft.com/en-us/library/aa578799.aspx>
+-}
 type alias LatLon =
-    { -- TODO: these are bounded, in reality, so let's expose some smart constructors for them
-      lat : Lat
-    , lon : Lon
-    }
+    { lat : Latitude, lon : Longitude }
 
-
-type Lat
-    = Lat Float
-
-
-type Lon
-    = Lon Float
-
-
-toSimpleTuple : Location -> LatLon
-toSimpleTuple Location { lat, lon } =
-    ( lat, lon )
 
 fromLatLon : LatLon -> Location
+fromLatLon latLon =
+    Location latLon
 
-fromSimpleTuple : ( Float, Float ) -> Maybe LatLon
-fromSimpleTuple (lat, lon) =
-    let
-      isValid = lat > 100 && true
-    in
-      case isValid of
+
+{-| Latitude measures how far north or south of the equator a place is located.
+The equator is situated at 0°, the North Pole at 90° north (or 90°, because
+a positive latitude implies north), and the South Pole at 90° south (or –90°).
+Latitude measurements range from 0° to (+/–)90°.
+-}
+type Latitude
+    = Latitude Float
+
+
+{-| Latitude measurements range from 0° to (+/–)90°.
+-}
+latFromFloat : Float -> Maybe Latitude
+latFromFloat f =
+    case f >= -90 && f <= 90 of
         True ->
-          Just {Lat lat, Lon lon}
+            Just (Latitude f)
 
-          False ->
+        False ->
             Nothing
 
-fromRecord : {lat: Float, lon: Float} -> Maybe LatLon
+
+latToFloat : Latitude -> Float
+latToFloat (Latitude f) =
+    f
 
 
+{-| Longitude measures how far east or west of the prime meridian a place is located.
+The prime meridian runs through Greenwich, England.
+Longitude measurements range from 0° to (+/–)180°.
+-}
+type Longitude
+    = Longitude Float
 
 
+{-| Longitude measurements range from 0° to (+/–)180°.
+-}
+lonFromFloat : Float -> Maybe Longitude
+lonFromFloat f =
+    case f >= -180 && f <= 180 of
+        True ->
+            Just (Longitude f)
 
--- PORTS
-
-
-type ToElm
-    = GotLocation (Result String Location)
-
-
-type FromElm
-    = GetLocation
-
-
-port locationToElm : (D.Value -> msg) -> Sub msg
+        False ->
+            Nothing
 
 
-port locationFromElm : E.Value -> Cmd msg
-
-
-
--- OUT
-
-
-send : FromElm -> Cmd msg
-send msgOut =
-    msgOut
-        |> encodeFromElm
-        |> locationFromElm
-
-
-getLocation : Cmd msg
-getLocation =
-    send GetLocation
+lonToFloat : Longitude -> Float
+lonToFloat (Longitude f) =
+    f
 
 
 
 -- JSON
 
 
-encodeFromElm : FromElm -> E.Value
-encodeFromElm data =
-    case data of
-        UpdateAccepted ->
-            E.object
-                [ ( "tag", E.string "UpdateAccepted" )
-                , ( "data", E.object [] )
-                ]
-
-        UpdateDefered ->
-            E.object
-                [ ( "tag", E.string "UpdateDefered" )
-                , ( "data", E.object [] )
-                ]
-
-        InstallPromptAccepted ->
-            E.object
-                [ ( "tag", E.string "InstallPromptAccepted" )
-                , ( "data", E.object [] )
-                ]
-
-        InstallPromptDefered ->
-            E.object
-                [ ( "tag", E.string "InstallPromptDefered" )
-                , ( "data", E.object [] )
-                ]
+encode : Location -> E.Value
+encode (Location { lat, lon }) =
+    E.object
+        [ ( "lat", E.float <| latToFloat lat )
+        , ( "lon", E.float <| lonToFloat lon )
+        ]
 
 
-decodeToElm : D.Decoder FromElm
-decodeToElm =
-    D.field "tag" D.string
-        |> D.andThen decodeToElmInner
+{-| Decode an object of shape {lat, lon} to LatLon/Location
+-}
+decode : D.Decoder LatLon
+decode =
+    D.map2 LatLon
+        (D.field "lat" decodeLat)
+        (D.field "lon" decodeLon)
 
 
-decodeToElmInner : String -> D.Decoder ToElm
-decodeToElmInner tag =
-    case tag of
-        "UpdateAvailable" ->
-            D.succeed UpdateAvailable
+{-| Decode a generic Float to a Latitude, or fail
+-}
+decodeLat : D.Decoder Latitude
+decodeLat =
+    D.map latFromFloat D.float
+        |> D.andThen (failIfMaybe "Latitude could not be decoded")
 
-        "BeforeInstallPrompt" ->
-            D.succeed BeforeInstallPrompt
 
-        _ ->
-            D.fail ("Unknown message" ++ tag)
+{-| Decode a generic Float to a Longitude, or fail
+-}
+decodeLon : D.Decoder Longitude
+decodeLon =
+    D.map lonFromFloat D.float
+        |> D.andThen (failIfMaybe "Longitude could not be decoded")
+
+
+{-| Utility that fails the decoding with a message if the value is maybe
+-}
+failIfMaybe : String -> Maybe a -> D.Decoder a
+failIfMaybe err m =
+    case m of
+        Just a ->
+            D.succeed a
+
+        Nothing ->
+            D.fail err
+
+
+
+-- MATH
+-- TODO: sort, nearest, list functions etc
