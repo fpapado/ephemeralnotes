@@ -1,5 +1,5 @@
 /* Styles that always get included,
- * This is mostly because Critters fails to parse them...
+ * FIXME: Things marked as "CRIT" will crash Critters, and are not included atm.
 */
 
 /*! modern-normalize | MIT License | https://github.com/sindresorhus/modern-normalize */
@@ -7,14 +7,26 @@
 /* Document
    ========================================================================== */
 
+/* CRIT */
+/* html {
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+} */
+
 /**
  * Use a more readable tab size (opinionated).
+ * CRIT
  */
 
-:root {
+/* :root {
   -moz-tab-size: 4;
   tab-size: 4;
-}
+} */
 
 /**
  * 1. Correct the line height in all browsers.
@@ -176,12 +188,12 @@ button::-moz-focus-inner,
  * Restore the focus styles unset by the previous rule.
  */
 
-button:-moz-focusring,
+/* button:-moz-focusring,
 [type='button']:-moz-focusring,
 [type='reset']:-moz-focusring,
 [type='submit']:-moz-focusring {
   outline: 1px dotted ButtonText;
-}
+} */
 
 /**
  * Correct the padding in Firefox.
@@ -237,12 +249,13 @@ progress {
 /**
  * 1. Correct the inability to style clickable types in iOS and Safari.
  * 2. Change font properties to `inherit` in Safari.
+ * CRIT
  */
 
-::-webkit-file-upload-button {
-  -webkit-appearance: button; /* 1 */
-  font: inherit; /* 2 */
-}
+/* ::-webkit-file-upload-button {
+  -webkit-appearance: button;
+    font: inherit;
+} */
 
 /* Interactive
    ========================================================================== */
