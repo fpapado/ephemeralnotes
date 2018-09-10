@@ -12,6 +12,18 @@
 
   <link rel="manifest" href="/assets/manifest.json">
   <link rel="preload" href="/assets/fonts/phantom-sans-v4-variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <style>
+    html {
+      box-sizing: border-box;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: inherit;
+    }
+  </style>
 </head>
 
 <body>
@@ -30,8 +42,10 @@
           <div class="measure center vs4">
             <h1 class="mv4 f3 f2-ns lh-title fw7">Javascript is turned off :(</h1>
             <p class="mv0 f5 f4-ns lh-copy">
-              Sorry, Ephemeral requires Javascript to run. This is because it does everything on the client, after the initial hand-off
-              from the server. I don't want to have people's data, and a server-only version would need that to be effective.
+              Sorry, Ephemeral requires Javascript to run. This is because it does everything on the client, after the
+              initial hand-off
+              from the server. I don't want to have people's data, and a server-only version would need that to be
+              effective.
             </p>
           </div>
         </noscript>
