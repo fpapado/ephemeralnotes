@@ -1,5 +1,7 @@
 module Location exposing
     ( LatLon
+    , Latitude
+    , Longitude
     , decode
     , decodeLat
     , decodeLon
@@ -63,7 +65,23 @@ type Longitude
     = Longitude Float
 
 
-{-| Longitude measurements range from 0° to (+/–)180°.
+{-| Turn a float into a longitude value, if valid.
+
+    -- Longitude measurements range from 0° to (+/–)180°.
+    lonFromFloat 180 --> Just (Longitude)
+
+    lonFromFloat -180 --> Just
+
+    lonFromFloat 0 --> Just
+
+    lonFromFloat 26.3 --> Just
+
+    lonFromFloat -190 --> Nothing
+
+    lonFromFloat -200 --> Nothing
+
+    lonFromFloat -180.51 --> Nothing
+
 -}
 lonFromFloat : Float -> Maybe Longitude
 lonFromFloat f =

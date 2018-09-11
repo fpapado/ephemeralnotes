@@ -25,7 +25,7 @@
     "release": "npm-run-all deploy alias",
     "deploy": "npx now",
     "alias": "npx now alias",
-    "test": "elm-test"
+    "test": "elm-verify-examples"
   },
   "bundlesize": [
     {
