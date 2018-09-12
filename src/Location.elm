@@ -40,6 +40,10 @@ type Latitude
     = Latitude Float
 
 
+
+-- fromFloats : {lat: Float, lon: Float} -> Maybe LatLon
+
+
 {-| Latitude measurements range from 0° to (+/–)90°.
 -}
 latFromFloat : Float -> Maybe Latitude
@@ -67,14 +71,20 @@ type Longitude
 
 {-| Turn a float into a longitude value, if valid.
 
+    isJust : Maybe a -> Bool
+    isJust m =
+        case m of
+            Nothing -> False
+            Just _ -> True
+
     -- Longitude measurements range from 0° to (+/–)180°.
-    lonFromFloat 180 --> Just (Longitude)
+    lonFromFloat 180 |> isJust --> True
 
-    lonFromFloat -180 --> Just
+    lonFromFloat -180 |> isJust --> True
 
-    lonFromFloat 0 --> Just
+    lonFromFloat 0 |> isJust --> True
 
-    lonFromFloat 26.3 --> Just
+    lonFromFloat 26.3 |> isJust --> True
 
     lonFromFloat -190 --> Nothing
 
