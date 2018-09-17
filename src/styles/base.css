@@ -1,32 +1,28 @@
 /* Styles that always get included,
- * FIXME: Things marked as "CRIT" will crash Critters, and are not included atm.
-*/
 
 /*! modern-normalize | MIT License | https://github.com/sindresorhus/modern-normalize */
 
 /* Document
    ========================================================================== */
 
-/* CRIT */
-/* html {
-    box-sizing: border-box;
+html {
+  box-sizing: border-box;
 }
 
 *,
-*::before,
-*::after {
-    box-sizing: inherit;
-} */
+*:before,
+*:after {
+  box-sizing: inherit;
+}
 
 /**
  * Use a more readable tab size (opinionated).
- * CRIT
  */
 
-/* :root {
+:root {
   -moz-tab-size: 4;
   tab-size: 4;
-} */
+}
 
 /**
  * 1. Correct the line height in all browsers.
@@ -249,13 +245,12 @@ progress {
 /**
  * 1. Correct the inability to style clickable types in iOS and Safari.
  * 2. Change font properties to `inherit` in Safari.
- * CRIT
  */
 
-/* ::-webkit-file-upload-button {
+::-webkit-file-upload-button {
   -webkit-appearance: button;
-    font: inherit;
-} */
+  font: inherit;
+}
 
 /* Interactive
    ========================================================================== */
