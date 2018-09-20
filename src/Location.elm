@@ -70,28 +70,6 @@ type Longitude
 
 
 {-| Turn a float into a longitude value, if valid.
-
-    isJust : Maybe a -> Bool
-    isJust m =
-        case m of
-            Nothing -> False
-            Just _ -> True
-
-    -- Longitude measurements range from 0° to (+/–)180°.
-    lonFromFloat 180 |> isJust --> True
-
-    lonFromFloat -180 |> isJust --> True
-
-    lonFromFloat 0 |> isJust --> True
-
-    lonFromFloat 26.3 |> isJust --> True
-
-    lonFromFloat -190 --> Nothing
-
-    lonFromFloat -200 --> Nothing
-
-    lonFromFloat -180.51 --> Nothing
-
 -}
 lonFromFloat : Float -> Maybe Longitude
 lonFromFloat f =

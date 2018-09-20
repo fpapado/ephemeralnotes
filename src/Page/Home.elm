@@ -39,6 +39,11 @@ type GeolocationData
     | Got Geo.LocationResult
 
 
+
+-- TODO: Spinner button, show when loading
+-- | Loading Id
+
+
 init : ( Model, Cmd Msg )
 init =
     ( { timeZone = Time.utc
