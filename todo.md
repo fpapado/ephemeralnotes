@@ -1,22 +1,22 @@
 # Static
 
-- Build pipeline just with npm commands and some light bundling, perhaps
-- index.html with inlined critical CSS
-- Font and font loading strategy
-- Github PR pipeline
+- [X] Build pipeline just with npm commands and some light bundling, perhaps
+- [X] index.html with inlined critical CSS
+- [X] Font and font loading strategy (variable fonts, font-display: swap, preload?)
+  - `preload` and `variable-fonts` have some good overlap, so we are not wasting much...
+- Github PR pipeline (now integration)
 - Script preload
 - Brotli compression and type
 - namespace (filespace?) js/css assets
-- postcss
+- postcss / autoprefixer
+- remove unused Tachyons classes
 - move SW state to top-level
-- style installBanner
-- inline all the CSS
-- font preload: use JS and feature-detect variable font support?
-  - On the other hand, `preload` and `variable-fonts` have some good overlap, so we are not wasting much...
+- [X] style installBanner
+- [?] inline all the CSS
 
 # MVP
 
-- localstorage and Port architecture
+- idb-keyval and Port architecture
 - Data structures
 - simple viewer
 - App shell
