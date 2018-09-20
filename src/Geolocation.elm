@@ -3,6 +3,7 @@ port module Geolocation exposing
     , Geolocation
     , LocationResult
     , ToElm(..)
+    , errorToString
     , getLocation
     , sub
     )
@@ -35,14 +36,31 @@ type alias LocationResult =
     Result Error LatLon
 
 
+type FromElm
+    = GetLocation
+
+
+
+-- Error
+
+
 type Error
     = PermissionDenied
     | LocationUnavailable
     | Timeout
 
 
-type FromElm
-    = GetLocation
+errorToString : Error -> String
+errorToString err =
+    case err of
+        PermissionDenied ->
+            "Permission denied"
+
+        LocationUnavailable ->
+            "Location unavailable"
+
+        Timeout ->
+            "Geolocation timed out"
 
 
 
@@ -132,7 +150,6 @@ decodeGotLocationErr =
         |> D.andThen
             (\tag ->
                 case tag of
-                    -- TODO: capture "data" for logging
                     "PermissionDenied" ->
                         D.succeed (GotLocation <| Err PermissionDenied)
 

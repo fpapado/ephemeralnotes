@@ -48,8 +48,6 @@ decodeOnSchema version =
             D.fail ("Unknown schema version: " ++ version)
 
 
-{-| TODO: implement
--}
 decodeV1 : D.Decoder EntryV1
 decodeV1 =
     D.map5 EntryV1

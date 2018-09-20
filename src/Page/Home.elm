@@ -107,7 +107,7 @@ viewLocation locationData =
                     div [ class "vs3" ]
                         [ heading 2 [] [ text "Error getting location:" ]
                         , div []
-                            [ text "To-do: print the error..."
+                            [ text <| Geo.errorToString error
                             ]
                         ]
 
