@@ -1630,7 +1630,7 @@ elm-hot@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.0.0.tgz#d2087f896545915029919dcdbcb4b8fdc08aec96"
 
-elm-test@^0.19.0-beta8, elm-test@beta:
+elm-test@0.19.0-beta9, elm-test@beta:
   version "0.19.0-beta9"
   resolved "https://registry.yarnpkg.com/elm-test/-/elm-test-0.19.0-beta9.tgz#58ed44f4e389f2bb7e9b258a524b5bdc226334dd"
   dependencies:
