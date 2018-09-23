@@ -2,9 +2,9 @@ module Location exposing
     ( LatLon
     , Latitude
     , Longitude
-    , decode
-    , decodeLat
-    , decodeLon
+    , decoder
+    , latDecoder
+    , lonDecoder
     , encode
     , latFromFloat
     , latToFloat
@@ -100,25 +100,25 @@ encode { lat, lon } =
 
 {-| Decode an object of shape {lat, lon} to LatLon/Location
 -}
-decode : D.Decoder LatLon
-decode =
+decoder : D.Decoder LatLon
+decoder =
     D.map2 LatLon
-        (D.field "latitude" decodeLat)
-        (D.field "longitude" decodeLon)
+        (D.field "latitude" latDecoder)
+        (D.field "longitude" lonDecoder)
 
 
 {-| Decode a generic Float to a Latitude, or fail
 -}
-decodeLat : D.Decoder Latitude
-decodeLat =
+latDecoder : D.Decoder Latitude
+latDecoder =
     D.map latFromFloat D.float
         |> D.andThen (failIfMaybe "Latitude could not be decoded")
 
 
 {-| Decode a generic Float to a Longitude, or fail
 -}
-decodeLon : D.Decoder Longitude
-decodeLon =
+lonDecoder : D.Decoder Longitude
+lonDecoder =
     D.map lonFromFloat D.float
         |> D.andThen (failIfMaybe "Longitude could not be decoded")
 

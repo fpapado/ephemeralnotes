@@ -1,4 +1,4 @@
-module Entry.Id exposing (Id, decode, generate, toString)
+module Entry.Id exposing (Id, decoder, generate, toString)
 
 import Json.Decode as D exposing (Decoder)
 
@@ -26,7 +26,7 @@ fromString str =
     Id str
 
 
-decode : Decoder Id
-decode =
+decoder : Decoder Id
+decoder =
     D.string
         |> D.map fromString

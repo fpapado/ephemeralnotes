@@ -94,7 +94,7 @@ deferInstallPrompt =
 
 sub : Sub ToElm
 sub =
-    D.decodeValue decodeToElm
+    D.decodeValue toElmDecoder
         |> swToElm
         |> Sub.map (extract DecodingError)
 
@@ -186,14 +186,14 @@ viewInstallPrompt installPrompt { none, available } =
 -- JSON
 
 
-decodeToElm : D.Decoder ToElm
-decodeToElm =
+toElmDecoder : D.Decoder ToElm
+toElmDecoder =
     D.field "tag" D.string
-        |> D.andThen decodeToElmInner
+        |> D.andThen toElmInnerDecoder
 
 
-decodeToElmInner : String -> D.Decoder ToElm
-decodeToElmInner tag =
+toElmInnerDecoder : String -> D.Decoder ToElm
+toElmInnerDecoder tag =
     case tag of
         "UpdateAvailable" ->
             D.succeed UpdateAvailable

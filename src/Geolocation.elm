@@ -85,7 +85,7 @@ getLocation =
 
 sub : Sub ToElm
 sub =
-    D.decodeValue decodeToElm
+    D.decodeValue toElmDecoder
         |> geolocationToElm
         |> Sub.map (extract DecodingError)
 
@@ -111,41 +111,41 @@ port geolocationToElm : (D.Value -> msg) -> Sub msg
     D.decodeValue decodeToElm {tag: "GotLocation", data: {tag: Err, data: "LocationUnavailable"}}
 
 -}
-decodeToElm : D.Decoder ToElm
-decodeToElm =
+toElmDecoder : D.Decoder ToElm
+toElmDecoder =
     D.field "tag" D.string
-        |> D.andThen decodeToElmInner
+        |> D.andThen toElmInnerDecoder
 
 
-decodeToElmInner : String -> D.Decoder ToElm
-decodeToElmInner tag =
+toElmInnerDecoder : String -> D.Decoder ToElm
+toElmInnerDecoder tag =
     case tag of
         "GotLocation" ->
-            D.field "data" decodeGotLocation
+            D.field "data" gotLocationDecoder
 
         _ ->
             D.fail ("Unknown message" ++ tag)
 
 
-decodeGotLocation =
+gotLocationDecoder =
     -- TODO:  write a more general decodeResult that does the Ok/Err/_ dance
     D.field "tag" D.string
         |> D.andThen
             (\tag ->
                 case tag of
                     "Ok" ->
-                        D.field "data" Location.decode
+                        D.field "data" Location.decoder
                             |> D.map (GotLocation << Ok)
 
                     "Err" ->
-                        D.field "data" decodeGotLocationErr
+                        D.field "data" gotLocationErrDecoder
 
                     _ ->
                         D.fail ("Unknown result type" ++ tag)
             )
 
 
-decodeGotLocationErr =
+gotLocationErrDecoder =
     D.field "tag" D.string
         |> D.andThen
             (\tag ->

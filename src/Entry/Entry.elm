@@ -1,4 +1,4 @@
-module Entry.Entry exposing (Entry, decode, encode)
+module Entry.Entry exposing (Entry, decoder, encode)
 
 import Entry.Id
 import Html exposing (Html)
@@ -32,30 +32,30 @@ type alias EntryV1 =
 -- JSON
 
 
-decode : D.Decoder Entry
-decode =
+decoder : D.Decoder Entry
+decoder =
     D.field "schema_version" D.string
-        |> D.andThen decodeOnSchema
+        |> D.andThen schemaDecoder
 
 
-decodeOnSchema : String -> D.Decoder Entry
-decodeOnSchema version =
+schemaDecoder : String -> D.Decoder Entry
+schemaDecoder version =
     case version of
         "1" ->
-            D.map V1 decodeV1
+            D.map V1 v1Decoder
 
         _ ->
             D.fail ("Unknown schema version: " ++ version)
 
 
-decodeV1 : D.Decoder EntryV1
-decodeV1 =
+v1Decoder : D.Decoder EntryV1
+v1Decoder =
     D.map5 EntryV1
-        (D.field "id" Entry.Id.decode)
+        (D.field "id" Entry.Id.decoder)
         (D.field "front" D.string)
         (D.field "back" D.string)
         (D.field "time" D.int |> D.map Time.millisToPosix)
-        (D.field "location" Location.decode)
+        (D.field "location" Location.decoder)
 
 
 {-| Encode an entry with a schema into the appropriate JSON representation.
