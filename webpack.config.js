@@ -54,7 +54,11 @@ module.exports = {
     // Inline critical css, preload fonts
     ifProduction(
       new Critters({
+        // Do not removed inlined selectors from source
+        // This is done because the feature is buggy and removes media queries :/
+        pruneSource: false,
         // Outputs: <link rel="preload" onload="this.rel='stylesheet'"> and LoadCSS fallback
+        // NOTE: Actually, only does the latter, maybe a PR opportunity/
         preload: 'js',
         // Inline critical font-face rules, and preload the font URLs
         inlineFonts: true,
