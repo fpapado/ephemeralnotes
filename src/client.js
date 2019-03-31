@@ -1,6 +1,7 @@
 import './styles/index.css';
 import {listenForWaitingSW} from './sw-utils';
 import {getLocation} from './Geolocation.js';
+import * as Store from './Store.js';
 
 export function runWith(Elm) {
   // Start Elm app
@@ -125,12 +126,16 @@ export function runWith(Elm) {
     switch (msg.tag) {
       // Post a message to the waiting SW to skip waiting
       case 'GetLocation':
-        getLocation(
-          data =>
-            console.log(GotLocationMsg(data)) ||
-            app.ports.geolocationToElm.send(GotLocationMsg(data))
-        );
+        getLocation(data => {
+          console.log(GotLocationMsg(data));
+          app.ports.geolocationToElm.send(GotLocationMsg(data));
+        });
         return;
     }
+  });
+
+  // Store <-> Elm
+  app.ports.storeFromElm.subscribe(msg => {
+    Store.handleSubMessage(app.ports.storeToElm.send, msg);
   });
 }

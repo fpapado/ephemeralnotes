@@ -59,24 +59,6 @@ v1Decoder =
 
 
 {-| Encode an entry with a schema into the appropriate JSON representation.
-
-import Time
-import Location
-import Entry.Id
-import Json.Decode as D
-
--- TODO: figure out a null location
-e : Entry
-e =
-{ id = Entry.Id.generate
-, front = "Hello"
-, back = "World"
-, time = Time.millisToPosix 1234567
-, location = { lat = Location.latFromFloat 64, lon = Location.lonFromFloat 32 }
-}
-
-(D.decodeValue decode (encode e)) --> Ok e
-
 -}
 encode : Entry -> E.Value
 encode entry =
@@ -84,6 +66,7 @@ encode entry =
         V1 e ->
             E.object
                 [ ( "schema_version", E.string "v1" )
+                , ( "id", E.string (Entry.Id.toString e.id) )
                 , ( "front", E.string e.front )
                 , ( "back", E.string e.back )
                 , ( "time", E.int (Time.posixToMillis e.time) )

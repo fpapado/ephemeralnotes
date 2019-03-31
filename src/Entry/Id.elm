@@ -1,17 +1,10 @@
-module Entry.Id exposing (Id, decoder, generate, toString)
+module Entry.Id exposing (Id, decoder, toString)
 
 import Json.Decode as D exposing (Decoder)
 
 
 type Id
     = Id String
-
-
-{-| TODO: make random/uuid
--}
-generate : Id
-generate =
-    Id "TODO_MAKE_RANDOM"
 
 
 toString : Id -> String

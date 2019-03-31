@@ -20,6 +20,7 @@ import Html.Events exposing (onClick)
 import Location as L
 import RemoteData exposing (RemoteData)
 import ServiceWorker as SW
+import Store
 import Task exposing (Task)
 import Time
 import Ui exposing (..)
@@ -54,10 +55,11 @@ init =
       , swUpdate = SW.updateNone
       , installPrompt = SW.installPromptNone
       , location = NotAsked
-      , entries = RemoteData.NotAsked
+      , entries = RemoteData.Loading
       }
     , Cmd.batch
         [ Task.perform GotTimeZone Time.here
+        , Store.getEntries
 
         -- Alternative: get the entries as a flag
         -- , GetEntries ...?
@@ -83,16 +85,8 @@ viewInner model =
             []
             [ div [ class "vs4" ]
                 [ div [ class "vs3" ]
-                    [ viewBanner
-                    , div [] [ a [ class "link underline", href "/404" ] [ text "Demo 404 page" ] ]
-                    ]
-                , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "Entries" ]
                     , viewEntries model.entries
-                    ]
-                , div [ class "vs3" ]
-                    [ Ui.styledButtonBlue [ onClick GetLocation ] [ text "Get Location" ]
-                    , viewLocation model.location
                     ]
                 ]
             , viewUpdatePrompt model.swUpdate
@@ -108,7 +102,7 @@ viewEntries entryData =
             paragraph [] [ text "Not asked for entries yet" ]
 
         RemoteData.Loading ->
-            paragraph [] [ text "Loading..." ]
+            paragraph [ class "animated fadeIn delay h5" ] [ text "Loading entries..." ]
 
         RemoteData.Failure err ->
             paragraph []
@@ -125,7 +119,11 @@ viewEntryList entryList =
         [] ->
             div
                 [ class "vs3 tc" ]
-                [ img (class "db mw4 mw5-l center" :: Asset.toAttr Asset.noData) []
+                [ div [ class "mw4 mw5-l center" ]
+                    [ div [ class "aspect-ratio aspect-ratio--1x1" ]
+                        [ img (class "aspect-ratio--object db" :: Asset.toAttr Asset.noData) []
+                        ]
+                    ]
                 , paragraph []
                     [ text "No entries yet. Why don't you add one? :)" ]
                 ]
@@ -228,6 +226,7 @@ type Msg
     = GotTimeZone Time.Zone
     | FromServiceWorker SW.ToElm
     | FromGeolocation Geo.ToElm
+    | FromStore Store.ToElm
     | AcceptUpdate
     | DeferUpdate
     | AcceptInstallPrompt
@@ -264,6 +263,14 @@ update msg model =
                 Geo.DecodingError err ->
                     ( model, Cmd.none )
 
+        FromStore storeMsg ->
+            case storeMsg of
+                Store.GotEntries entries ->
+                    ( { model | entries = RemoteData.Success entries }, Cmd.none )
+
+                Store.DecodingError err ->
+                    ( model, Cmd.none )
+
         AcceptUpdate ->
             ( { model | swUpdate = SW.updateAccepted }, SW.acceptUpdate )
 
@@ -290,4 +297,5 @@ subscriptions model =
     Sub.batch
         [ Sub.map FromServiceWorker SW.sub
         , Sub.map FromGeolocation Geo.sub
+        , Sub.map FromStore Store.sub
         ]
