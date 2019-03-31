@@ -39,7 +39,7 @@ getLatitudeExpectation randomFloat =
             Expect.notEqual Nothing
 
         False ->
-            Expect.notEqual Nothing
+            Expect.equal Nothing
 
 
 {-| Take any random float, and return the expectation (whether it should be valid or not)
