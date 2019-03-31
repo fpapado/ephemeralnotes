@@ -1,4 +1,4 @@
-module Asset exposing (Image, notFound, src)
+module Asset exposing (Image, noData, toAttr)
 
 {-| Utilities for linking to asset paths
 -}
@@ -8,27 +8,29 @@ import Html.Attributes as Attr
 
 
 type Image
-    = Image String
+    = Image ( String, String )
 
 
 
 -- IMAGES
 
 
-notFound : Image
-notFound =
-    image "not_found.jpg"
+noData : Image
+noData =
+    image ( "no_data_qbuo.svg", "An empty clipboard with sparkles." )
 
 
-image : String -> Image
-image filename =
-    Image ("/assets/images/" ++ filename)
+image : ( String, String ) -> Image
+image ( filename, alt ) =
+    Image ( "/assets/images/" ++ filename, alt )
 
 
 
 -- USING ASSETS
 
 
-src : Image -> Attribute msg
-src (Image url) =
-    Attr.src url
+toAttr : Image -> List (Attribute msg)
+toAttr (Image ( url, alt )) =
+    [ Attr.src url
+    , Attr.alt alt
+    ]

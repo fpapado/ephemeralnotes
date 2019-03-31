@@ -7,6 +7,7 @@ module Ui exposing
     , prompt
     , styledButton
     , styledButtonBlue
+    , subHeading
     , textbox
     )
 
@@ -22,8 +23,16 @@ heading level attrs children =
     Html.node tagName (class "mv0 f2 f1-ns lh-title fw7" :: attrs) children
 
 
+subHeading level attrs children =
+    let
+        tagName =
+            "h" ++ String.fromInt (clamp 1 6 level)
+    in
+    Html.node tagName (class "mv0 f3 f2-ns lh-title fw7" :: attrs) children
+
+
 centeredContainer attrs children =
-    div (class "mw8 center" :: attrs) children
+    div (class "mw7 center" :: attrs) children
 
 
 styledButton attrs children =

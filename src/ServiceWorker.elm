@@ -96,7 +96,7 @@ sub : Sub ToElm
 sub =
     D.decodeValue toElmDecoder
         |> swToElm
-        |> Sub.map (extract DecodingError)
+        |> Sub.map (extractResult DecodingError)
 
 
 
@@ -240,8 +240,8 @@ encodeFromElm data =
 {-| Turn a `Result e a` to an `a`, by applying the conversion
 function specified to the `e`.
 -}
-extract : (e -> a) -> Result e a -> a
-extract f x =
+extractResult : (e -> a) -> Result e a -> a
+extractResult f x =
     case x of
         Ok a ->
             a

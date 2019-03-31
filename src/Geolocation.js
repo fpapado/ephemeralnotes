@@ -2,7 +2,7 @@
  * Adapted for usage with Ports from https://github.com/elm-lang/geolocation
  * The encoding of tag/data for data structures is standard in this
  * code base, but there is nothing special about it.
-*/
+ */
 
 // TODO: Movev this to a module
 const Maybe_Nothing = {tag: 'Maybe', data: {tag: 'Nothing'}};
@@ -70,7 +70,9 @@ const defaultOptions = {
 };
 
 // GET LOCATION
-export function getLocation(cb, options = defaultOptions) {
+export function getLocation(cb, opts = {}) {
+  const options = {...defaultOptions, opts};
+
   function onSuccess(rawPosition) {
     cb(Result_Ok(toLocation(rawPosition)));
   }

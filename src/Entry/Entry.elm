@@ -1,4 +1,4 @@
-module Entry.Entry exposing (Entry, decoder, encode)
+module Entry.Entry exposing (Entry(..), decoder, encode)
 
 import Entry.Id
 import Html exposing (Html)

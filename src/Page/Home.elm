@@ -11,15 +11,18 @@ module Page.Home exposing
 {-| The homepage. You can get here via either the / route.
 -}
 
+import Asset
+import Entry.Entry as Entry exposing (Entry)
 import Geolocation as Geo
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Location as L
+import RemoteData exposing (RemoteData)
 import ServiceWorker as SW
 import Task exposing (Task)
 import Time
-import Ui exposing (calloutContainer, heading, paragraph, prompt, styledButtonBlue)
+import Ui exposing (..)
 
 
 
@@ -31,6 +34,7 @@ type alias Model =
     , swUpdate : SW.SwUpdate
     , installPrompt : SW.InstallPrompt
     , location : GeolocationData
+    , entries : RemoteData String (List Entry)
     }
 
 
@@ -50,9 +54,13 @@ init =
       , swUpdate = SW.updateNone
       , installPrompt = SW.installPromptNone
       , location = NotAsked
+      , entries = RemoteData.NotAsked
       }
     , Cmd.batch
         [ Task.perform GotTimeZone Time.here
+
+        -- Alternative: get the entries as a flag
+        -- , GetEntries ...?
         ]
     )
 
@@ -79,6 +87,10 @@ viewInner model =
                     , div [] [ a [ class "link underline", href "/404" ] [ text "Demo 404 page" ] ]
                     ]
                 , div [ class "vs3" ]
+                    [ subHeading 2 [] [ text "Entries" ]
+                    , viewEntries model.entries
+                    ]
+                , div [ class "vs3" ]
                     [ Ui.styledButtonBlue [ onClick GetLocation ] [ text "Get Location" ]
                     , viewLocation model.location
                     ]
@@ -87,6 +99,49 @@ viewInner model =
             , viewInstallPrompt model.installPrompt
             ]
         ]
+
+
+viewEntries : RemoteData String (List Entry) -> Html Msg
+viewEntries entryData =
+    case entryData of
+        RemoteData.NotAsked ->
+            paragraph [] [ text "Not asked for entries yet" ]
+
+        RemoteData.Loading ->
+            paragraph [] [ text "Loading..." ]
+
+        RemoteData.Failure err ->
+            paragraph []
+                [ text <| "Error getting entries: " ++ err
+                ]
+
+        RemoteData.Success entries ->
+            viewEntryList entries
+
+
+viewEntryList : List Entry -> Html Msg
+viewEntryList entryList =
+    case entryList of
+        [] ->
+            div
+                [ class "vs3 tc" ]
+                [ img (class "db mw4 mw5-l center" :: Asset.toAttr Asset.noData) []
+                , paragraph []
+                    [ text "No entries yet. Why don't you add one? :)" ]
+                ]
+
+        -- TODO: HTML.keyed
+        entries ->
+            div [] (List.map viewEntry entries)
+
+
+viewEntry : Entry -> Html Msg
+viewEntry ambiguousEntry =
+    case ambiguousEntry of
+        Entry.V1 entry ->
+            div []
+                [ text entry.front
+                ]
 
 
 viewLocation : GeolocationData -> Html Msg
@@ -99,7 +154,7 @@ viewLocation locationData =
             case locationRes of
                 Ok location ->
                     div [ class "vs3" ]
-                        [ heading 2 [] [ text "Got location:" ]
+                        [ subHeading 2 [] [ text "Got location:" ]
                         , div []
                             [ text <|
                                 String.fromFloat (L.latToFloat location.lat)
