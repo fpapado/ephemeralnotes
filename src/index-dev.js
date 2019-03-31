@@ -2,6 +2,10 @@
  *  @see docs/build.md for details
  */
 import {Elm} from './Main.elm';
-import {runClient} from './client.js';
+import * as client from './client.js';
 
-runClient(Elm);
+function init() {
+  client.runWith(Elm);
+}
+
+init();

@@ -2,7 +2,7 @@ import './styles/index.css';
 import {listenForWaitingSW} from './sw-utils';
 import {getLocation} from './Geolocation.js';
 
-export function runClient(Elm) {
+export function runWith(Elm) {
   // Start Elm app
   const app = Elm.Main.init({});
 
