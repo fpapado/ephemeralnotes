@@ -5,6 +5,9 @@
   "directories": {
     "test": "tests"
   },
+  "engines": {
+    "node": "10"
+  },
   "scripts": {
     "dev": "npm-run-all clean setup build:copy-assets dev:webpack",
     "dev:watch": "npm-run-all --parallel dev:watch-elm dev:webpack",
