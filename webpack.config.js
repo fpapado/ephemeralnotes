@@ -4,7 +4,6 @@ const SizePlugin = require('size-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
-const history = require('koa-connect-history-api-fallback');
 
 const cssnano = require('cssnano');
 
@@ -112,13 +111,11 @@ module.exports = {
       },
     ],
   },
-  serve: {
-    add: (app, _middleware, _options) => {
-      // routes /xyz -> /index.html
-      app.use(history());
-      // e.g.
-      // app.use(convert(proxy('/api', { target: 'http://localhost:5000' })));
-    },
+  devServer: {
+    compress: true,
+    // E.g. /404 should serve index.html, and let Elm handle the route
+    historyApiFallback: true,
+    hot: true,
   },
 };
 
