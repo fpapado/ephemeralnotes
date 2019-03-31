@@ -1,7 +1,7 @@
 FROM mhart/alpine-node:10
 WORKDIR /usr/src
-COPY package.json yarn.lock ./
-RUN yarn install
+COPY package.json package-lock.json ./
+RUN npm install
 COPY . .
-RUN yarn build
+RUN npm run build
 RUN mv ./dist /public
