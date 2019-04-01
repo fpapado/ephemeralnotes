@@ -1,9 +1,9 @@
-module Page exposing (Page(..), view, viewErrors)
+module Page exposing (FocusState(..), Page(..), view)
 
 import Browser exposing (Document)
 import Html exposing (Html, a, button, div, footer, h1, header, i, img, li, main_, nav, p, span, text, ul)
 import Html.Attributes exposing (class, classList, href, id, style, tabindex)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onBlur, onClick)
 import Route exposing (Route)
 import Ui
 
@@ -20,28 +20,57 @@ type Page
     | Home
 
 
+type FocusState
+    = NotYetFocused
+    | Focusing
+    | FocusOnMain
+    | FocusPastMain
+    | FocusErr
+
+
 {-| Take a page's Html and frames it with a header and footer.
 
-The caller provides the current user, so we can display in either
-"signed in" (rendering username) or "signed out" mode.
-
-isLoading is for determining whether we should show a loading spinner
-in the header. (This comes up during slow page transitions.)
+The caller provides the content, which must use the provided "main" element, so that we can
+focus it on transition.
+The "main" element handles the state of being focused or not, to toggle tabindex dynamically.
 
 -}
-view : Page -> { title : String, content : Html msg } -> Document msg
-view activePage { title, content } =
+view : { activePage : Page, focusState : FocusState, onBlurredMain : msg, toOutMsg : innerMsg -> msg } -> { title : String, content : Html innerMsg } -> Document msg
+view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
+    let
+        -- The main element that the caller must render
+        -- We must dynamically set the tabindex, to avoid a critical but where it captures/steals focus
+        mainAttrs =
+            case focusState of
+                -- When focusing, set tabindex to -1
+                Focusing ->
+                    [ id "main"
+                    , class "pa3 flex flex-column flex-auto"
+                    , tabindex -1
+                    ]
+
+                -- When the user tabs past, then the state should be set to FocusPastMain
+                FocusOnMain ->
+                    [ id "main"
+                    , class "pa3 flex flex-column flex-auto"
+                    , tabindex -1
+                    , onBlur onBlurredMain
+                    ]
+
+                -- In other cases, no need for focus attributes
+                _ ->
+                    [ id "main"
+                    , class "pa3 flex flex-column flex-auto"
+                    ]
+
+        viewMain =
+            main_ mainAttrs
+    in
     { title = title ++ " | Ephemeral"
     , body =
         [ viewShell
             [ viewHeader activePage
-            , main_
-                [ id "main"
-                , class "pa3 flex flex-column flex-auto"
-                , tabindex -1
-                ]
-                [ content
-                ]
+            , viewMain [ Html.map toOutMsg content ]
             , viewFooter
             ]
         ]
@@ -89,27 +118,6 @@ isActive page route =
 
         _ ->
             False
-
-
-{-| Render dismissable errors. We use this all over the place!
--}
-viewErrors : msg -> List String -> Html msg
-viewErrors dismissErrors errors =
-    if List.isEmpty errors then
-        Html.text ""
-
-    else
-        div
-            [ class "error-messages"
-            , style "position" "fixed"
-            , style "top" "0"
-            , style "background" "rgb(250, 250, 250)"
-            , style "padding" "20px"
-            , style "border" "1px solid"
-            ]
-        <|
-            List.map (\error -> p [] [ text error ]) errors
-                ++ [ button [ onClick dismissErrors ] [ text "Ok" ] ]
 
 
 skipLink =

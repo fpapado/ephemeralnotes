@@ -6,10 +6,11 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Log
-import Page exposing (Page)
+import Page exposing (FocusState(..), Page)
 import Page.Blank as Blank
 import Page.Home as Home
 import Page.NotFound as NotFound
+import Process
 import Route exposing (Route)
 import Task
 import Time
@@ -19,6 +20,7 @@ import Url exposing (Url)
 type alias Model =
     { navKey : Nav.Key
     , page : PageModel
+    , focusState : Page.FocusState
     }
 
 
@@ -35,7 +37,7 @@ type PageModel
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     changeRouteTo (Route.fromUrl url)
-        { navKey = navKey, page = Redirect }
+        { navKey = navKey, page = Redirect, focusState = NotYetFocused }
 
 
 
@@ -48,10 +50,10 @@ view model =
         viewPage page toMsg config =
             let
                 { title, body } =
-                    Page.view page config
+                    Page.view { activePage = page, focusState = model.focusState, onBlurredMain = FocusedPastMain, toOutMsg = toMsg } config
             in
             { title = title
-            , body = List.map (Html.map toMsg) body
+            , body = body
             }
     in
     case model.page of
@@ -75,6 +77,7 @@ type Msg
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
     | GotFocusResult (Result Dom.Error ())
+    | FocusedPastMain
     | GotHomeMsg Home.Msg
 
 
@@ -89,9 +92,12 @@ changeRouteTo maybeRoute model =
                 |> updateWith (\m -> { model | page = Home m }) GotHomeMsg model
 
 
+{-| Deferred focus after a setTimeout, to allow the rendering to settle
+-}
 focus : String -> Cmd Msg
 focus id =
-    Task.attempt GotFocusResult (Dom.focus id)
+    Dom.focus id
+        |> Task.attempt GotFocusResult
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,9 +107,10 @@ update msg model =
             ( model, Cmd.none )
 
         ( ClickedLink urlRequest, _ ) ->
+            -- On Internal Link Click, attempt to focus "main"
             case urlRequest of
                 Browser.Internal url ->
-                    ( model
+                    ( { model | focusState = Focusing }
                     , Cmd.batch [ Nav.pushUrl model.navKey (Url.toString url), focus "main" ]
                     )
 
@@ -114,11 +121,16 @@ update msg model =
 
         ( GotFocusResult res, _ ) ->
             case res of
+                -- If we focused Ok, then set the state
                 Ok () ->
-                    ( model, Cmd.none )
+                    ( { model | focusState = FocusOnMain }, Cmd.none )
 
+                -- Otherwise, set the state and log
                 Err (Dom.NotFound id) ->
-                    ( model, Log.error ("Dom.Error.NotFound" ++ id) )
+                    ( { model | focusState = FocusErr }, Log.error ("Dom.Error.NotFound" ++ id) )
+
+        ( FocusedPastMain, _ ) ->
+            ( { model | focusState = FocusPastMain }, Cmd.none )
 
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) model
