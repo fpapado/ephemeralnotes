@@ -1,12 +1,12 @@
 import './styles/index.css';
 import {listenForWaitingSW} from './sw-utils';
-import {Elm} from './Main';
+import {Elm} from './Main/index';
 import {getLocation, Result, Location, LocationError} from './Geolocation';
 import * as Store from './Store';
 
-export function runWith(init: typeof Elm) {
+export function runWith(Elm_: typeof Elm) {
   // Start Elm app
-  const app = Elm.Main.init({flags: null});
+  const app = Elm_.Main.init({flags: null});
 
   // PORTS
 
