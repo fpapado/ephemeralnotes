@@ -50,7 +50,7 @@ calloutContainer attrs children =
 
 
 prompt attrs children =
-    div (class "pa3 flex justify-around items-center bg-white near-black shadow-1 animated fadeInUp" :: attrs) children
+    div (class "pa3 flex flex-wrap justify-around items-center bg-white near-black shadow-1 animated fadeInUp" :: attrs) children
 
 
 paragraph attrs children =
