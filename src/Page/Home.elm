@@ -21,6 +21,8 @@ import Location as L
 import RemoteData exposing (RemoteData)
 import ServiceWorker as SW
 import Store
+import Svg.Attributes
+import Svg.NoData
 import Task exposing (Task)
 import Time
 import Ui exposing (..)
@@ -104,7 +106,7 @@ viewInner model =
                 [ viewForm model.form
                 , div [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
-                    , viewEntries model.entries
+                    , viewEntries model.entries ( model.form.front, model.form.back )
                     ]
                 ]
             , viewUpdatePrompt model.swUpdate
@@ -175,8 +177,8 @@ viewForm form_ =
         ]
 
 
-viewEntries : RemoteData String (List Entry) -> Html Msg
-viewEntries entryData =
+viewEntries : RemoteData String (List Entry) -> ( String, String ) -> Html Msg
+viewEntries entryData entryTuple =
     case entryData of
         RemoteData.NotAsked ->
             paragraph [] [ text "Not asked for entries yet" ]
@@ -190,19 +192,17 @@ viewEntries entryData =
                 ]
 
         RemoteData.Success entries ->
-            viewEntryList entries
+            viewEntryList entries entryTuple
 
 
-viewEntryList : List Entry -> Html Msg
-viewEntryList entryList =
+viewEntryList : List Entry -> ( String, String ) -> Html Msg
+viewEntryList entryList ( front, back ) =
     case entryList of
         [] ->
             div
                 [ class "vs3 tc" ]
                 [ div [ class "mw5 center" ]
-                    [ div [ class "aspect-ratio aspect-ratio--1x1" ]
-                        [ img (class "aspect-ratio--object db" :: Asset.toAttr Asset.noData) []
-                        ]
+                    [ Svg.NoData.view ( "Ephemeral", "Lasting a short time, fleeting" ) ( front, back ) []
                     ]
                 , paragraph []
                     [ text "No entries yet. Why don't you add one? :)" ]

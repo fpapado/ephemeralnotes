@@ -1,4 +1,4 @@
-module Asset exposing (Image, noData, toAttr)
+module Asset exposing (Image, toAttr)
 
 {-| Utilities for linking to asset paths
 -}
@@ -13,11 +13,6 @@ type Image
 
 
 -- IMAGES
-
-
-noData : Image
-noData =
-    image ( "no_data_qbuo.svg", "An empty clipboard with sparkles." )
 
 
 image : ( String, String ) -> Image
