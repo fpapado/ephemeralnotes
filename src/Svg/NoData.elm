@@ -1,6 +1,6 @@
 module Svg.NoData exposing (view)
 
-import Html exposing (p)
+import Html exposing (div, p)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
@@ -62,9 +62,11 @@ view ( defaultText1, defaultText2 ) ( text1, text2 ) attrs =
         , circle [ cx "735.31", cy "477.23", r "7.53", fill "#f55f44", opacity ".5" ] []
         , circle [ cx "87.14", cy "96.35", r "7.53", fill "#4d8af0", opacity ".5" ] []
         , circle [ cx "7.53", cy "301.76", r "7.53", fill "#47e6b1", opacity ".5" ] []
-        , foreignObject [ x "300", y "220", height "400", width "360", class "f2 fw6 near-black lh-title" ]
-            [ p [ class "mt0 mb3 f2 fw6 near-black lh-title tl" ] [ text t1 ]
-            , p [ class "mv0 f2 fw6 near-black lh-title tl" ] [ text t2 ]
+        , foreignObject [ x "300", y "220", height "400", width "360" ]
+            [ div [ class "f2 fw4 near-black lh-title tl" ]
+                [ p [ class "mt0 mb3" ] [ text t1 ]
+                , p [ class "mv0" ] [ text t2 ]
+                ]
             ]
 
         -- , foreignObject [ x "300", y "270", class "f2 fw6 near-black lh-title" ] [ text t2 ]

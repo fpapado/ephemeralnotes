@@ -108,6 +108,7 @@ viewInner model =
                     [ subHeading 2 [] [ text "Entries" ]
                     , viewEntries model.entries ( model.form.front, model.form.back )
                     ]
+                , viewAbout
                 ]
             , viewUpdatePrompt model.swUpdate
             , viewInstallPrompt model.installPrompt
@@ -115,11 +116,24 @@ viewInner model =
         ]
 
 
+viewAbout =
+    details [ class "vs3", HA.attribute "open" "true" ]
+        [ summary [ class "mw6" ]
+            [ subHeading 2
+                [ class "dib v-mid" ]
+                [ text "About" ]
+            ]
+        , paragraph
+            [ class "measure" ]
+            [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. You can install Ephemeral to your homescreen for quicker access and standalone use. It will still be available offline through the browser, even if you do not install it." ]
+        ]
+
+
 viewForm : Form -> Html Msg
 viewForm form_ =
     form [ class "vs3 vs4-ns", HE.onSubmit FormSubmitClicked, HA.autocomplete False ]
         [ subHeading 2 [ class "decor" ] [ text "Add Entry" ]
-        , div [ class "vs3 vs4-ns mw6 center" ]
+        , div [ class "vs3 vs4-ns mw6" ]
             [ div [ class "vs2" ]
                 [ label
                     [ class "db fw6 f5 f4-ns"
@@ -170,7 +184,7 @@ viewForm form_ =
                     ]
                     [ text "Save location" ]
                 ]
-            , styledButtonBlue []
+            , styledButtonBlue [ class "w-100" ]
                 [ text "Save entry"
                 ]
             ]
@@ -280,8 +294,6 @@ viewInstallPrompt installPrompt =
                 [ prompt [ class "na2" ]
                     [ div [ class "measure ma2" ]
                         [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to home screen?" ]
-
-                        -- , paragraph [] [ text "You can install Ephemeral to your homescreen for\n            quicker access and standalone use. It will still\n            be available offline through the browser if you\n            do not." ]
                         ]
                     , div [ class "ma2 flex" ]
                         [ styledButtonBlue [ onClick AcceptInstallPrompt, class "mr2" ] [ text "Add" ]

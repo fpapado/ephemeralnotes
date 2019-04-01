@@ -54,7 +54,7 @@ prompt attrs children =
 
 
 paragraph attrs children =
-    p (class "mv0 f5 lh-copy" :: attrs) children
+    p (class "mv0 f5 f4-ns lh-copy" :: attrs) children
 
 
 textbox attrs children =
