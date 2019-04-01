@@ -103,12 +103,16 @@ viewInner model =
         [ Ui.centeredContainer
             []
             [ div [ class "vs4 vs5-ns" ]
-                [ viewForm model.form
-                , div [ class "vs3 vs4-ns" ]
+                [ section [ class "vs3 vs4-ns" ]
+                    [ heading 1 [] [ text "Ephemeral" ]
+                    , paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them." ]
+                    ]
+                , section [] [ viewForm model.form ]
+                , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
                     , viewEntries model.entries ( model.form.front, model.form.back )
                     ]
-                , viewAbout
+                , section [] [ viewAbout ]
                 ]
             , viewUpdatePrompt model.swUpdate
             , viewInstallPrompt model.installPrompt
@@ -121,11 +125,11 @@ viewAbout =
         [ summary [ class "mw6" ]
             [ subHeading 2
                 [ class "dib v-mid" ]
-                [ text "About" ]
+                [ text "Installing" ]
             ]
         , paragraph
             [ class "measure" ]
-            [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. You can install Ephemeral to your homescreen for quicker access and standalone use. It will still be available offline through the browser, even if you do not install it." ]
+            [ text "You can install Ephemeral to your homescreen for quicker access and standalone use. It will still be available offline through the browser, even if you do not install it." ]
         ]
 
 
@@ -139,7 +143,7 @@ viewForm form_ =
                     [ class "db fw6 f5 f4-ns"
                     , HA.for "entry-front"
                     ]
-                    [ text "Front" ]
+                    [ text "Word" ]
                 , input
                     [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
                     , HA.type_ "text"
@@ -156,7 +160,7 @@ viewForm form_ =
                     [ class "db fw6 f5 f4-ns"
                     , HA.for "entry-back"
                     ]
-                    [ text "Back" ]
+                    [ text "Translation" ]
                 , input
                     [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
                     , HA.type_ "text"
