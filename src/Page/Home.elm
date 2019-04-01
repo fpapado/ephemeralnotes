@@ -71,7 +71,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { timeZone = Time.utc
       , swUpdate = SW.updateNone
-      , installPrompt = SW.installPromptNone
+      , installPrompt = SW.installPromptAvailable
       , location = NotAsked
       , entries = RemoteData.Loading
       , form = emptyForm
@@ -270,42 +270,46 @@ viewLocation locationData =
 
 viewUpdatePrompt : SW.SwUpdate -> Html Msg
 viewUpdatePrompt swUpdate =
-    SW.viewSwUpdate swUpdate
-        { none = div [] []
-        , available =
-            calloutContainer []
-                [ prompt [ class "na2" ]
-                    [ div [ class "measure ma2" ]
-                        [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "A new version is available. You can reload now to get it." ]
-                        ]
-                    , div [ class "ma2 flex" ]
-                        [ styledButtonBlue [ onClick AcceptUpdate, class "mr2" ] [ text "Reload" ]
-                        , styledButtonBlue [ onClick DeferUpdate ] [ text "Later" ]
+    notificationRegion []
+        [ SW.viewSwUpdate swUpdate
+            { none = div [] []
+            , available =
+                calloutContainer []
+                    [ prompt [ class "na2" ]
+                        [ div [ class "measure ma2" ]
+                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "A new version is available. You can reload now to get it." ]
+                            ]
+                        , div [ class "ma2 flex" ]
+                            [ styledButtonBlue [ onClick AcceptUpdate, class "mr2" ] [ text "Reload" ]
+                            , styledButtonBlue [ onClick DeferUpdate ] [ text "Later" ]
+                            ]
                         ]
                     ]
-                ]
-        , accepted = div [] []
-        , deferred = div [] []
-        }
+            , accepted = div [] []
+            , deferred = div [] []
+            }
+        ]
 
 
 viewInstallPrompt : SW.InstallPrompt -> Html Msg
 viewInstallPrompt installPrompt =
-    SW.viewInstallPrompt installPrompt
-        { none = div [] []
-        , available =
-            calloutContainer []
-                [ prompt [ class "na2" ]
-                    [ div [ class "measure ma2" ]
-                        [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to home screen?" ]
-                        ]
-                    , div [ class "ma2 flex" ]
-                        [ styledButtonBlue [ onClick AcceptInstallPrompt, class "mr2" ] [ text "Add" ]
-                        , styledButtonBlue [ onClick DeferInstallPrompt ] [ text "Dismiss" ]
+    notificationRegion []
+        [ SW.viewInstallPrompt installPrompt
+            { none = div [] []
+            , available =
+                calloutContainer []
+                    [ prompt [ class "na2" ]
+                        [ div [ class "measure ma2" ]
+                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to home screen?" ]
+                            ]
+                        , div [ class "ma2 flex" ]
+                            [ styledButtonBlue [ onClick AcceptInstallPrompt, class "mr2" ] [ text "Add" ]
+                            , styledButtonBlue [ onClick DeferInstallPrompt ] [ text "Dismiss" ]
+                            ]
                         ]
                     ]
-                ]
-        }
+            }
+        ]
 
 
 viewBanner : Html msg

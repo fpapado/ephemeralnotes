@@ -3,6 +3,7 @@ module Ui exposing
     , calloutContainer
     , centeredContainer
     , heading
+    , notificationRegion
     , paragraph
     , prompt
     , styledButton
@@ -11,8 +12,8 @@ module Ui exposing
     , textbox
     )
 
-import Html exposing (Html, a, button, div, h1, img, p)
-import Html.Attributes exposing (class)
+import Html as H exposing (Html, a, button, div, h1, img, p)
+import Html.Attributes as HA exposing (class)
 
 
 heading level attrs children =
@@ -20,7 +21,7 @@ heading level attrs children =
         tagName =
             "h" ++ String.fromInt (clamp 1 6 level)
     in
-    Html.node tagName (class "mv0 f2 f1-ns lh-title fw7" :: attrs) children
+    H.node tagName (class "mv0 f2 f1-ns lh-title fw7" :: attrs) children
 
 
 subHeading level attrs children =
@@ -28,7 +29,7 @@ subHeading level attrs children =
         tagName =
             "h" ++ String.fromInt (clamp 1 6 level)
     in
-    Html.node tagName (class "mv0 f3 f2-ns lh-title fw7" :: attrs) children
+    H.node tagName (class "mv0 f3 f2-ns lh-title fw7" :: attrs) children
 
 
 centeredContainer attrs children =
@@ -47,6 +48,18 @@ calloutContainer attrs children =
     div (class "fixed bottom-0 left-0 w-100 br1" :: attrs)
         [ div [ class "mw6 center" ] children
         ]
+
+
+{-| A region that explicitly announces its content to screen readers.
+Use it in cases where you show notification popups visually, and want a
+comparable experience for screen reader users.
+
+    Bear in mind that screen readers announce changes already, so you shouldn't
+    need this for most of the content on a page!
+
+-}
+notificationRegion attrs children =
+    div ([ HA.attribute "status" "role", HA.attribute "aria-live" "polite" ] ++ attrs) children
 
 
 prompt attrs children =
