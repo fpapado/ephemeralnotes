@@ -27,7 +27,7 @@ const ifNotProduction = makeIfNotProp(isProduction);
 module.exports = {
   context: process.cwd(),
   mode: ifProduction('production', 'development'),
-  entry: ifProduction(['./src/index-prod.js'], ['./src/index-dev.js']),
+  entry: ifProduction(['./src/index-prod.ts'], ['./src/index-dev.ts']),
   output: {
     path: __dirname + '/dist',
     chunkFilename: '[name]-[contenthash].js',

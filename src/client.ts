@@ -1,11 +1,12 @@
 import './styles/index.css';
 import {listenForWaitingSW} from './sw-utils';
-import {getLocation} from './Geolocation.js';
-import * as Store from './Store.js';
+import {Elm} from './Main';
+import {getLocation, Result, Location, LocationError} from './Geolocation';
+import * as Store from './Store';
 
-export function runWith(Elm) {
+export function runWith(init: typeof Elm) {
   // Start Elm app
-  const app = Elm.Main.init({});
+  const app = Elm.Main.init({flags: null});
 
   // PORTS
 
@@ -24,7 +25,7 @@ export function runWith(Elm) {
   // TO ELM
   if ('serviceWorker' in navigator) {
     // Chrome App Install Banner
-    let deferredPrompt;
+    let deferredPrompt: BeforeInstallPromptEvent | null;
     window.addEventListener('beforeinstallprompt', e => {
       console.log('Before install prompt', e);
 
@@ -32,7 +33,7 @@ export function runWith(Elm) {
       e.preventDefault();
 
       // Stash the event so it can be triggered later.
-      deferredPrompt = e;
+      deferredPrompt = e as BeforeInstallPromptEvent;
 
       // Notify the user
       app.ports.swToElm.send(BeforeInstallPrompt);
@@ -51,7 +52,7 @@ export function runWith(Elm) {
 
     // Reload once the new Service Worker starts activating
     // When the user asks to refresh the UI, we'll need to reload the window
-    let preventDevToolsReloadLoop;
+    let preventDevToolsReloadLoop: boolean;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       // Ensure refresh is only called once.
       // This works around a bug in "force update on reload".
@@ -61,8 +62,16 @@ export function runWith(Elm) {
       window.location.reload();
     });
 
-    // FROM ELM
-    app.ports.swFromElm.subscribe(msg => {
+    // SW FROM ELM
+    type SWFromElm =
+      | {tag: 'UpdateAccepted'}
+      | {tag: 'UpdateDeferred'}
+      | {tag: 'InstallPromptAccepted'}
+      | {tag: 'InstallPromptDeferred'};
+
+    app.ports.swFromElm.subscribe(unkMsg => {
+      let msg = unkMsg as SWFromElm;
+
       if (!msg.tag) {
         console.error('No tag for msg', msg);
         return;
@@ -75,11 +84,11 @@ export function runWith(Elm) {
       switch (msg.tag) {
         // Post a message to the waiting SW to skip waiting
         case 'UpdateAccepted':
-          navigator.serviceWorker
-            .getRegistration()
-            .then(registration =>
-              registration.waiting.postMessage('SkipWaiting')
-            );
+          navigator.serviceWorker.getRegistration().then(registration => {
+            if (registration && registration.waiting) {
+              registration.waiting.postMessage('SkipWaiting');
+            }
+          });
           return;
         // Do nothing on deferred update
         case 'UpdateDeferred':
@@ -101,19 +110,26 @@ export function runWith(Elm) {
           });
           return;
         }
-        case 'InstallPromptDefered':
+        case 'InstallPromptDeferred':
+          return;
+
+        default:
+          console.warn('Unknown message: ', msg);
           return;
       }
     });
   }
 
   // GEOLOCATION <-> ELM
-  const GotLocationMsg = data => ({
+  const GotLocationMsg = (data: Result<Location, LocationError>) => ({
     tag: 'GotLocation',
     data,
   });
 
-  app.ports.geolocationFromElm.subscribe(msg => {
+  type GeolocationFromElm = {tag: 'GetLocation'};
+
+  app.ports.geolocationFromElm.subscribe(unkMsg => {
+    let msg = unkMsg as GeolocationFromElm;
     if (!msg.tag) {
       console.error('No tag for msg', msg);
       return;
@@ -127,15 +143,19 @@ export function runWith(Elm) {
       // Post a message to the waiting SW to skip waiting
       case 'GetLocation':
         getLocation(data => {
-          console.log(GotLocationMsg(data));
           app.ports.geolocationToElm.send(GotLocationMsg(data));
         });
+        return;
+
+      default:
+        console.warn('Unknown message: ', msg);
         return;
     }
   });
 
   // Store <-> Elm
-  app.ports.storeFromElm.subscribe(msg => {
+  app.ports.storeFromElm.subscribe(unkMsg => {
+    let msg = unkMsg as Store.FromElm;
     Store.handleSubMessage(app.ports.storeToElm.send, msg);
   });
 }

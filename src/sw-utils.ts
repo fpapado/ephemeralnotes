@@ -1,11 +1,20 @@
 /**
     @see https://developers.google.com/web/tools/workbox/guides/advanced-recipes
 */
-export function listenForWaitingSW(registration, cb) {
+export function listenForWaitingSW(
+  registration: ServiceWorkerRegistration | undefined,
+  cb: (registration: ServiceWorkerRegistration) => void
+) {
   function awaitStateChange() {
-    registration.installing.addEventListener('statechange', function(event) {
-      if (event.target.state === 'installed') cb(registration);
-    });
+    if (registration && registration.installing) {
+      registration.installing.addEventListener('statechange', function(event) {
+        if (event && event.target) {
+          if (((event.target as any).state as string) === 'installed') {
+            cb(registration);
+          }
+        }
+      });
+    }
   }
   if (!registration) return;
 

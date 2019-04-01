@@ -5,22 +5,41 @@
  */
 
 // TODO: Movev this to a module
-const Maybe_Nothing = {tag: 'Maybe', data: {tag: 'Nothing'}};
-const Maybe_Just = data => ({tag: 'Maybe', data: {tag: 'Just', data}});
+type Maybe<Data> = {
+  tag: 'Maybe';
+  data: {tag: 'Just'; data: Data} | {tag: 'Nothing'};
+};
+const Maybe_Nothing = (): Maybe<any> => ({
+  tag: 'Maybe',
+  data: {tag: 'Nothing'},
+});
+const Maybe_Just = <A>(data: A): Maybe<A> => ({
+  tag: 'Maybe',
+  data: {tag: 'Just', data},
+});
 
-const Result_Ok = data => ({tag: 'Ok', data});
-const Result_Error = data => ({tag: 'Err', data});
+export type Result<Data, Error> =
+  | {tag: 'Ok'; data: Data}
+  | {tag: 'Err'; data: Error};
+export const Result_Ok = <A>(data: A): Result<A, any> => ({tag: 'Ok', data});
+export const Result_Error = <E>(data: E): Result<any, E> => ({
+  tag: 'Err',
+  data,
+});
 
 // LOCATIONS
 
-function toLocation(rawPosition) {
+export type Location = ReturnType<typeof toLocation>;
+export type LocationError = ReturnType<typeof toError>;
+
+function toLocation(rawPosition: Position) {
   var coords = rawPosition.coords;
 
   var rawAltitude = coords.altitude;
   var rawAccuracy = coords.altitudeAccuracy;
-  var altitude =
+  var altitude: Maybe<number> =
     rawAltitude === null || rawAccuracy === null
-      ? Maybe_Nothing
+      ? Maybe_Nothing()
       : Maybe_Just({value: rawAltitude, accuracy: rawAccuracy});
 
   var heading = coords.heading;
@@ -28,7 +47,7 @@ function toLocation(rawPosition) {
 
   var movement =
     heading === null || speed === null
-      ? Maybe_Nothing
+      ? Maybe_Nothing()
       : Maybe_Just(
           speed === 0
             ? {tag: 'Static'}
@@ -54,7 +73,7 @@ function toLocation(rawPosition) {
 
 let GeolocationErrors = ['PermissionDenied', 'PositionUnavailable', 'Timeout'];
 
-function toError(positionErr) {
+function toError(positionErr: PositionError) {
   return {
     tag: GeolocationErrors[positionErr.code - 1],
     data: positionErr.message,
@@ -70,14 +89,16 @@ const defaultOptions = {
 };
 
 // GET LOCATION
-export function getLocation(cb, opts = {}) {
+type LocationCallback = (data: Result<Location, LocationError>) => void;
+
+export function getLocation(cb: LocationCallback, opts = {}) {
   const options = {...defaultOptions, opts};
 
-  function onSuccess(rawPosition) {
+  function onSuccess(rawPosition: Position) {
     cb(Result_Ok(toLocation(rawPosition)));
   }
 
-  function onError(rawError) {
+  function onError(rawError: PositionError) {
     cb(Result_Error(toError(rawError)));
   }
 
@@ -85,6 +106,6 @@ export function getLocation(cb, opts = {}) {
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
   } else {
-    onError({code: 2, message: 'Geolocation unavailable.'});
+    onError({code: 2, message: 'Geolocation unavailable.'} as any);
   }
 }

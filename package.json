@@ -40,6 +40,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^11.12.2",
     "chokidar-cli": "^1.2.2",
     "critters-webpack-plugin": "^2.3.0",
     "css-loader": "^2.1.1",

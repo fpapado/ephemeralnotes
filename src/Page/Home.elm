@@ -281,7 +281,7 @@ viewUpdatePrompt swUpdate =
                     ]
                 ]
         , accepted = div [] []
-        , defered = div [] []
+        , deferred = div [] []
         }
 
 
@@ -374,7 +374,7 @@ update msg model =
             ( { model | swUpdate = SW.updateAccepted }, SW.acceptUpdate )
 
         DeferUpdate ->
-            ( { model | swUpdate = SW.updateDefered }, SW.deferUpdate )
+            ( { model | swUpdate = SW.updateDeferred }, SW.deferUpdate )
 
         -- TODO: Fix None to Accepted/Defered
         AcceptInstallPrompt ->

@@ -11,7 +11,7 @@ port module ServiceWorker exposing
     , sub
     , updateAccepted
     , updateAvailable
-    , updateDefered
+    , updateDeferred
     , updateNone
     , viewInstallPrompt
     , viewSwUpdate
@@ -52,9 +52,9 @@ type FromElm
     = -- The user has accepted the update
       UpdateAccepted
       -- The user has postponed the update
-    | UpdateDefered
+    | UpdateDeferred
     | InstallPromptAccepted
-    | InstallPromptDefered
+    | InstallPromptDeferred
 
 
 
@@ -75,7 +75,7 @@ acceptUpdate =
 
 deferUpdate : Cmd msg
 deferUpdate =
-    send UpdateDefered
+    send UpdateDeferred
 
 
 acceptInstallPrompt : Cmd msg
@@ -85,7 +85,7 @@ acceptInstallPrompt =
 
 deferInstallPrompt : Cmd msg
 deferInstallPrompt =
-    send InstallPromptDefered
+    send InstallPromptDeferred
 
 
 
@@ -117,7 +117,7 @@ type SwUpdate
     = None
     | Available
     | Accepted
-    | Defered
+    | Deferred
 
 
 updateNone =
@@ -132,15 +132,15 @@ updateAccepted =
     Accepted
 
 
-updateDefered =
-    Defered
+updateDeferred =
+    Deferred
 
 
 {-| View function that accepts a separate view for each update state.
 Exhaustive and does not expose the SwUpdate constructor.
 -}
-viewSwUpdate : SwUpdate -> { none : Html msg, available : Html msg, accepted : Html msg, defered : Html msg } -> Html msg
-viewSwUpdate swUpdate { none, available, accepted, defered } =
+viewSwUpdate : SwUpdate -> { none : Html msg, available : Html msg, accepted : Html msg, deferred : Html msg } -> Html msg
+viewSwUpdate swUpdate { none, available, accepted, deferred } =
     case swUpdate of
         None ->
             none
@@ -151,8 +151,8 @@ viewSwUpdate swUpdate { none, available, accepted, defered } =
         Accepted ->
             accepted
 
-        Defered ->
-            defered
+        Deferred ->
+            deferred
 
 
 
@@ -214,9 +214,9 @@ encodeFromElm data =
                 , ( "data", E.object [] )
                 ]
 
-        UpdateDefered ->
+        UpdateDeferred ->
             E.object
-                [ ( "tag", E.string "UpdateDefered" )
+                [ ( "tag", E.string "UpdateDeferred" )
                 , ( "data", E.object [] )
                 ]
 
@@ -226,9 +226,9 @@ encodeFromElm data =
                 , ( "data", E.object [] )
                 ]
 
-        InstallPromptDefered ->
+        InstallPromptDeferred ->
             E.object
-                [ ( "tag", E.string "InstallPromptDefered" )
+                [ ( "tag", E.string "InstallPromptDeferred" )
                 , ( "data", E.object [] )
                 ]
 
