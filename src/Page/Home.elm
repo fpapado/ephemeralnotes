@@ -71,7 +71,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { timeZone = Time.utc
       , swUpdate = SW.updateNone
-      , installPrompt = SW.installPromptAvailable
+      , installPrompt = SW.installPromptNone
       , location = NotAsked
       , entries = RemoteData.Loading
       , form = emptyForm

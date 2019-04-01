@@ -1,6 +1,7 @@
 module Svg.NoData exposing (view)
 
 import Html exposing (div, p)
+import Html.Attributes as HA
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
@@ -21,7 +22,14 @@ view ( defaultText1, defaultText2 ) ( text1, text2 ) attrs =
             else
                 text2
     in
-    svg ([ viewBox "0 0 820.16 780.81" ] ++ attrs)
+    svg
+        ([ viewBox "0 0 820.16 780.81"
+         , HA.attribute "focusable" "false"
+         , HA.attribute "role" "img"
+         , HA.attribute "aria-label" "A clipboard with sparkles"
+         ]
+            ++ attrs
+        )
         [ defs []
             [ linearGradient
                 [ id "a"
