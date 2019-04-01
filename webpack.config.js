@@ -4,6 +4,8 @@ const SizePlugin = require('size-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const cssnano = require('cssnano');
 
@@ -23,6 +25,7 @@ const ifNotProduction = makeIfNotProp(isProduction);
 
 // webpack.config.js
 module.exports = {
+  context: process.cwd(),
   mode: ifProduction('production', 'development'),
   entry: ifProduction(['./src/index-prod.js'], ['./src/index-dev.js']),
   output: {
@@ -35,6 +38,20 @@ module.exports = {
     // Place things in template
     new HtmlWebpackPlugin({
       template: 'index.html',
+    }),
+    ifProduction(
+      new ForkTsCheckerWebpackPlugin({
+        async: false,
+        useTypescriptIncrementalApi: true,
+        memoryLimit: 4096,
+      }),
+      new ForkTsCheckerWebpackPlugin({
+        useTypescriptIncrementalApi: true,
+      })
+    ),
+    new ForkTsCheckerNotifierWebpackPlugin({
+      title: 'Typescript',
+      excludeWarnings: false,
     }),
     new OptimizeCssAssetsPlugin({
       cssProcessor: cssnano,
@@ -97,6 +114,10 @@ module.exports = {
         ),
       },
       {
+        test: /.tsx?$/,
+        use: [{loader: 'ts-loader', options: {transpileOnly: true}}],
+      },
+      {
         test: /\.css$/,
         use: [
           {
@@ -115,11 +136,15 @@ module.exports = {
       },
     ],
   },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.elm'],
+  },
   devServer: {
     compress: true,
     // E.g. /404 should serve index.html, and let Elm handle the route
     historyApiFallback: true,
     hot: true,
+    stats: 'errors-only',
   },
 };
 

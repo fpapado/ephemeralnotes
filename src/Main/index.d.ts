@@ -7,23 +7,23 @@ export namespace Elm {
     export interface App {
       ports: {
         swFromElm: {
-          subscribe(callback: (data: unknown) => void): void
-        }
+          subscribe(callback: (data: unknown) => void): void;
+        };
         swToElm: {
-          send(data: any): void
-        }
+          send(data: any): void;
+        };
         geolocationFromElm: {
-          subscribe(callback: (data: unknown) => void): void
-        }
+          subscribe(callback: (data: unknown) => void): void;
+        };
         geolocationToElm: {
-          send(data: any): void
-        }
-        swFromElm: {
-          subscribe(callback: (data: unknown) => void): void
-        }
-        swToElm: {
-          send(data: any): void
-        }
+          send(data: any): void;
+        };
+        storeFromElm: {
+          subscribe(callback: (data: unknown) => void): void;
+        };
+        storeToElm: {
+          send(data: any): void;
+        };
       };
     }
     export function init(options: {
