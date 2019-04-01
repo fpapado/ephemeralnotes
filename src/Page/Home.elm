@@ -13,10 +13,13 @@ module Page.Home exposing
 
 import Asset
 import Entry.Entry as Entry exposing (Entry)
+import Entry.Id
 import Geolocation as Geo
 import Html exposing (..)
 import Html.Attributes as HA exposing (class, href)
 import Html.Events as HE exposing (onClick)
+import Html.Keyed as Keyed
+import Json.Decode as JD
 import Location as L
 import RemoteData exposing (RemoteData)
 import ServiceWorker as SW
@@ -205,8 +208,11 @@ viewEntries entryData entryTuple =
             paragraph [ class "animated fadeIn delay h5" ] [ text "Loading entries..." ]
 
         RemoteData.Failure err ->
-            paragraph []
-                [ text <| "Error getting entries: " ++ err
+            div []
+                [ paragraph [] [ text "Error getting entries" ]
+                , pre []
+                    [ text err
+                    ]
                 ]
 
         RemoteData.Success entries ->
@@ -226,18 +232,34 @@ viewEntryList entryList ( front, back ) =
                     [ text "No entries yet. Why don't you add one? :)" ]
                 ]
 
-        -- TODO: HTML.keyed
+        -- The list might change often, so we use Html.Keyed to help the diffs
         entries ->
-            div [] (List.map viewEntry entries)
+            Keyed.node "ul"
+                [ class "pl0 list grid-entries grid-entries--compact" ]
+                (List.map viewEntryKeyed entries)
 
 
-viewEntry : Entry -> Html Msg
-viewEntry ambiguousEntry =
+viewEntryKeyed : Entry -> ( String, Html Msg )
+viewEntryKeyed ambiguousEntry =
     case ambiguousEntry of
         Entry.V1 entry ->
-            div []
-                [ text entry.front
+            ( Entry.Id.toString entry.id
+            , li [ class "flex flex-column vs3 pa3 br2 bg-white ba bw1 b--near-black shadow-4 near-black" ]
+                [ div [ class "vs2 mb3" ]
+                    [ paragraph [ class "fw6" ] [ text entry.front ]
+                    , paragraph [] [ text entry.back ]
+                    ]
+                , div [ class "mt-auto" ]
+                    [ paragraph []
+                        [ text <|
+                            String.fromFloat (L.latToFloat entry.location.lat)
+                                ++ ", "
+                                ++ String.fromFloat (L.lonToFloat entry.location.lon)
+                        ]
+                    , paragraph [] [ text (String.fromInt <| Time.posixToMillis entry.time) ]
+                    ]
                 ]
+            )
 
 
 viewLocation : GeolocationData -> Html Msg
@@ -376,7 +398,7 @@ update msg model =
                     ( { model | entries = RemoteData.Success entries }, Cmd.none )
 
                 Store.DecodingError err ->
-                    ( model, Cmd.none )
+                    ( { model | entries = RemoteData.Failure (JD.errorToString err) }, Cmd.none )
 
         AcceptUpdate ->
             ( { model | swUpdate = SW.updateAccepted }, SW.acceptUpdate )
@@ -426,6 +448,7 @@ update msg model =
             ( { model | form = newForm }, Cmd.none )
 
         -- TODO: On Form submit:
+        -- - TODO: Set form "submitting" state
         -- - get location if specified
         -- - tie that to the form somehow / prevent the form from being edited and the button clicked
         -- - add a "loading" to the button
@@ -438,7 +461,31 @@ update msg model =
         -- NOTE: Need a way to encode partials, e.g Entry.encodePartial
         -- NOTE: Check JS-side for the uuid generation
         FormSubmitClicked ->
-            ( model, Cmd.none )
+            let
+                saveCmd =
+                    let
+                        lat =
+                            L.latFromFloat 0
+
+                        lon =
+                            L.lonFromFloat 0
+                    in
+                    case ( lat, lon ) of
+                        ( Just x, Just y ) ->
+                            let
+                                entryPartial =
+                                    { front = model.form.front
+                                    , back = model.form.back
+                                    , time = Time.millisToPosix 0
+                                    , location = { lat = x, lon = y }
+                                    }
+                            in
+                            Store.storeEntry entryPartial
+
+                        _ ->
+                            Cmd.none
+            in
+            ( model, saveCmd )
 
         FormSubmittedOk ->
             ( { model | form = emptyForm }, Cmd.none )

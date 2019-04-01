@@ -7013,3 +7013,19 @@ code {
     margin-top: 4rem;
   }
 }
+
+.mt-auto {
+  margin-top: auto;
+}
+
+.grid-entries {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  grid-auto-flow: dense;
+  grid-gap: 1rem;
+}
+
+.grid-entries--compact {
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}

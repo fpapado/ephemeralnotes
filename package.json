@@ -40,7 +40,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^11.12.2",
+    "@types/node": "^11.13.0",
     "chokidar-cli": "^1.2.2",
     "critters-webpack-plugin": "^2.3.0",
     "css-loader": "^2.1.1",
@@ -68,7 +68,9 @@
     "workbox-webpack-plugin": "^4.1.1"
   },
   "dependencies": {
-    "idb": "^4.0.0",
-    "idb-keyval": "^3.1.0"
+    "@types/nanoid": "^1.2.1",
+    "idb": "^4.0.1",
+    "idb-keyval": "^3.2.0",
+    "nanoid": "^2.0.1"
   }
 }

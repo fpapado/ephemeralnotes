@@ -1,6 +1,7 @@
 export {handleSubMessage};
 
 import {openDB, DBSchema} from 'idb';
+import nanoid from 'nanoid';
 import {Elm} from './Main';
 
 // FromElm
@@ -12,7 +13,7 @@ import {Elm} from './Main';
 // ToElm
 
 type EntryToElm = EntryV1 & {schema_version: number};
-type ParialEntryFromElm = Omit<EntryV1, 'id'> & {schema_version: number};
+type PartialEntryFromElm = Omit<EntryV1, 'id'> & {schema_version: number};
 
 const GotEntries = (data: EntryToElm[]) => ({
   tag: 'GotEntries',
@@ -30,7 +31,7 @@ const SavedEntryErr = (data: string) => ({
 });
 
 export type FromElm =
-  | {tag: 'StoreEntry'; data: ParialEntryFromElm}
+  | {tag: 'StoreEntry'; data: PartialEntryFromElm}
   | {tag: 'GetEntries'};
 
 /** Respond to a Store.FromElm message */
@@ -49,17 +50,18 @@ function handleSubMessage(
 
   switch (msg.tag) {
     case 'StoreEntry':
-      throw Error('Not yet implemented');
-    /* storeEntry(msg.data)
-        .then(data => {
-          sendToElm(SavedEntryOk(data));
+      storeAndGetEntry(msg.data)
+        .then(entry => {
+          if (entry) {
+            const entryToElm = {...entry, schema_version: 1};
+            sendToElm(SavedEntryOk(entryToElm));
+          }
         })
         .catch(err => {
           console.error(err);
           sendToElm(SavedEntryErr(err.toString));
         });
-        return;
-      */
+      return;
 
     case 'GetEntries':
       getEntries().then(entries => {
@@ -105,9 +107,28 @@ interface DBV1 extends DBSchema {
   };
 }
 
+async function storeAndGetEntry(entry: PartialEntryFromElm) {
+  const key = await storeEntry(entry);
+  return getEntry(key);
+}
+
+async function getEntry(key: string) {
+  const db = await openEntryDB();
+  return db.get(ENTRY_STORE_NAME, key);
+}
+
 async function getEntries() {
   const db = await openEntryDB();
   return db.getAllFromIndex(ENTRY_STORE_NAME, Index.Time);
+}
+
+async function storeEntry(entry: PartialEntryFromElm) {
+  const db = await openEntryDB();
+  // Generate a random id
+  // TODO: Find the difference between this and autoIncrement
+  const id = nanoid();
+  const newEntry = {...entry, id};
+  return db.add(ENTRY_STORE_NAME, newEntry);
 }
 
 async function openEntryDB() {

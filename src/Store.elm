@@ -5,18 +5,25 @@ port module Store exposing
     , sub
     )
 
-import Entry.Entry as Entry exposing (Entry)
+import Entry.Entry as Entry exposing (Entry, EntryV1Partial)
 import Json.Decode as JD
 import Json.Encode as JE
 
 
+
+-- TODO: Intead of unwrapping to DecodingError, make GotEntries Result JD.Error (List Entry)
+-- And then DecodingError would become an explicit UnknownMsg
+
+
 type ToElm
     = GotEntries (List Entry)
+      -- TODO: Implement GotEntry
+      -- | GotEntry Entry
     | DecodingError JD.Error
 
 
 type FromElm
-    = StoreEntry Entry
+    = StoreEntry EntryV1Partial
     | GetEntries
 
 
@@ -36,7 +43,7 @@ getEntries =
     send GetEntries
 
 
-storeEntry : Entry -> Cmd msg
+storeEntry : EntryV1Partial -> Cmd msg
 storeEntry entry =
     send (StoreEntry entry)
 
@@ -72,7 +79,7 @@ encodeFromElm data =
         StoreEntry entry ->
             JE.object
                 [ ( "tag", JE.string "StoreEntry" )
-                , ( "data", Entry.encode entry )
+                , ( "data", Entry.encodePartial entry )
                 ]
 
         GetEntries ->

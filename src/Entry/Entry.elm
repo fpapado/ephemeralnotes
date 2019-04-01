@@ -1,4 +1,4 @@
-module Entry.Entry exposing (Entry(..), decoder, encode)
+module Entry.Entry exposing (Entry(..), EntryV1Partial, decoder, encode, encodePartial)
 
 import Entry.Id
 import Html exposing (Html)
@@ -28,24 +28,28 @@ type alias EntryV1 =
     }
 
 
-
--- JSON
+type alias EntryV1Partial =
+    { front : String
+    , back : String
+    , time : Time.Posix
+    , location : Location.LatLon
+    }
 
 
 decoder : D.Decoder Entry
 decoder =
-    D.field "schema_version" D.string
+    D.field "schema_version" D.int
         |> D.andThen schemaDecoder
 
 
-schemaDecoder : String -> D.Decoder Entry
+schemaDecoder : Int -> D.Decoder Entry
 schemaDecoder version =
     case version of
-        "1" ->
+        1 ->
             D.map V1 v1Decoder
 
         _ ->
-            D.fail ("Unknown schema version: " ++ version)
+            D.fail ("Unknown schema version: " ++ String.fromInt version)
 
 
 v1Decoder : D.Decoder EntryV1
@@ -72,3 +76,15 @@ encode entry =
                 , ( "time", E.int (Time.posixToMillis e.time) )
                 , ( "location", Location.encode e.location )
                 ]
+
+
+{-| Encode an entry with a schema into the appropriate JSON representation.
+-}
+encodePartial : EntryV1Partial -> E.Value
+encodePartial e =
+    E.object
+        [ ( "front", E.string e.front )
+        , ( "back", E.string e.back )
+        , ( "time", E.int (Time.posixToMillis e.time) )
+        , ( "location", Location.encode e.location )
+        ]

@@ -3,11 +3,11 @@ module Location exposing
     , Latitude
     , Longitude
     , decoder
-    , latDecoder
-    , lonDecoder
     , encode
+    , latDecoder
     , latFromFloat
     , latToFloat
+    , lonDecoder
     , lonFromFloat
     , lonToFloat
     )
@@ -103,8 +103,8 @@ encode { lat, lon } =
 decoder : D.Decoder LatLon
 decoder =
     D.map2 LatLon
-        (D.field "latitude" latDecoder)
-        (D.field "longitude" lonDecoder)
+        (D.field "lat" latDecoder)
+        (D.field "lon" lonDecoder)
 
 
 {-| Decode a generic Float to a Latitude, or fail
