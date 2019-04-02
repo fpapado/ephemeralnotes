@@ -93,6 +93,7 @@ changeRouteTo maybeRoute model =
 
 
 {-| Deferred focus after a setTimeout, to allow the rendering to settle
+TODO: Test this with Process.sleep 0 - 200ms
 -}
 focus : String -> Cmd Msg
 focus id =

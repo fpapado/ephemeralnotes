@@ -1,4 +1,5 @@
-# Static
+# TODO
+## Static
 
 - [X] Build pipeline just with npm commands and some light bundling, perhaps
 - [X] index.html with inlined critical CSS
@@ -14,9 +15,12 @@
 - [X] style installBanner
 - [?] inline all the CSS
 
-# MVP
+## MVP
 
 - idb-keyval and Port architecture
 - Data structures
 - simple viewer
 - App shell
+
+## Accessibility
+- [ ] Test Focus management with screen readers, decide on timeout before focus

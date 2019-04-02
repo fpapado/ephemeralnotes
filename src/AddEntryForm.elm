@@ -11,6 +11,7 @@ module AddEntryForm exposing
     , view
     )
 
+import Browser.Dom as Dom
 import Entry.Entry as Entry exposing (Entry)
 import Geolocation as Geo
 import Html exposing (..)
@@ -61,6 +62,21 @@ type alias Input =
     , back : String
     , saveLocation : Bool
     }
+
+
+
+-- Setup for focusing the error summary
+-- We focus the summary to notify users of errors
+
+
+errorSummaryId : String
+errorSummaryId =
+    "addEntryForm-summary"
+
+
+focusErrorSummaryAndForget =
+    Dom.focus errorSummaryId
+        |> Task.attempt (\_ -> NoOp)
 
 
 {-| Update the form, skipping invalid transitions
@@ -141,11 +157,15 @@ update msg form =
                                                             , location = location
                                                             }
                                                     in
-                                                    ( { form | location = locationData, state = WaitingForSave }, Store.storeEntry entryPartial )
+                                                    ( { form | location = locationData, state = WaitingForSave }
+                                                    , Store.storeEntry entryPartial
+                                                    )
 
                                                 -- On geolocation error, notify the user, and do not save
                                                 RemoteData.Failure error ->
-                                                    ( { form | location = locationData, state = EditingWithError (GeolocationError error) }, Cmd.none )
+                                                    ( { form | location = locationData, state = EditingWithError (GeolocationError error) }
+                                                    , focusErrorSummaryAndForget
+                                                    )
 
                                                 _ ->
                                                     ( form, Cmd.none )
@@ -167,7 +187,9 @@ update msg form =
                                     ( { form | input = emptyInput, state = Editing }, Cmd.none )
 
                                 Err () ->
-                                    ( { form | state = EditingWithError SavingError }, Cmd.none )
+                                    ( { form | state = EditingWithError SavingError }
+                                    , focusErrorSummaryAndForget
+                                    )
 
                         _ ->
                             ( form, Cmd.none )
@@ -326,6 +348,9 @@ view form_ =
 viewError : Error -> Html msg
 viewError error =
     let
+        headingId =
+            "addEntryFrom-error-heading"
+
         humanText =
             case error of
                 GeolocationError Geo.PermissionDenied ->
@@ -340,7 +365,13 @@ viewError error =
                 SavingError ->
                     "There was an internal error when saving the note locally. Sorry about that.."
     in
-    div [ class "vs1 pa3 bg-washed-red ba bw1 br2 b--light-red" ]
-        [ subHeading 3 [] [ text "Error" ]
+    div
+        [ HA.tabindex -1
+        , HA.id errorSummaryId
+        , HA.attribute "role" "group"
+        , HA.attribute "aria-labelledby" headingId
+        , class "vs1 pa3 bg-washed-red ba bw1 br2 b--light-red"
+        ]
+        [ subHeading 3 [ HA.id headingId ] [ text "Error" ]
         , paragraph [] [ text humanText ]
         ]
