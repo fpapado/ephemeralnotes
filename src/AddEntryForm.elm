@@ -123,6 +123,9 @@ update msg form =
                         Editing ->
                             ( { form | state = WaitingForTime }, Task.perform GotTime Time.now )
 
+                        EditingWithError err ->
+                            ( { form | state = WaitingForTime }, Task.perform GotTime Time.now )
+
                         _ ->
                             ( form, Cmd.none )
 
