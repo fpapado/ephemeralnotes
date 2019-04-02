@@ -8,18 +8,16 @@ port module Store exposing
 import Entry.Entry as Entry exposing (Entry, EntryV1Partial)
 import Json.Decode as JD
 import Json.Encode as JE
+import Result.Decode
 
 
-
--- TODO: Intead of unwrapping to DecodingError, make GotEntries Result JD.Error (List Entry)
--- And then DecodingError would become an explicit UnknownMsg
-
-
-type ToElm
+type
+    ToElm
+    -- TODO: Intead of unwrapping to DecodingError, make GotEntries Result JD.Error (List Entry)
+    -- And then DecodingError would become an explicit UnknownMsg
     = GotEntries (List Entry)
-      -- TODO: Implement GotEntry
-      -- | GotEntry Entry
-    | DecodingError JD.Error
+    | GotEntry (Result String Entry)
+    | BadMessage JD.Error
 
 
 type FromElm
@@ -54,9 +52,16 @@ storeEntry entry =
 
 sub : Sub ToElm
 sub =
-    JD.decodeValue toElmDecoder
-        |> storeToElm
-        |> Sub.map (extractResult DecodingError)
+    storeToElm (JD.decodeValue toElmDecoder)
+        |> Sub.map
+            (\subMsg ->
+                case subMsg of
+                    Ok msg ->
+                        msg
+
+                    Err err ->
+                        BadMessage err
+            )
 
 
 
@@ -102,22 +107,10 @@ toElmInnerDecoder tag =
             JD.field "data" (JD.list Entry.decoder)
                 |> JD.map GotEntries
 
+        "GotEntry" ->
+            -- GotEntry is a Result String Entry, so use the custom Result Decoder!
+            JD.field "data" (Result.Decode.decoder JD.string Entry.decoder)
+                |> JD.map GotEntry
+
         _ ->
-            JD.fail ("Unknown message" ++ tag)
-
-
-
--- UTILS
-
-
-{-| Turn a `Result e a` to an `a`, by applying the conversion
-function specified to the `e`.
--}
-extractResult : (e -> a) -> Result e a -> a
-extractResult f x =
-    case x of
-        Ok a ->
-            a
-
-        Err e ->
-            f e
+            JD.fail ("Unknown message: " ++ tag)

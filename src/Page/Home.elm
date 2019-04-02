@@ -21,6 +21,7 @@ import Html.Events as HE exposing (onClick)
 import Html.Keyed as Keyed
 import Json.Decode as JD
 import Location as L
+import Log
 import RemoteData exposing (RemoteData)
 import ServiceWorker as SW
 import Store
@@ -397,8 +398,20 @@ update msg model =
                 Store.GotEntries entries ->
                     ( { model | entries = RemoteData.Success entries }, Cmd.none )
 
-                Store.DecodingError err ->
-                    ( { model | entries = RemoteData.Failure (JD.errorToString err) }, Cmd.none )
+                Store.GotEntry entryRes ->
+                    let
+                        entryData =
+                            RemoteData.fromResult entryRes
+
+                        -- Merge the two data sources
+                        newEntries =
+                            RemoteData.map2 (\entry entries -> entry :: entries) entryData model.entries
+                    in
+                    --TODO: Consider notification
+                    ( { model | entries = newEntries }, Cmd.none )
+
+                Store.BadMessage err ->
+                    ( model, Log.error (JD.errorToString err) )
 
         AcceptUpdate ->
             ( { model | swUpdate = SW.updateAccepted }, SW.acceptUpdate )

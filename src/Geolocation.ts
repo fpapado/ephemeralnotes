@@ -18,11 +18,11 @@ const Maybe_Just = <A>(data: A): Maybe<A> => ({
   data: {tag: 'Just', data},
 });
 
-export type Result<Data, Error> =
+export type Result<Error, Data> =
   | {tag: 'Ok'; data: Data}
   | {tag: 'Err'; data: Error};
-export const Result_Ok = <A>(data: A): Result<A, any> => ({tag: 'Ok', data});
-export const Result_Error = <E>(data: E): Result<any, E> => ({
+export const Result_Ok = <A>(data: A): Result<any, A> => ({tag: 'Ok', data});
+export const Result_Error = <E>(data: E): Result<E, any> => ({
   tag: 'Err',
   data,
 });
@@ -89,7 +89,7 @@ const defaultOptions = {
 };
 
 // GET LOCATION
-type LocationCallback = (data: Result<Location, LocationError>) => void;
+type LocationCallback = (data: Result<LocationError, Location>) => void;
 
 export function getLocation(cb: LocationCallback, opts = {}) {
   const options = {...defaultOptions, opts};

@@ -3,9 +3,9 @@ export {handleSubMessage};
 import {openDB, DBSchema} from 'idb';
 import nanoid from 'nanoid';
 import {Elm} from './Main';
+import {Result, Result_Ok, Result_Error} from './Geolocation';
 
 // FromElm
-// type FromElm = {tag: 'StoreEntry', data: Entry} | {tag: 'GetEntries'}
 // TODO: UpdateEntry Entry
 
 // Store <-> Elm
@@ -20,13 +20,8 @@ const GotEntries = (data: EntryToElm[]) => ({
   data,
 });
 
-const SavedEntryOk = (data: EntryToElm) => ({
-  tag: 'SavedEntryOk',
-  data,
-});
-
-const SavedEntryErr = (data: string) => ({
-  tag: 'SavedEntryErr',
+const GotEntry = (data: Result<string, EntryToElm>) => ({
+  tag: 'GotEntry',
   data,
 });
 
@@ -54,12 +49,12 @@ function handleSubMessage(
         .then(entry => {
           if (entry) {
             const entryToElm = {...entry, schema_version: 1};
-            sendToElm(SavedEntryOk(entryToElm));
+            sendToElm(GotEntry(Result_Ok(entryToElm)));
           }
         })
         .catch(err => {
           console.error(err);
-          sendToElm(SavedEntryErr(err.toString));
+          sendToElm(GotEntry(Result_Error(err.toString)));
         });
       return;
 

@@ -121,7 +121,7 @@ export function runWith(Elm_: typeof Elm) {
   }
 
   // GEOLOCATION <-> ELM
-  const GotLocationMsg = (data: Result<Location, LocationError>) => ({
+  const GotLocationMsg = (data: Result<LocationError, Location>) => ({
     tag: 'GotLocation',
     data,
   });
