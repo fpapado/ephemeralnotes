@@ -40,30 +40,170 @@ type alias Model =
     { timeZone : Time.Zone
     , swUpdate : SW.SwUpdate
     , installPrompt : SW.InstallPrompt
-    , location : GeolocationData
     , entries : RemoteData String (List Entry)
     , form : Form
     }
 
 
 type alias Form =
+    { input : FormInput
+    , location : RemoteData Geo.Error L.LatLon
+    , time : RemoteData Never Time.Posix
+    , state : FormState
+    }
+
+
+type FormTransitionMsg
+    = FrontChanged String
+    | BackChanged String
+    | LocationToggled Bool
+    | PressedSave
+    | GotTime Time.Posix
+    | GotLocation (RemoteData Geo.Error L.LatLon)
+    | GotSaveResult (Result FormError ())
+
+
+type FormState
+    = Editing
+    | WaitingForTime
+    | WaitingForLocation
+    | WaitingForSave
+    | FormError FormError
+
+
+type FormError
+    = GeolocationFailed
+    | SavingError
+
+
+type alias FormInput =
     { front : String
     , back : String
     , saveLocation : Bool
     }
 
 
+{-| Update the form, skipping invalid transitions
+-}
+updateForm : FormTransitionMsg -> Form -> ( Form, Cmd FormTransitionMsg )
+updateForm msg form =
+    let
+        newForm =
+            case msg of
+                FrontChanged front ->
+                    let
+                        input =
+                            form.input
+
+                        newInput =
+                            { input | front = front }
+                    in
+                    ( { form | input = newInput }
+                    , Cmd.none
+                    )
+
+                BackChanged back ->
+                    let
+                        input =
+                            form.input
+
+                        newInput =
+                            { input | back = back }
+                    in
+                    ( { form | input = newInput }, Cmd.none )
+
+                LocationToggled toggle ->
+                    let
+                        input =
+                            form.input
+
+                        newInput =
+                            { input | saveLocation = toggle }
+                    in
+                    ( { form | input = newInput }, Cmd.none )
+
+                PressedSave ->
+                    case form.state of
+                        Editing ->
+                            ( { form | state = WaitingForTime }, Task.perform GotTime Time.now )
+
+                        _ ->
+                            ( form, Cmd.none )
+
+                GotTime time ->
+                    case form.state of
+                        WaitingForTime ->
+                            -- TODO: Depending on location save being toggled, transition to location or submission
+                            -- Consider whether we should be calling updateForm in here as a short-circuit...
+                            ( { form | time = RemoteData.succeed time, location = RemoteData.Loading, state = WaitingForLocation }, Geo.getLocation )
+
+                        _ ->
+                            ( form, Cmd.none )
+
+                GotLocation locationData ->
+                    case form.state of
+                        -- TODO: Handle the location failing better
+                        WaitingForLocation ->
+                            let
+                                saveCmd =
+                                    case locationData of
+                                        RemoteData.Success location ->
+                                            case form.time of
+                                                RemoteData.Success time ->
+                                                    let
+                                                        entryPartial : Entry.EntryV1Partial
+                                                        entryPartial =
+                                                            { front = form.input.front
+                                                            , back = form.input.back
+                                                            , time = time
+                                                            , location = location
+                                                            }
+                                                    in
+                                                    Store.storeEntry entryPartial
+
+                                                _ ->
+                                                    Cmd.none
+
+                                        _ ->
+                                            Cmd.none
+                            in
+                            ( { form | location = locationData, state = WaitingForSave }, saveCmd )
+
+                        _ ->
+                            ( form, Cmd.none )
+
+                GotSaveResult res ->
+                    case form.state of
+                        WaitingForSave ->
+                            case res of
+                                -- Reset the form
+                                Ok () ->
+                                    ( { form | input = emptyInput, state = Editing }, Cmd.none )
+
+                                Err formError ->
+                                    ( { form | state = FormError formError }, Cmd.none )
+
+                        _ ->
+                            ( form, Cmd.none )
+    in
+    newForm
+
+
 emptyForm : Form
 emptyForm =
+    { input = emptyInput
+    , location = RemoteData.NotAsked
+    , time = RemoteData.NotAsked
+    , state = Editing
+    }
+
+
+emptyInput : FormInput
+emptyInput =
     { front = ""
     , back = ""
     , saveLocation = True
     }
-
-
-type GeolocationData
-    = NotAsked
-    | Got Geo.LocationResult
 
 
 
@@ -76,7 +216,6 @@ init =
     ( { timeZone = Time.utc
       , swUpdate = SW.updateNone
       , installPrompt = SW.installPromptNone
-      , location = NotAsked
       , entries = RemoteData.Loading
       , form = emptyForm
       }
@@ -114,7 +253,7 @@ viewInner model =
                 , section [] [ viewForm model.form ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
-                    , viewEntries model.entries ( model.form.front, model.form.back )
+                    , viewEntries model.entries ( model.form.input.front, model.form.input.back )
                     ]
                 , section [] [ viewAbout ]
                 ]
@@ -139,7 +278,7 @@ viewAbout =
 
 viewForm : Form -> Html Msg
 viewForm form_ =
-    form [ class "vs3 vs4-ns", HE.onSubmit FormSubmitClicked, HA.autocomplete False ]
+    form [ class "vs3 vs4-ns", HE.onSubmit (FormMsg PressedSave), HA.autocomplete False ]
         [ subHeading 2 [ class "decor" ] [ text "Add Entry" ]
         , div [ class "vs3 vs4-ns mw6" ]
             [ paragraph [ class "pa3 bg-washed-yellow ba bw1 br2 b--yellow" ]
@@ -157,8 +296,8 @@ viewForm form_ =
                     , HA.type_ "text"
                     , HA.id "entry-front"
                     , HA.name "front"
-                    , HE.onInput FormFrontChanged
-                    , HA.value form_.front
+                    , HE.onInput (FormMsg << FrontChanged)
+                    , HA.value form_.input.front
                     , HA.placeholder "Ephemeral"
                     ]
                     []
@@ -174,8 +313,8 @@ viewForm form_ =
                     , HA.type_ "text"
                     , HA.id "entry-back"
                     , HA.name "back"
-                    , HE.onInput FormBackChanged
-                    , HA.value form_.back
+                    , HE.onInput (FormMsg << BackChanged)
+                    , HA.value form_.input.back
                     , HA.placeholder "Lasting a short time, fleeting"
                     ]
                     []
@@ -186,9 +325,8 @@ viewForm form_ =
                     , HA.type_ "checkbox"
                     , HA.id "entry-location"
                     , HA.name "save location"
-                    , HE.onCheck FormLocationToggled
-                    , HA.checked form_.saveLocation
-                    , HA.disabled True
+                    , HE.onCheck (FormMsg << LocationToggled)
+                    , HA.checked form_.input.saveLocation
                     ]
                     []
                 , label
@@ -268,34 +406,6 @@ viewEntryKeyed ambiguousEntry =
             )
 
 
-viewLocation : GeolocationData -> Html Msg
-viewLocation locationData =
-    case locationData of
-        NotAsked ->
-            div [] []
-
-        Got locationRes ->
-            case locationRes of
-                Ok location ->
-                    div [ class "vs3" ]
-                        [ subHeading 2 [] [ text "Got location:" ]
-                        , div []
-                            [ text <|
-                                String.fromFloat (L.latToFloat location.lat)
-                                    ++ ", "
-                                    ++ String.fromFloat (L.lonToFloat location.lon)
-                            ]
-                        ]
-
-                Err error ->
-                    div [ class "vs3" ]
-                        [ heading 2 [] [ text "Error getting location:" ]
-                        , div []
-                            [ text <| Geo.errorToString error
-                            ]
-                        ]
-
-
 viewUpdatePrompt : SW.SwUpdate -> Html Msg
 viewUpdatePrompt swUpdate =
     notificationRegion []
@@ -361,12 +471,7 @@ type Msg
     | DeferUpdate
     | AcceptInstallPrompt
     | DeferInstallPrompt
-    | GetLocation
-    | FormSubmitClicked
-    | FormSubmittedOk
-    | FormFrontChanged String
-    | FormBackChanged String
-    | FormLocationToggled Bool
+    | FormMsg FormTransitionMsg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -388,21 +493,27 @@ update msg model =
                     )
 
                 SW.DecodingError err ->
-                    ( model, Cmd.none )
+                    ( model, Log.error (JD.errorToString err) )
 
         FromGeolocation geoMsg ->
             case geoMsg of
+                -- Only the form cares about geolocation
                 Geo.GotLocation locationRes ->
-                    ( { model | location = Got locationRes }, Cmd.none )
+                    let
+                        ( newForm, cmd ) =
+                            updateForm (GotLocation (RemoteData.fromResult locationRes)) model.form
+                    in
+                    ( { model | form = newForm }, Cmd.map FormMsg cmd )
 
                 Geo.DecodingError err ->
-                    ( model, Cmd.none )
+                    ( model, Log.error (JD.errorToString err) )
 
         FromStore storeMsg ->
             case storeMsg of
                 Store.GotEntries entries ->
                     ( { model | entries = RemoteData.Success entries }, Cmd.none )
 
+                -- The form cares about GotEntry
                 Store.GotEntry entryRes ->
                     let
                         entryData =
@@ -411,9 +522,21 @@ update msg model =
                         -- Merge the two data sources
                         newEntries =
                             RemoteData.map2 (\entry entries -> entry :: entries) entryData model.entries
+
+                        -- Update the form as well!
+                        -- Internally, the form knows only to reset when the save msg arrives when it is waiting for one
+                        -- NOTE: In the future, we could be attaching an id here
+                        -- Get the result into the shape the form wants
+                        formResult =
+                            entryRes
+                                |> Result.map (\entry -> ())
+                                |> Result.mapError (\err -> SavingError)
+
+                        ( newForm, cmd ) =
+                            updateForm (GotSaveResult formResult) model.form
                     in
-                    --TODO: Consider notification
-                    ( { model | entries = newEntries }, Cmd.none )
+                    -- TODO: Consider notification
+                    ( { model | entries = newEntries, form = newForm }, Cmd.map FormMsg cmd )
 
                 Store.BadMessage err ->
                     ( model, Log.error (JD.errorToString err) )
@@ -431,82 +554,13 @@ update msg model =
         DeferInstallPrompt ->
             ( { model | installPrompt = SW.installPromptNone }, SW.deferInstallPrompt )
 
-        GetLocation ->
-            ( model, Geo.getLocation )
-
         -- Form
-        FormFrontChanged front ->
+        FormMsg formTransitionMsg ->
             let
-                form =
-                    model.form
-
-                newForm =
-                    { form | front = front }
+                ( newForm, cmd ) =
+                    updateForm formTransitionMsg model.form
             in
-            ( { model | form = newForm }, Cmd.none )
-
-        FormBackChanged back ->
-            let
-                form =
-                    model.form
-
-                newForm =
-                    { form | back = back }
-            in
-            ( { model | form = newForm }, Cmd.none )
-
-        FormLocationToggled toggle ->
-            let
-                form =
-                    model.form
-
-                newForm =
-                    { form | saveLocation = toggle }
-            in
-            ( { model | form = newForm }, Cmd.none )
-
-        -- TODO: On Form submit:
-        -- - TODO: Set form "submitting" state
-        -- - get location if specified
-        -- - tie that to the form somehow / prevent the form from being edited and the button clicked
-        -- - add a "loading" to the button
-        -- - if failed, show message
-        -- - if succeeded, send to JS side for storing
-        -- - keep "loading" with "saving"
-        -- - if succeeded, reset form
-        -- - if failed, show message, do not reset
-        -- NOTE: need a way to relate the GotResult/SavedOk to the form submit, maybe through some key?
-        -- NOTE: Need a way to encode partials, e.g Entry.encodePartial
-        -- NOTE: Check JS-side for the uuid generation
-        FormSubmitClicked ->
-            let
-                saveCmd =
-                    let
-                        lat =
-                            L.latFromFloat 0
-
-                        lon =
-                            L.lonFromFloat 0
-                    in
-                    case ( lat, lon ) of
-                        ( Just x, Just y ) ->
-                            let
-                                entryPartial =
-                                    { front = model.form.front
-                                    , back = model.form.back
-                                    , time = Time.millisToPosix 0
-                                    , location = { lat = x, lon = y }
-                                    }
-                            in
-                            Store.storeEntry entryPartial
-
-                        _ ->
-                            Cmd.none
-            in
-            ( model, saveCmd )
-
-        FormSubmittedOk ->
-            ( { model | form = emptyForm }, Cmd.none )
+            ( { model | form = newForm }, Cmd.map FormMsg cmd )
 
 
 

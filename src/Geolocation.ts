@@ -58,8 +58,8 @@ function toLocation(rawPosition: Position) {
         );
 
   return {
-    latitude: coords.latitude,
-    longitude: coords.longitude,
+    lat: coords.latitude,
+    lon: coords.longitude,
     accuracy: coords.accuracy,
     altitude,
     movement,
@@ -95,10 +95,12 @@ export function getLocation(cb: LocationCallback, opts = {}) {
   const options = {...defaultOptions, opts};
 
   function onSuccess(rawPosition: Position) {
+    console.log('Got location ok');
     cb(Result_Ok(toLocation(rawPosition)));
   }
 
   function onError(rawError: PositionError) {
+    console.log('Got location err');
     cb(Result_Error(toError(rawError)));
   }
 
