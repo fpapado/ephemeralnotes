@@ -1,0 +1,43 @@
+/* Assume we know what we are doing for programmatic focus */
+:focus[tabindex='-1'] {
+  outline: none;
+  /* Debug */
+  /* outline: 4px solid red; */
+}
+
+.link {
+  text-decoration: none;
+}
+.link,
+.link:active,
+.link:focus,
+.link:hover,
+.link:link,
+.link:visited {
+  transition: color 0.15s ease-in, background-color 0.15s ease-in;
+}
+.link:focus {
+  outline: 4px solid rgb(3, 102, 214);
+  outline-offset: 2px;
+}
+.button-link {
+  text-decoration: none;
+}
+.focus-shadow,
+.focus-shadow:active,
+.focus-shadow:focus,
+.focus-shadow:hover,
+.focus-shadow:link,
+.focus-shadow:visited {
+  transition: color 0.15s ease-in, background-color 0.15s ease-in;
+}
+.focus-shadow:focus {
+  /* Enhance outline that follows border */
+  outline: none;
+  box-shadow: 0 0 0 0.2em rgba(3, 102, 214, 0.85);
+}
+.focus-shadow-light:focus {
+  /* Enhance outline that follows border */
+  outline: none;
+  box-shadow: 0 0 0 0.2em rgba(3, 102, 214, 0.5);
+}

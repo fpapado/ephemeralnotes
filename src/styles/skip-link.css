@@ -1,0 +1,17 @@
+/* Skip Link */
+.skip-link {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+.skip-link:focus {
+  width: auto;
+  height: auto;
+  z-index: 111;
+  clip: auto;
+}
