@@ -2,6 +2,7 @@ module Ui exposing
     ( buttonLink
     , calloutContainer
     , centeredContainer
+    , checkbox
     , heading
     , notificationRegion
     , paragraph
@@ -12,8 +13,8 @@ module Ui exposing
     , textbox
     )
 
-import Html as H exposing (Html, a, button, div, h1, img, p)
-import Html.Attributes as HA exposing (class)
+import Html as H exposing (..)
+import Html.Attributes as HA exposing (..)
 
 
 heading level attrs children =
@@ -37,7 +38,7 @@ centeredContainer attrs children =
 
 
 styledButton attrs children =
-    button (class "pv2 ph3 button-reset focus-shadow br2 fw5" :: attrs) children
+    button (class "pv2 ph3 button-reset focus-shadow br2 f5 f4-ns fw5" :: attrs) children
 
 
 styledButtonBlue isReadOnly attrs children =
@@ -84,3 +85,25 @@ textbox attrs children =
 
 buttonLink attrs children =
     a (class "db mw5 center pa3 button-link fw5 bg-blue br2 near-white hover-bg-light-blue hover-near-black focus-shadow" :: attrs) children
+
+
+{-| A progressively-enhanced, larger checkbox
+-}
+checkbox : { id : String, name : String, isReadOnly : Bool } -> List (H.Attribute msg) -> String -> Html msg
+checkbox config attrs labelText =
+    let
+        modifierCls =
+            if config.isReadOnly then
+                "enhanced-checkbox--readonly"
+
+            else
+                ""
+    in
+    div [ class <| "enhanced-checkbox-container f5 f4-ns lh-copy v-mid fw6 " ++ modifierCls ]
+        [ input
+            ([ id config.id, name config.name, type_ "checkbox", class "enhanced-checkbox-input" ] ++ attrs)
+            []
+        , label
+            [ for config.id, class "enhanced-checkbox-label" ]
+            [ text labelText ]
+        ]

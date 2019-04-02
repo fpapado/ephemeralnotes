@@ -85,7 +85,7 @@ function toError(positionErr: PositionError) {
 const defaultOptions = {
   enableHighAccuracy: false,
   timeout: 30000,
-  maximumAge: 400,
+  maximumAge: 10000,
 };
 
 // GET LOCATION

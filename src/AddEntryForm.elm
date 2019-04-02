@@ -307,23 +307,13 @@ view form_ =
                     ]
                     []
                 ]
-            , div [ class "flex" ]
-                [ input
-                    [ class "db mr2 f5 f4-ns"
-                    , class inputBgCls
-                    , HA.type_ "checkbox"
-                    , HA.id "entry-location"
-                    , HA.name "save location"
-                    , HE.onCheck (noOpIfReadOnly << LocationToggled)
+            , div []
+                [ checkbox { id = "entry-location", name = "entry-location", isReadOnly = areFieldsReadOnly }
+                    [ HE.onCheck (noOpIfReadOnly << LocationToggled)
                     , HA.checked form_.input.saveLocation
                     , HA.readonly areFieldsReadOnly
                     ]
-                    []
-                , label
-                    [ class "db fw6 f5 f4-ns"
-                    , HA.for "entry-location"
-                    ]
-                    [ text "Save location" ]
+                    "Save location"
                 ]
             , styledButtonBlue areFieldsReadOnly
                 [ class "w-100" ]
