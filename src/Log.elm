@@ -11,9 +11,7 @@ a placeholder anyway, I didn't bother making this function accept actual
 diagnostic info, authentication tokens, etc.)
 -}
 
-import Debug
-
 
 error : String -> Cmd msg
 error err =
-    Debug.log err Cmd.none
+    Cmd.none
