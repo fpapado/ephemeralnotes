@@ -11,6 +11,7 @@ module Page.Home exposing
 {-| The homepage. You can get here via either the / route.
 -}
 
+import AddEntryForm as Form exposing (Form)
 import Asset
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
@@ -45,186 +46,17 @@ type alias Model =
     }
 
 
-type alias Form =
-    { input : FormInput
-    , location : RemoteData Geo.Error L.LatLon
-    , time : RemoteData Never Time.Posix
-    , state : FormState
-    }
-
-
-type FormTransitionMsg
-    = FrontChanged String
-    | BackChanged String
-    | LocationToggled Bool
-    | PressedSave
-    | GotTime Time.Posix
-    | GotLocation (RemoteData Geo.Error L.LatLon)
-    | GotSaveResult (Result FormError ())
-
-
-type FormState
-    = Editing
-    | WaitingForTime
-    | WaitingForLocation
-    | WaitingForSave
-    | FormError FormError
-
-
-type FormError
-    = GeolocationFailed
-    | SavingError
-
-
-type alias FormInput =
-    { front : String
-    , back : String
-    , saveLocation : Bool
-    }
-
-
-{-| Update the form, skipping invalid transitions
--}
-updateForm : FormTransitionMsg -> Form -> ( Form, Cmd FormTransitionMsg )
-updateForm msg form =
-    let
-        newForm =
-            case msg of
-                FrontChanged front ->
-                    let
-                        input =
-                            form.input
-
-                        newInput =
-                            { input | front = front }
-                    in
-                    ( { form | input = newInput }
-                    , Cmd.none
-                    )
-
-                BackChanged back ->
-                    let
-                        input =
-                            form.input
-
-                        newInput =
-                            { input | back = back }
-                    in
-                    ( { form | input = newInput }, Cmd.none )
-
-                LocationToggled toggle ->
-                    let
-                        input =
-                            form.input
-
-                        newInput =
-                            { input | saveLocation = toggle }
-                    in
-                    ( { form | input = newInput }, Cmd.none )
-
-                PressedSave ->
-                    case form.state of
-                        Editing ->
-                            ( { form | state = WaitingForTime }, Task.perform GotTime Time.now )
-
-                        _ ->
-                            ( form, Cmd.none )
-
-                GotTime time ->
-                    case form.state of
-                        WaitingForTime ->
-                            -- TODO: Depending on location save being toggled, transition to location or submission
-                            -- Consider whether we should be calling updateForm in here as a short-circuit...
-                            ( { form | time = RemoteData.succeed time, location = RemoteData.Loading, state = WaitingForLocation }, Geo.getLocation )
-
-                        _ ->
-                            ( form, Cmd.none )
-
-                GotLocation locationData ->
-                    case form.state of
-                        -- TODO: Handle the location failing better
-                        WaitingForLocation ->
-                            let
-                                saveCmd =
-                                    case locationData of
-                                        RemoteData.Success location ->
-                                            case form.time of
-                                                RemoteData.Success time ->
-                                                    let
-                                                        entryPartial : Entry.EntryV1Partial
-                                                        entryPartial =
-                                                            { front = form.input.front
-                                                            , back = form.input.back
-                                                            , time = time
-                                                            , location = location
-                                                            }
-                                                    in
-                                                    Store.storeEntry entryPartial
-
-                                                _ ->
-                                                    Cmd.none
-
-                                        _ ->
-                                            Cmd.none
-                            in
-                            ( { form | location = locationData, state = WaitingForSave }, saveCmd )
-
-                        _ ->
-                            ( form, Cmd.none )
-
-                GotSaveResult res ->
-                    case form.state of
-                        WaitingForSave ->
-                            case res of
-                                -- Reset the form
-                                Ok () ->
-                                    ( { form | input = emptyInput, state = Editing }, Cmd.none )
-
-                                Err formError ->
-                                    ( { form | state = FormError formError }, Cmd.none )
-
-                        _ ->
-                            ( form, Cmd.none )
-    in
-    newForm
-
-
-emptyForm : Form
-emptyForm =
-    { input = emptyInput
-    , location = RemoteData.NotAsked
-    , time = RemoteData.NotAsked
-    , state = Editing
-    }
-
-
-emptyInput : FormInput
-emptyInput =
-    { front = ""
-    , back = ""
-    , saveLocation = True
-    }
-
-
-
--- TODO: Spinner button, show when loading
--- | Loading Id
-
-
 init : ( Model, Cmd Msg )
 init =
     ( { timeZone = Time.utc
       , swUpdate = SW.updateNone
       , installPrompt = SW.installPromptNone
       , entries = RemoteData.Loading
-      , form = emptyForm
+      , form = Form.empty
       }
     , Cmd.batch
         [ Task.perform GotTimeZone Time.here
         , Store.getEntries
-
-        -- Alternative: get the entries as a flag
-        -- , GetEntries ...?
         ]
     )
 
@@ -242,6 +74,10 @@ view model =
 
 viewInner : Model -> Html Msg
 viewInner model =
+    let
+        formInput =
+            Form.getInput model.form
+    in
     div []
         [ Ui.centeredContainer
             []
@@ -250,10 +86,10 @@ viewInner model =
                     [ heading 1 [] [ text "Ephemeral" ]
                     , paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them." ]
                     ]
-                , section [] [ viewForm model.form ]
+                , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
-                    , viewEntries model.entries ( model.form.input.front, model.form.input.back )
+                    , viewEntries model.entries ( formInput.front, formInput.back )
                     ]
                 , section [] [ viewAbout ]
                 ]
@@ -273,72 +109,6 @@ viewAbout =
         , paragraph
             [ class "measure" ]
             [ text "You can install Ephemeral to your homescreen for quicker access and standalone use. It will still be available offline through the browser, even if you do not install it." ]
-        ]
-
-
-viewForm : Form -> Html Msg
-viewForm form_ =
-    form [ class "vs3 vs4-ns", HE.onSubmit (FormMsg PressedSave), HA.autocomplete False ]
-        [ subHeading 2 [ class "decor" ] [ text "Add Entry" ]
-        , div [ class "vs3 vs4-ns mw6" ]
-            [ paragraph [ class "pa3 bg-washed-yellow ba bw1 br2 b--yellow" ]
-                [ span [ class "fw6" ] [ text "Note: " ]
-                , span [] [ text "Location and Time saving are not yet implemented. We will save these with defaults for now." ]
-                ]
-            , div [ class "vs2" ]
-                [ label
-                    [ class "db fw6 f5 f4-ns"
-                    , HA.for "entry-front"
-                    ]
-                    [ text "Word" ]
-                , input
-                    [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
-                    , HA.type_ "text"
-                    , HA.id "entry-front"
-                    , HA.name "front"
-                    , HE.onInput (FormMsg << FrontChanged)
-                    , HA.value form_.input.front
-                    , HA.placeholder "Ephemeral"
-                    ]
-                    []
-                ]
-            , div [ class "vs2" ]
-                [ label
-                    [ class "db fw6 f5 f4-ns"
-                    , HA.for "entry-back"
-                    ]
-                    [ text "Translation" ]
-                , input
-                    [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
-                    , HA.type_ "text"
-                    , HA.id "entry-back"
-                    , HA.name "back"
-                    , HE.onInput (FormMsg << BackChanged)
-                    , HA.value form_.input.back
-                    , HA.placeholder "Lasting a short time, fleeting"
-                    ]
-                    []
-                ]
-            , div [ class "flex" ]
-                [ input
-                    [ class "db mr2 f5 f4-ns"
-                    , HA.type_ "checkbox"
-                    , HA.id "entry-location"
-                    , HA.name "save location"
-                    , HE.onCheck (FormMsg << LocationToggled)
-                    , HA.checked form_.input.saveLocation
-                    ]
-                    []
-                , label
-                    [ class "db fw6 f5 f4-ns"
-                    , HA.for "entry-location"
-                    ]
-                    [ text "Save location" ]
-                ]
-            , styledButtonBlue [ class "w-100" ]
-                [ text "Save entry"
-                ]
-            ]
         ]
 
 
@@ -471,7 +241,7 @@ type Msg
     | DeferUpdate
     | AcceptInstallPrompt
     | DeferInstallPrompt
-    | FormMsg FormTransitionMsg
+    | FormMsg Form.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -501,7 +271,7 @@ update msg model =
                 Geo.GotLocation locationRes ->
                     let
                         ( newForm, cmd ) =
-                            updateForm (GotLocation (RemoteData.fromResult locationRes)) model.form
+                            Form.update (Form.GotLocation (RemoteData.fromResult locationRes)) model.form
                     in
                     ( { model | form = newForm }, Cmd.map FormMsg cmd )
 
@@ -530,10 +300,10 @@ update msg model =
                         formResult =
                             entryRes
                                 |> Result.map (\entry -> ())
-                                |> Result.mapError (\err -> SavingError)
+                                |> Result.mapError (\err -> ())
 
                         ( newForm, cmd ) =
-                            updateForm (GotSaveResult formResult) model.form
+                            Form.update (Form.GotSaveResult formResult) model.form
                     in
                     -- TODO: Consider notification
                     ( { model | entries = newEntries, form = newForm }, Cmd.map FormMsg cmd )
@@ -558,7 +328,7 @@ update msg model =
         FormMsg formTransitionMsg ->
             let
                 ( newForm, cmd ) =
-                    updateForm formTransitionMsg model.form
+                    Form.update formTransitionMsg model.form
             in
             ( { model | form = newForm }, Cmd.map FormMsg cmd )
 
