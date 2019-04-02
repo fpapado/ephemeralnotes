@@ -1,5 +1,5 @@
 port module Geolocation exposing
-    ( Error
+    ( Error(..)
     , Geolocation
     , LocationResult
     , ToElm(..)
@@ -46,7 +46,7 @@ type FromElm
 
 type Error
     = PermissionDenied
-    | LocationUnavailable
+    | PositionUnavailable
     | Timeout
 
 
@@ -56,8 +56,8 @@ errorToString err =
         PermissionDenied ->
             "Permission denied"
 
-        LocationUnavailable ->
-            "Location unavailable"
+        PositionUnavailable ->
+            "Position unavailable"
 
         Timeout ->
             "Geolocation timed out"
@@ -153,8 +153,8 @@ gotLocationErrDecoder =
                     "PermissionDenied" ->
                         D.succeed (GotLocation <| Err PermissionDenied)
 
-                    "LocationUnavailable" ->
-                        D.succeed (GotLocation <| Err LocationUnavailable)
+                    "PositionUnavailable" ->
+                        D.succeed (GotLocation <| Err PositionUnavailable)
 
                     "Timeout" ->
                         D.succeed (GotLocation <| Err Timeout)

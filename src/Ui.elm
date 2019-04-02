@@ -40,8 +40,16 @@ styledButton attrs children =
     button (class "pv2 ph3 button-reset focus-shadow br2 fw5" :: attrs) children
 
 
-styledButtonBlue attrs children =
-    styledButton (class "bg-blue near-white hover-bg-light-blue hover-near-black" :: attrs) children
+styledButtonBlue isReadOnly attrs children =
+    let
+        cls =
+            if isReadOnly then
+                "bg-light-blue near-black"
+
+            else
+                "bg-blue near-white hover-bg-light-blue hover-near-black"
+    in
+    styledButton (class cls :: attrs) children
 
 
 calloutContainer attrs children =

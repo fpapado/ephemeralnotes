@@ -40,6 +40,7 @@ type Msg
     | GotTime Time.Posix
     | GotLocation (RemoteData Geo.Error L.LatLon)
     | GotSaveResult (Result () ())
+    | NoOp
 
 
 type State
@@ -47,11 +48,11 @@ type State
     | WaitingForTime
     | WaitingForLocation
     | WaitingForSave
-    | Error Error
+    | EditingWithError Error
 
 
 type Error
-    = GeolocationFailed
+    = GeolocationError Geo.Error
     | SavingError
 
 
@@ -124,11 +125,13 @@ update msg form =
                         -- TODO: Handle the location failing better
                         WaitingForLocation ->
                             let
-                                saveCmd =
-                                    case locationData of
-                                        RemoteData.Success location ->
-                                            case form.time of
-                                                RemoteData.Success time ->
+                                next =
+                                    -- TODO: The fact that we need to pattern match time even though we *know* we have it, is a hint that we should
+                                    -- rething the data modelling. Perhaps something that makes the sequencing more obvious? I'm not sure to what though :)
+                                    case form.time of
+                                        RemoteData.Success time ->
+                                            case locationData of
+                                                RemoteData.Success location ->
                                                     let
                                                         entryPartial : Entry.EntryV1Partial
                                                         entryPartial =
@@ -138,15 +141,19 @@ update msg form =
                                                             , location = location
                                                             }
                                                     in
-                                                    Store.storeEntry entryPartial
+                                                    ( { form | location = locationData, state = WaitingForSave }, Store.storeEntry entryPartial )
+
+                                                -- On geolocation error, notify the user, and do not save
+                                                RemoteData.Failure error ->
+                                                    ( { form | location = locationData, state = EditingWithError (GeolocationError error) }, Cmd.none )
 
                                                 _ ->
-                                                    Cmd.none
+                                                    ( form, Cmd.none )
 
                                         _ ->
-                                            Cmd.none
+                                            ( form, Cmd.none )
                             in
-                            ( { form | location = locationData, state = WaitingForSave }, saveCmd )
+                            next
 
                         _ ->
                             ( form, Cmd.none )
@@ -160,10 +167,13 @@ update msg form =
                                     ( { form | input = emptyInput, state = Editing }, Cmd.none )
 
                                 Err () ->
-                                    ( { form | state = Error SavingError }, Cmd.none )
+                                    ( { form | state = EditingWithError SavingError }, Cmd.none )
 
                         _ ->
                             ( form, Cmd.none )
+
+                NoOp ->
+                    ( form, Cmd.none )
     in
     newForm
 
@@ -192,15 +202,73 @@ getInput form_ =
     form_.input
 
 
+isEditable : State -> Bool
+isEditable state =
+    case state of
+        Editing ->
+            True
+
+        EditingWithError err ->
+            True
+
+        _ ->
+            False
+
+
 view : Form -> Html Msg
 view form_ =
-    form [ class "vs3 vs4-ns", HE.onSubmit PressedSave, HA.autocomplete False ]
+    let
+        -- NOTE: We make the fields "Read only", and make the submit a noOp, if we are in any
+        -- state other than editing.
+        -- We want users to not edit the field while it is submitting, and must style and announce as such
+        -- The 'disabled' attribute is pretty bad for screen reader announcements, so we prefer readonly and
+        -- NoOp on any relevant events :)
+        areFieldsReadOnly =
+            not (isEditable form_.state)
+
+        noOpIfReadOnly msg =
+            if areFieldsReadOnly then
+                NoOp
+
+            else
+                msg
+
+        inputBgCls =
+            if areFieldsReadOnly then
+                "bg-light-gray"
+
+            else
+                "bg-white"
+
+        buttonText =
+            case form_.state of
+                Editing ->
+                    "Save entry"
+
+                WaitingForTime ->
+                    "Getting time..."
+
+                WaitingForLocation ->
+                    "Getting location..."
+
+                WaitingForSave ->
+                    "Saving..."
+
+                EditingWithError err ->
+                    "Save entry"
+
+        viewFormError =
+            case form_.state of
+                EditingWithError err ->
+                    viewError err
+
+                _ ->
+                    div [] []
+    in
+    form [ class "vs3 vs4-ns", HE.onSubmit (noOpIfReadOnly PressedSave), HA.autocomplete False ]
         [ subHeading 2 [ class "decor" ] [ text "Add Entry" ]
         , div [ class "vs3 vs4-ns mw6" ]
-            [ paragraph [ class "pa3 bg-washed-yellow ba bw1 br2 b--yellow" ]
-                [ span [ class "fw6" ] [ text "Note: " ]
-                , span [] [ text "Location and Time saving are not yet implemented. We will save these with defaults for now." ]
-                ]
+            [ viewFormError
             , div [ class "vs2" ]
                 [ label
                     [ class "db fw6 f5 f4-ns"
@@ -209,12 +277,14 @@ view form_ =
                     [ text "Word" ]
                 , input
                     [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
+                    , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-front"
                     , HA.name "front"
-                    , HE.onInput FrontChanged
+                    , HE.onInput (noOpIfReadOnly << FrontChanged)
                     , HA.value form_.input.front
                     , HA.placeholder "Ephemeral"
+                    , HA.readonly areFieldsReadOnly
                     ]
                     []
                 ]
@@ -226,23 +296,27 @@ view form_ =
                     [ text "Translation" ]
                 , input
                     [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
+                    , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-back"
                     , HA.name "back"
-                    , HE.onInput BackChanged
+                    , HE.onInput (noOpIfReadOnly << BackChanged)
                     , HA.value form_.input.back
                     , HA.placeholder "Lasting a short time, fleeting"
+                    , HA.readonly areFieldsReadOnly
                     ]
                     []
                 ]
             , div [ class "flex" ]
                 [ input
                     [ class "db mr2 f5 f4-ns"
+                    , class inputBgCls
                     , HA.type_ "checkbox"
                     , HA.id "entry-location"
                     , HA.name "save location"
-                    , HE.onCheck LocationToggled
+                    , HE.onCheck (noOpIfReadOnly << LocationToggled)
                     , HA.checked form_.input.saveLocation
+                    , HA.readonly areFieldsReadOnly
                     ]
                     []
                 , label
@@ -251,8 +325,32 @@ view form_ =
                     ]
                     [ text "Save location" ]
                 ]
-            , styledButtonBlue [ class "w-100" ]
-                [ text "Save entry"
+            , styledButtonBlue areFieldsReadOnly
+                [ class "w-100" ]
+                [ text buttonText
                 ]
             ]
+        ]
+
+
+viewError : Error -> Html msg
+viewError error =
+    let
+        humanText =
+            case error of
+                GeolocationError Geo.PermissionDenied ->
+                    "The location permission was denied, now or in the past. Perhaps there is a setting in your browser? For now, you can save the note without a location, using the checkbox below."
+
+                GeolocationError Geo.PositionUnavailable ->
+                    "There was an error when acquiring your location. For now, you can save the note without a location, using the checkbox below."
+
+                GeolocationError Geo.Timeout ->
+                    "Acquiring your location took too long. This can happen sometimes. For now, you can save the note without a location, using the checkbox below."
+
+                SavingError ->
+                    "There was an internal error when saving the note locally. Sorry about that.."
+    in
+    div [ class "vs1 pa3 bg-washed-red ba bw1 br2 b--light-red" ]
+        [ subHeading 3 [] [ text "Error" ]
+        , paragraph [] [ text humanText ]
         ]
