@@ -142,7 +142,11 @@ viewForm form_ =
     form [ class "vs3 vs4-ns", HE.onSubmit FormSubmitClicked, HA.autocomplete False ]
         [ subHeading 2 [ class "decor" ] [ text "Add Entry" ]
         , div [ class "vs3 vs4-ns mw6" ]
-            [ div [ class "vs2" ]
+            [ paragraph [ class "pa3 bg-washed-yellow ba bw1 br2 b--yellow" ]
+                [ span [ class "fw6" ] [ text "Note: " ]
+                , span [] [ text "Location and Time saving are not yet implemented. We will save these with defaults for now." ]
+                ]
+            , div [ class "vs2" ]
                 [ label
                     [ class "db fw6 f5 f4-ns"
                     , HA.for "entry-front"
@@ -184,6 +188,7 @@ viewForm form_ =
                     , HA.name "save location"
                     , HE.onCheck FormLocationToggled
                     , HA.checked form_.saveLocation
+                    , HA.disabled True
                     ]
                     []
                 , label
