@@ -132,9 +132,29 @@ update msg form =
                 GotTime time ->
                     case form.state of
                         WaitingForTime ->
-                            -- TODO: Depending on location save being toggled, transition to location or submission
-                            -- Consider whether we should be calling updateForm in here as a short-circuit...
-                            ( { form | time = RemoteData.succeed time, location = RemoteData.Loading, state = WaitingForLocation }, Geo.getLocation )
+                            -- Depending on location save being toggled, transition
+                            -- to WaitingForLocation or short-circuit to WaitingForSave
+                            case form.input.saveLocation of
+                                True ->
+                                    ( { form | time = RemoteData.succeed time, location = RemoteData.Loading, state = WaitingForLocation }
+                                    , Geo.getLocation
+                                    )
+
+                                False ->
+                                    -- TODO: Encoding as nullIsland is ugly, and will lead to more confusion in the view code
+                                    -- perhaps we should just be using a Maybe? The one question then is persistence in IndexedDB?
+                                    let
+                                        entryPartial : Entry.EntryV1Partial
+                                        entryPartial =
+                                            { front = form.input.front
+                                            , back = form.input.back
+                                            , time = time
+                                            , location = L.nullIsland
+                                            }
+                                    in
+                                    ( { form | state = WaitingForSave }
+                                    , Store.storeEntry entryPartial
+                                    )
 
                         _ ->
                             ( form, Cmd.none )

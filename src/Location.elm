@@ -4,12 +4,14 @@ module Location exposing
     , Longitude
     , decoder
     , encode
+    , isNullIsland
     , latDecoder
     , latFromFloat
     , latToFloat
     , lonDecoder
     , lonFromFloat
     , lonToFloat
+    , nullIsland
     )
 
 import Json.Decode as D
@@ -38,6 +40,22 @@ Latitude measurements range from 0° to (+/–)90°.
 -}
 type Latitude
     = Latitude Float
+
+
+{-| Null island is the location 0, 0, often used as a short-hand for undefined data.
+TODO: Consider whether it should be easily constructable or not!
+-}
+nullIsland : LatLon
+nullIsland =
+    { lat = Latitude 0, lon = Longitude 0 }
+
+
+{-| Regardless of whether null island is a good idea, we need some way to spot it,
+in case the data we consume provides it
+-}
+isNullIsland : LatLon -> Bool
+isNullIsland { lat, lon } =
+    latToFloat lat == 0 && lonToFloat lon == 0
 
 
 
