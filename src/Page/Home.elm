@@ -84,7 +84,7 @@ viewInner model =
             [ div [ class "vs4 vs5-ns" ]
                 [ section [ class "vs3 vs4-ns" ]
                     [ heading 1 [] [ text "Ephemeral" ]
-                    , paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them." ]
+                    , paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. It works offline and everything is stored locally, on your device." ]
                     ]
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
@@ -100,15 +100,13 @@ viewInner model =
 
 
 viewAbout =
-    details [ class "vs3", HA.attribute "open" "true" ]
-        [ summary [ class "mw6" ]
-            [ subHeading 2
-                [ class "dib v-mid" ]
-                [ text "Installing" ]
-            ]
+    div [ class "vs3", HA.attribute "open" "true" ]
+        [ subHeading 2
+            [ class "dib v-mid" ]
+            [ text "Add to Home Screen" ]
         , paragraph
             [ class "measure" ]
-            [ text "You can install Ephemeral to your homescreen for quicker access and standalone use. It will still be available offline through the browser, even if you do not install it." ]
+            [ text "You can add Ephemeral to your home screen for quicker access and standalone use. It will always be available offline through your web browser." ]
         ]
 
 
@@ -208,7 +206,7 @@ viewInstallPrompt installPrompt =
                 calloutContainer []
                     [ prompt [ class "na2" ]
                         [ div [ class "measure ma2" ]
-                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to home screen?" ]
+                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to your home screen?" ]
                             ]
                         , div [ class "ma2 flex" ]
                             [ styledButtonBlue False [ onClick AcceptInstallPrompt, class "mr2" ] [ text "Add" ]
