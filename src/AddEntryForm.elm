@@ -141,12 +141,11 @@ update msg form =
 
                 GotLocation locationData ->
                     case form.state of
-                        -- TODO: Handle the location failing better
                         WaitingForLocation ->
                             let
                                 next =
                                     -- TODO: The fact that we need to pattern match time even though we *know* we have it, is a hint that we should
-                                    -- rething the data modelling. Perhaps something that makes the sequencing more obvious? I'm not sure to what though :)
+                                    -- rethink the data modelling. Perhaps something that makes the sequencing more obvious? I'm not sure to what though :)
                                     case form.time of
                                         RemoteData.Success time ->
                                             case locationData of
@@ -348,6 +347,10 @@ view form_ =
         ]
 
 
+{-| Displays the form error to humans.
+I love the GDS' guidance on writing errors here
+@see <https://design-system.service.gov.uk/components/error-message/#be-clear-and-concise>
+-}
 viewError : Error -> Html msg
 viewError error =
     let
@@ -357,24 +360,24 @@ viewError error =
         humanText =
             case error of
                 GeolocationError Geo.PermissionDenied ->
-                    "The location permission was denied, now or in the past. Perhaps there is a setting in your browser? For now, you can save the note without a location, using the checkbox below."
+                    "We do not have permission to read your location. Perhaps there is a setting in your browser, a pop-up window, or your phone's top menu? For now, you can save the note without a location, using the checkbox below."
 
                 GeolocationError Geo.PositionUnavailable ->
-                    "There was an error when acquiring your location. For now, you can save the note without a location, using the checkbox below."
+                    "We could not acquire your location. For now, you can save the note without a location, using the checkbox below."
 
                 GeolocationError Geo.Timeout ->
-                    "Acquiring your location took too long. This can happen sometimes. For now, you can save the note without a location, using the checkbox below."
+                    "It took us to long to acquire your location. This can happen sometimes. For now, you can save the note without a location, using the checkbox below."
 
                 SavingError ->
-                    "There was an internal error when saving the note locally. Sorry about that.."
+                    "We could not save the note locally. This is likely a problem in the code."
     in
     div
         [ HA.tabindex -1
         , HA.id errorSummaryId
         , HA.attribute "role" "group"
         , HA.attribute "aria-labelledby" headingId
-        , class "vs1 pa3 bg-washed-red ba bw1 br2 b--light-red"
+        , class "vs2 pa3 bg-washed-red ba bw1 br2 b--light-red focus-shadow-light"
         ]
-        [ subHeading 3 [ HA.id headingId ] [ text "Error" ]
+        [ subSubHeading 3 [ HA.id headingId ] [ text "There is a problem" ]
         , paragraph [] [ text humanText ]
         ]

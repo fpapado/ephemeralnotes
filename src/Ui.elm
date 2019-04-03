@@ -10,6 +10,7 @@ module Ui exposing
     , styledButton
     , styledButtonBlue
     , subHeading
+    , subSubHeading
     , textbox
     )
 
@@ -31,6 +32,14 @@ subHeading level attrs children =
             "h" ++ String.fromInt (clamp 1 6 level)
     in
     H.node tagName (class "mv0 f3 f2-ns lh-title fw7" :: attrs) children
+
+
+subSubHeading level attrs children =
+    let
+        tagName =
+            "h" ++ String.fromInt (clamp 1 6 level)
+    in
+    H.node tagName (class "mv0 f4 f3-ns lh-title fw7" :: attrs) children
 
 
 centeredContainer attrs children =
