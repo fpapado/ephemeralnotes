@@ -300,7 +300,7 @@ view form_ =
                     ]
                     [ text "Word" ]
                 , input
-                    [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
+                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
                     , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-front"
@@ -319,7 +319,7 @@ view form_ =
                     ]
                     [ text "Translation" ]
                 , input
-                    [ class "mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
+                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
                     , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-back"

@@ -1,3 +1,14 @@
+/** Enhanced Input 
+  * Contains:
+  *   - enhanced-input-text
+  *   - enhanced-checkbox
+*/
+
+/** Set the height of the text input to be the same as checkboxes */
+.enhanced-input-text {
+  height: 40px;
+}
+
 .enhanced-checkbox-container {
   position: relative;
   padding-left: 40px;
