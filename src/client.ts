@@ -1,11 +1,9 @@
 // @ts-ignore
-import mainStyle from './styles/index.css';
+import './styles/index.css';
 import {listenForWaitingSW} from './sw-utils';
 import {Elm} from './Main/index';
 import {getLocation, Result, Location, LocationError} from './Geolocation';
 import * as Store from './Store';
-
-console.log({mainStyle});
 
 export function runWith(Elm_: typeof Elm) {
   // Start Elm app

@@ -15,8 +15,6 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 //@ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 
-console.log({marker, marker2x, markerShadow});
-
 const template = document.createElement('template');
 template.innerHTML = `
 <style>
