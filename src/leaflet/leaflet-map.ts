@@ -1,10 +1,20 @@
 import L from 'leaflet';
 
+// NOTE: This plugin assumes a global 'L' being available, because it is old-school cool
+// doing import '' means that side-effects can be run
+// TODO: Fork the plugin and use a factory/constructor :)
+import 'leaflet.markercluster';
+
 // Grab a hashed URL reference to the leaflet css
 // This is done through webpack, which knows to grab the url and bundle it
 // @see webpack.donfig.js
 //@ts-ignore
 import styleUrl from '../styles/leaflet.css';
+
+// Type that chidren must implement in order to get added to the layer
+// Might change in the future (see note about Events below)
+export type AddToLayerCb = (marker: L.Marker) => void;
+export type RemoveFromLayerCb = (marker: L.Marker) => void;
 
 const CONTAINER_ID = 'leaflet-map-container';
 
@@ -40,6 +50,7 @@ class LeafletMap extends HTMLElement {
   private $mapContainer: HTMLDivElement;
   private observer: MutationObserver;
   private map?: L.Map | null;
+  private markersLayer?: L.LayerGroup | null;
   private isConnectedForReal: boolean;
 
   constructor() {
@@ -87,6 +98,9 @@ class LeafletMap extends HTMLElement {
       }
     ).addTo(this.map);
 
+    this.markersLayer = (L as any).markerClusterGroup();
+    this.map.addLayer(this.markersLayer!);
+
     this.isConnectedForReal = true;
     this.setMapView();
 
@@ -110,6 +124,7 @@ class LeafletMap extends HTMLElement {
     this.observer.disconnect();
     this.map!.remove();
     this.map = null;
+    this.markersLayer = null;
   }
 
   attributeChangedCallback(name: ObservedAttribute, oldVal: any, newVal: any) {
@@ -119,17 +134,29 @@ class LeafletMap extends HTMLElement {
     }
   }
 
+  // TODO: Instead of this, perhaps use events for the children to notify the parent of additions
+  // I *think* that might be more composable
   private _updateFeaturesFor(nodes: NodeList | HTMLCollection) {
     if (nodes.length && this.map) {
       for (const feature of nodes) {
+        // NOTE: We could make this more open, if we want to allow extensions
         if (feature.nodeName.toLowerCase() === 'leaflet-marker') {
           // Wait till after the leaflet-marker element has been upgraded
           // and had a chance to run its connectedCallback.
           customElements.whenDefined('leaflet-marker').then(_ => {
             // TS hack...
-            if (!(feature as any).leafletMap) {
-              // Assign the map property to the feature
-              (feature as any).leafletMap = this.map;
+            if (!(feature as any).addToLayerCb) {
+              (feature as any).addToLayerCb = (feature: L.Marker) => {
+                // NOTE: Could also do this.markersLayer.addLayer(feature)
+                // which one is more valid?
+                feature.addTo(this.markersLayer!);
+              };
+              (feature as any).removeFromLayerCb = (feature: L.Marker) => {
+                // NOTE: Could also do this.markersLayer.addLayer(feature)
+                // which one is more valid?
+                // TODO: Types are meh
+                feature.removeFrom(this.markersLayer as any);
+              };
             }
           });
         }

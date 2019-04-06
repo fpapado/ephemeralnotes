@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import {AddToLayerCb, RemoveFromLayerCb} from './leaflet-map';
 
 // Import references to leaflet's markers
 
@@ -27,12 +28,13 @@ template.innerHTML = `
 // TODO: Consider reflecting the properties to attributes here
 type ObservedAttribute = 'latitude' | 'longitude';
 type ReflectedAttribute = 'latitude' | 'longitude';
-type Property = 'latitude' | 'longitude' | 'leafletMap';
+type Property = 'latitude' | 'longitude' | 'addToLayerCb';
 
 class LeafletPin extends HTMLElement {
   latitude?: number;
   longitude?: number;
-  private _leafletMap?: L.Map | null;
+  private _addToLayerCb?: AddToLayerCb | null;
+  private _removeFromLayerCb?: RemoveFromLayerCb | null;
   private feature?: L.Marker;
 
   constructor() {
@@ -45,13 +47,21 @@ class LeafletPin extends HTMLElement {
     return ['latitude', 'longitude'];
   }
 
-  get leafletMap() {
-    return this._leafletMap;
+  get addToLayerCb() {
+    return this._addToLayerCb;
   }
 
-  set leafletMap(value) {
-    this._leafletMap = value;
+  set addToLayerCb(value) {
+    this._addToLayerCb = value;
     this.onMapChanged();
+  }
+
+  get removeFromLayerCb() {
+    return this._removeFromLayerCb;
+  }
+
+  set removeFromLayerCb(value) {
+    this._removeFromLayerCb = value;
   }
 
   connectedCallback() {
@@ -60,16 +70,17 @@ class LeafletPin extends HTMLElement {
     // @see https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
     this.upgradeProperty('latitude');
     this.upgradeProperty('longitude');
-    this.upgradeProperty('leafletMap');
+    this.upgradeProperty('addToLayerCb');
     this.mapReady();
   }
 
   disconnectedCallback() {
     // Remove the feature from the map
-    if (this.feature && this._leafletMap) {
-      this.feature.removeFrom(this._leafletMap);
+    if (this.feature && this._removeFromLayerCb) {
+      this._removeFromLayerCb(this.feature);
     }
-    this._leafletMap = null;
+    this._addToLayerCb = null;
+    this._removeFromLayerCb = null;
   }
 
   attributeChangedCallback(name: ObservedAttribute, oldVal: any, newVal: any) {
@@ -82,7 +93,7 @@ class LeafletPin extends HTMLElement {
   }
 
   mapReady() {
-    if (this.latitude && this.longitude && this._leafletMap) {
+    if (this.latitude && this.longitude && this._addToLayerCb) {
       this.feature = L.marker([this.latitude, this.longitude], {
         icon: new L.Icon.Default({
           // Point to local markers
@@ -91,7 +102,9 @@ class LeafletPin extends HTMLElement {
           shadowUrl: markerShadow,
         }),
       });
-      this.feature.addTo(this._leafletMap);
+
+      // Add the feature to the map
+      this._addToLayerCb(this.feature);
 
       // TODO: Set up mutations for this, because the content can change independently!
       this.contentChanged();
