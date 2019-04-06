@@ -24,6 +24,24 @@
         ]
       },
       {
+        "source": "leaflet-*.@(css|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000,immutable"
+          }
+        ]
+      },
+      {
+        "source": "vendors~*.@(js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000,immutable"
+          }
+        ]
+      },
+      {
         "source": "workbox-*/*.js",
         "headers": [
           {
@@ -33,7 +51,7 @@
         ]
       },
       {
-        "source": "phantom-sans-v*-*.@(woff|woff2)",
+        "source": "phantom-sans-v*.@(woff|woff2)",
         "headers": [
           {
             "key": "Cache-Control",
