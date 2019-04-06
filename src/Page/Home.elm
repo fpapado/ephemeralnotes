@@ -128,12 +128,14 @@ viewEntriesMap entryData =
                 RemoteData.Success entries ->
                     List.map viewEntryMarkerKeyed entries
     in
-    Keyed.node "leaflet-map"
-        [ HA.attribute "latitude" "60.1699"
-        , HA.attribute "longitude" "24.9384"
-        , HA.attribute "zoom" "12"
+    div [ class "leaflet-map-wrapper" ]
+        [ Keyed.node "leaflet-map"
+            [ HA.attribute "latitude" "60.1699"
+            , HA.attribute "longitude" "24.9384"
+            , HA.attribute "zoom" "12"
+            ]
+            markerNodes
         ]
-        markerNodes
 
 
 viewEntryMarkerKeyed : Entry -> ( String, Html msg )

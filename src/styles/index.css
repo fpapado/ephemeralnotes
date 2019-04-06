@@ -8,3 +8,14 @@
 @import './skip-link.css';
 @import './enhanced-input.css';
 @import './grid-entries.css';
+
+/* Hide leaflet map if not defined */
+.leaflet-map-wrapper {
+  min-height: 32rem;
+  background: #eee;
+}
+leaflet-map:not(:defined) {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}

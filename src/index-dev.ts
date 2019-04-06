@@ -3,11 +3,16 @@
  */
 import {Elm} from './Main';
 import * as client from './client';
-import * as leaflet from './leaflet/leaflet-wc';
 
 function init() {
   client.runWith(Elm);
-  leaflet.init();
+
+  // Import the leaflet component dynamically, to prioritise the rest of the interface
+  import('./leaflet/leaflet-wc')
+    .then(leaflet => leaflet.init())
+    .catch(err => {
+      console.error(err);
+    });
 }
 
 init();
