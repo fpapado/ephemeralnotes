@@ -1,5 +1,22 @@
 import L from 'leaflet';
 
+// Import references to leaflet's markers
+
+//@ts-ignore
+import marker from 'leaflet/dist/images/marker-icon.png';
+//@ts-ignore
+import marker2x from 'leaflet/dist/images/marker-icon-2x.png';
+//@ts-ignore
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Hack to make it work with webpack-provided URLs
+// @see https://github.com/PaulLeCam/react-leaflet/issues/255
+
+//@ts-ignore
+delete L.Icon.Default.prototype._getIconUrl;
+
+console.log({marker, marker2x, markerShadow});
+
 const template = document.createElement('template');
 template.innerHTML = `
 <style>
@@ -70,8 +87,10 @@ class LeafletPin extends HTMLElement {
     if (this.latitude && this.longitude && this._leafletMap) {
       this.feature = L.marker([this.latitude, this.longitude], {
         icon: new L.Icon.Default({
-          // TODO: Import this locally, hash, cache
-          imagePath: 'https://unpkg.com/leaflet@1.4.0/dist/images/',
+          // Point to local markers
+          iconRetinaUrl: marker2x,
+          iconUrl: marker,
+          shadowUrl: markerShadow,
         }),
       });
       this.feature.addTo(this._leafletMap);

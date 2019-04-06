@@ -134,10 +134,25 @@ module.exports = {
           'css-loader',
         ],
       },
+      // Load references to file URLs after resolution
+      // Used, for example, to link urls
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name]_[hash].[ext]',
+              outputPath: 'assets/images',
+              publicPath: 'assets/images',
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.elm'],
+    extensions: ['.tsx', '.ts', '.js', '.elm', '.css'],
   },
   devServer: {
     compress: true,

@@ -3,9 +3,11 @@ import L from 'leaflet';
 // Grab a hashed URL reference to the leaflet css
 // This is done through webpack, which knows to grab the url and bundle it
 //@ts-ignore
-// import styleUrl from 'leaflet/dist/leaflet.css';
+import styleUrl from 'leaflet/dist/leaflet.css';
+console.log('styleurl', styleUrl);
 
 // TODO: Import this locally
+// const styleLink = `<link rel="stylesheet" href="${styleUrl}" />`;
 const styleLink = `<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
   integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
   crossorigin=""/>`;
