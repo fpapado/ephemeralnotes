@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const Critters = require('critters-webpack-plugin');
 const SizePlugin = require('size-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -27,7 +28,9 @@ const ifNotProduction = makeIfNotProp(isProduction);
 module.exports = {
   context: process.cwd(),
   mode: ifProduction('production', 'development'),
-  entry: ifProduction(['./src/index-prod.ts'], ['./src/index-dev.ts']),
+  entry: {
+    main: ifProduction(['./src/index-prod.ts'], ['./src/index-dev.ts']),
+  },
   output: {
     path: __dirname + '/dist',
     chunkFilename: '[name]-[contenthash].js',
@@ -38,6 +41,10 @@ module.exports = {
     // Place things in template
     new HtmlWebpackPlugin({
       template: 'index.html',
+    }),
+    // Adjust scripts in template
+    new ScriptExtHtmlWebpackPlugin({
+      preload: ['main'],
     }),
     ifProduction(
       new ForkTsCheckerWebpackPlugin({
