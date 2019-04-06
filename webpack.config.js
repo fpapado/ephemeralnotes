@@ -45,6 +45,7 @@ module.exports = {
     // Adjust scripts in template
     new ScriptExtHtmlWebpackPlugin({
       preload: ['main'],
+      chunks: 'initial',
     }),
     ifProduction(
       new ForkTsCheckerWebpackPlugin({
