@@ -90,9 +90,6 @@ viewInner model =
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
                     , viewEntriesMap model.entries
-                    , viewEntriesMap model.entries
-                    , viewEntriesMap model.entries
-                    , viewEntriesMap model.entries
                     , viewEntries model.entries ( formInput.front, formInput.back )
                     ]
                 , section [] [ viewAbout ]
