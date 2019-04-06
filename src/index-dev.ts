@@ -8,7 +8,7 @@ function init() {
   client.runWith(Elm);
 
   // Import the leaflet component dynamically, to prioritise the rest of the interface
-  import('./leaflet/leaflet-wc')
+  import(/* webpackChunkName: "leaflet-wc" */ './leaflet/leaflet-wc')
     .then(leaflet => leaflet.init())
     .catch(err => {
       console.error(err);
