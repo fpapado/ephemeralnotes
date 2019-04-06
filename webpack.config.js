@@ -134,12 +134,17 @@ module.exports = {
       {
         test: /.css$/,
         use: [
+          // Use the file loader to load only a reference to a file
           {
             loader: 'file-loader',
             options: {
               name: '[name]-[hash:20].[ext]',
             },
           },
+          // Use postcss to bundle leaflet css, while keeping it out of webpack
+          // This is because we want to reference the leaflet css inside of the web component
+          // whereas webpack (css-loader + extractText) assumes top-level styles, which wouldn't work
+          {loader: 'postcss-loader'},
         ],
         // Include a reference to leaflet.css, hashed, but do not touch it otherwise
         include: /leaflet\.css/,

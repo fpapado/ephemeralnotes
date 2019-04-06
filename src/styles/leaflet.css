@@ -1,0 +1,7 @@
+/* NOTE: This file is bundled with postcss-import, and not webpack.
+   This is intentional; webpack should only see an opaque file to reference, so we can use a <link> in the web component.
+   @see webpack.config.js and leaflet-map.ts for more info
+*/
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';

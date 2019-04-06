@@ -29,4 +29,4 @@
 
 ## Performance
 
-- [ ] Import leaflet-wc dynamically, make placholder leaflet-map with aspect-ratio
+- [x] Import leaflet-wc dynamically, make placholder leaflet-map with aspect-ratio

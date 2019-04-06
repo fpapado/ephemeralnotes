@@ -4,7 +4,7 @@ import L from 'leaflet';
 // This is done through webpack, which knows to grab the url and bundle it
 // @see webpack.donfig.js
 //@ts-ignore
-import styleUrl from 'leaflet/dist/leaflet.css';
+import styleUrl from '../styles/leaflet.css';
 
 const CONTAINER_ID = 'leaflet-map-container';
 
