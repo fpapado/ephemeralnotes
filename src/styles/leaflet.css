@@ -1,5 +1,6 @@
 /* NOTE: This file is bundled with postcss-import, and not webpack.
-   This is intentional; webpack should only see an opaque file to reference, so we can use a <link> in the web component.
+   This is intentional; webpack should only provide a raw text to reference in <style> or ConstructableStylesheet.
+   The setup for the other CSS files is for "extracting" to the top-level, for <link> tags
    @see webpack.config.js and leaflet-map.ts for more info
 */
 @import 'leaflet/dist/leaflet.css';

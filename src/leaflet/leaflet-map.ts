@@ -5,26 +5,20 @@ import L from 'leaflet';
 // TODO: Fork the plugin and use a factory/constructor :)
 import 'leaflet.markercluster';
 
-// Grab a hashed URL reference to the leaflet css
-// This is done through webpack, which knows to grab the url and bundle it
+// This is done through webpack, where we use postcss to bundle the CSS
+// and lift the raw text in the module graph.
 // @see webpack.donfig.js
 //@ts-ignore
-import styleUrl from '../styles/leaflet.css';
-
-// Type that chidren must implement in order to get added to the layer
-// Might change in the future (see note about Events below)
-export type AddToLayerCb = (marker: L.Marker) => void;
-export type RemoveFromLayerCb = (marker: L.Marker) => void;
+import styleText from '../styles/leaflet.css';
 
 const CONTAINER_ID = 'leaflet-map-container';
 
 // Import the local leaflet styles
-const styleLink = `<link rel="stylesheet" href="${styleUrl}" />`;
+// TODO: Use ConstructableStylesheet where supported
+const getStyleTag = () => `<style>${styleText}</style>`;
 
 const template = document.createElement('template');
 template.innerHTML = `
-${styleLink}
-
 <style>
   :host {
     display: block;
@@ -36,8 +30,14 @@ ${styleLink}
     background-color: #ddd;
   }
 </style>
+${getStyleTag()}
 <div class="container" id="${CONTAINER_ID}"></div>
 `;
+
+// Type that chidren must implement in order to get added to the layer
+// Might change in the future (see note about Events below)
+export type AddToLayerCb = (marker: L.Marker) => void;
+export type RemoveFromLayerCb = (marker: L.Marker) => void;
 
 type ObservedAttribute = 'latitude' | 'longitude' | 'zoom';
 type ReflectedAttribute = 'latitude' | 'longitude' | 'zoom';
