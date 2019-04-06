@@ -4,9 +4,11 @@
 // @ts-ignore
 import {Elm} from '../dist/js/elm.js';
 import * as client from './client';
+import * as leaflet from './leaflet/leaflet-wc';
 
 function init() {
   client.runWith(Elm);
+  leaflet.init();
 }
 
 init();

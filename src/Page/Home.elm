@@ -89,6 +89,7 @@ viewInner model =
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
+                    , viewEntriesMap model.entries
                     , viewEntries model.entries ( formInput.front, formInput.back )
                     ]
                 , section [] [ viewAbout ]
@@ -108,6 +109,48 @@ viewAbout =
             [ class "measure" ]
             [ text "You can add Ephemeral to your home screen for quicker access and standalone use. It will always be available offline through your web browser." ]
         ]
+
+
+viewEntriesMap : RemoteData String (List Entry) -> Html msg
+viewEntriesMap entryData =
+    let
+        markerNodes =
+            case entryData of
+                RemoteData.NotAsked ->
+                    []
+
+                RemoteData.Loading ->
+                    []
+
+                RemoteData.Failure err ->
+                    []
+
+                RemoteData.Success entries ->
+                    List.map viewEntryMarkerKeyed entries
+    in
+    Keyed.node "leaflet-map"
+        [ HA.attribute "latitude" "60.1699"
+        , HA.attribute "longitude" "24.9384"
+        , HA.attribute "zoom" "12"
+        ]
+        markerNodes
+
+
+viewEntryMarkerKeyed : Entry -> ( String, Html msg )
+viewEntryMarkerKeyed ambiguousEntry =
+    case ambiguousEntry of
+        Entry.V1 entry ->
+            ( Entry.Id.toString entry.id
+            , Html.node "leaflet-marker"
+                [ HA.attribute "latitude" (String.fromFloat (L.latToFloat entry.location.lat))
+                , HA.attribute "longitude" (String.fromFloat (L.lonToFloat entry.location.lon))
+                ]
+                [ div [ class "vs2" ]
+                    [ paragraph [ class "fw6" ] [ text entry.front ]
+                    , paragraph [] [ text entry.back ]
+                    ]
+                ]
+            )
 
 
 viewEntries : RemoteData String (List Entry) -> ( String, String ) -> Html Msg

@@ -3,9 +3,11 @@
  */
 import {Elm} from './Main';
 import * as client from './client';
+import * as leaflet from './leaflet/leaflet-wc';
 
 function init() {
   client.runWith(Elm);
+  leaflet.init();
 }
 
 init();

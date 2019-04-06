@@ -68,9 +68,11 @@
     "workbox-webpack-plugin": "^4.1.1"
   },
   "dependencies": {
+    "@types/leaflet": "^1.4.3",
     "@types/nanoid": "^1.2.1",
     "idb": "^4.0.1",
     "idb-keyval": "^3.2.0",
+    "leaflet": "^1.4.0",
     "nanoid": "^2.0.1"
   }
 }
