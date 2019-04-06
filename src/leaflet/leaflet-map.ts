@@ -9,28 +9,40 @@ import 'leaflet.markercluster';
 // and lift the raw text in the module graph.
 // @see webpack.donfig.js
 //@ts-ignore
-import styleText from '../styles/leaflet.css';
+import leafletStyleText from '../styles/leaflet.css';
+import {getStyleResult} from './util';
+
+const styleText = `
+:host {
+  display: block;
+  max-width: 100%;
+}
+
+.container {
+  height: 32rem;
+  background-color: #ddd;
+}
+
+${leafletStyleText}
+`;
+
+// TODO: Use the lazy init version with connectedCallback
+
+// Import the local leaflet styles
+// We use the ConstructableStyleSheet where supported
+// The ConstructableStyleSheet proposal allows sharing of styles
+// between different roots (including document and shadow roots).
+// This is better than using <style>, because the sheets can be
+// cached, shared, parsed once etc. This means that multiple instances
+// of the same component will only need to incur the parsing cost once!
+const styleResult = getStyleResult(styleText);
 
 const CONTAINER_ID = 'leaflet-map-container';
 
-// Import the local leaflet styles
-// TODO: Use ConstructableStylesheet where supported
-const getStyleTag = () => `<style>${styleText}</style>`;
-
 const template = document.createElement('template');
-template.innerHTML = `
-<style>
-  :host {
-    display: block;
-    max-width: 100%;
-  }
 
-  .container {
-    height: 32rem;
-    background-color: #ddd;
-  }
-</style>
-${getStyleTag()}
+template.innerHTML = `
+${styleResult.text ? `<style>${styleResult.text}</style>` : ''}
 <div class="container" id="${CONTAINER_ID}"></div>
 `;
 
@@ -51,12 +63,18 @@ class LeafletMap extends HTMLElement {
   private observer: MutationObserver;
   private map?: L.Map | null;
   private markersLayer?: L.LayerGroup | null;
-  private isConnectedForReal: boolean;
+  private isConnectedForReal = false;
 
   constructor() {
     super();
     this.attachShadow({mode: 'open'});
     this.shadowRoot!.appendChild(template.content.cloneNode(true));
+
+    // Adopt stylesheet, if supported
+    if (styleResult.sheet) {
+      (this.shadowRoot as any).adoptedStyleSheets = [styleResult.sheet];
+    }
+
     this.$mapContainer = this.shadowRoot!.getElementById(
       CONTAINER_ID
     ) as HTMLDivElement;
@@ -65,8 +83,6 @@ class LeafletMap extends HTMLElement {
     this.observer = new MutationObserver(
       this.childrenChangedCallback.bind(this)
     );
-
-    this.isConnectedForReal = false;
   }
 
   static get observedAttributes(): ObservedAttribute[] {
@@ -85,6 +101,11 @@ class LeafletMap extends HTMLElement {
     this.upgradeProperty('latitude');
     this.upgradeProperty('longitude');
     this.upgradeProperty('zoom');
+
+    // Only actually parse the stylesheet when the first instance is connected.
+    if (styleResult.sheet && styleResult.sheet.cssRules.length === 0) {
+      (styleResult.sheet as any).replaceSync(styleText);
+    }
 
     this.map = L.map(this.$mapContainer);
 

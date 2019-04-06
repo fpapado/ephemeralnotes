@@ -9,6 +9,7 @@ import marker from 'leaflet/dist/images/marker-icon.png';
 import marker2x from 'leaflet/dist/images/marker-icon-2x.png';
 //@ts-ignore
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import {getStyleResult} from './util';
 
 // Hack to make it work with webpack-provided URLs
 // @see https://github.com/PaulLeCam/react-leaflet/issues/255
@@ -16,14 +17,20 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 //@ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 
-const template = document.createElement('template');
-template.innerHTML = `
+const styleText = `
 <style>
-    :host {
-        display: none;
-    }
+  :host {
+    display: none;
+  }
 </style>
 `;
+
+const styleResult = getStyleResult(styleText);
+const template = document.createElement('template');
+
+template.innerHTML = styleResult.text
+  ? `<style>${styleResult.text}</style>`
+  : '';
 
 // TODO: Consider reflecting the properties to attributes here
 type ObservedAttribute = 'latitude' | 'longitude';
@@ -41,6 +48,11 @@ class LeafletPin extends HTMLElement {
     super();
     this.attachShadow({mode: 'open'});
     this.shadowRoot!.appendChild(template.content.cloneNode(true));
+
+    // Adopt stylesheet, if supported
+    if (styleResult.sheet) {
+      (this.shadowRoot as any).adoptedStyleSheets = [styleResult.sheet];
+    }
   }
 
   static get observedAttributes(): ObservedAttribute[] {
@@ -71,6 +83,12 @@ class LeafletPin extends HTMLElement {
     this.upgradeProperty('latitude');
     this.upgradeProperty('longitude');
     this.upgradeProperty('addToLayerCb');
+
+    // Adopt stylesheet, if supported
+    if (styleResult.sheet) {
+      (this.shadowRoot as any).adoptedStyleSheets = [styleResult.sheet];
+    }
+
     this.mapReady();
   }
 

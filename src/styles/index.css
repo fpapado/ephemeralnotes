@@ -12,7 +12,7 @@
 /* Hide leaflet map if not defined */
 .leaflet-map-wrapper {
   min-height: 32rem;
-  background: #eee;
+  background: #ddd;
 }
 leaflet-map:not(:defined) {
   display: none;
