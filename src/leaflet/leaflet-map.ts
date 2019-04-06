@@ -2,21 +2,15 @@ import L from 'leaflet';
 
 // Grab a hashed URL reference to the leaflet css
 // This is done through webpack, which knows to grab the url and bundle it
+// @see webpack.donfig.js
 //@ts-ignore
 import styleUrl from 'leaflet/dist/leaflet.css';
-console.log('styleurl', styleUrl);
-
-// TODO: Import this locally
-// const styleLink = `<link rel="stylesheet" href="${styleUrl}" />`;
-const styleLink = `<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
-  integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-  crossorigin=""/>`;
 
 const CONTAINER_ID = 'leaflet-map-container';
 
-// Note that we're grabbing the stylesheet url from a CDN
-// In reality, we should be grabbing it from the build process, in a way that allows it to be hashed etc.
-// This was too much of a pain for a demo, so this will do for now :D
+// Import the local leaflet styles
+const styleLink = `<link rel="stylesheet" href="${styleUrl}" />`;
+
 const template = document.createElement('template');
 template.innerHTML = `
 ${styleLink}

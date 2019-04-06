@@ -1,9 +1,10 @@
 # TODO
+
 ## Static
 
-- [X] Build pipeline just with npm commands and some light bundling, perhaps
-- [X] index.html with inlined critical CSS
-- [X] Font and font loading strategy (variable fonts, font-display: swap, preload?)
+- [x] Build pipeline just with npm commands and some light bundling, perhaps
+- [x] index.html with inlined critical CSS
+- [x] Font and font loading strategy (variable fonts, font-display: swap, preload?)
   - `preload` and `variable-fonts` have some good overlap, so we are not wasting much...
 - Github PR pipeline (now integration)
 - Script preload
@@ -12,7 +13,7 @@
 - postcss / autoprefixer
 - remove unused Tachyons classes
 - move SW state to top-level
-- [X] style installBanner
+- [x] style installBanner
 - [?] inline all the CSS
 
 ## MVP
@@ -23,4 +24,9 @@
 - App shell
 
 ## Accessibility
+
 - [ ] Test Focus management with screen readers, decide on timeout before focus
+
+## Performance
+
+- [ ] Import leaflet-wc dynamically, make placholder leaflet-map with aspect-ratio

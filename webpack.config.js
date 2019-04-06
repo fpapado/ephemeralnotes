@@ -120,19 +120,29 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          {
-            loader: ifNotProduction(
-              'style-loader',
-              MiniCssExtractPlugin.loader
-            ),
-            options: {
-              // you can specify a publicPath here
-              // by default it use publicPath in webpackOptions.output
-              // publicPath: "../"
-            },
-          },
+          ifNotProduction(
+            {loader: 'style-loader'},
+            {
+              loader: MiniCssExtractPlugin.loader,
+            }
+          ),
           'css-loader',
         ],
+        // Exclude leaflet.css; we include only a reference to it
+        exclude: /leaflet\.css/,
+      },
+      {
+        test: /.css$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name]-[hash:20].[ext]',
+            },
+          },
+        ],
+        // Include a reference to leaflet.css, hashed, but do not touch it otherwise
+        include: /leaflet\.css/,
       },
       // Load references to file URLs after resolution
       // Used, for example, to link urls
@@ -142,7 +152,7 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name]_[hash].[ext]',
+              name: '[name]-[hash:20].[ext]',
               outputPath: 'assets/images',
               publicPath: 'assets/images',
             },
