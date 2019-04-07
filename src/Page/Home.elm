@@ -5,7 +5,6 @@ module Page.Home exposing
     , subscriptions
     , update
     , view
-    , viewBanner
     )
 
 {-| The homepage. You can get here via either the / route.
@@ -15,17 +14,20 @@ import AddEntryForm as Form exposing (Form)
 import Asset
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
+import File.Download
 import Geolocation as Geo
 import Html exposing (..)
 import Html.Attributes as HA exposing (class, href)
 import Html.Events as HE exposing (onClick)
 import Html.Keyed as Keyed
 import Json.Decode as JD
+import Json.Encode as JE
 import Location as L
 import Log
 import RemoteData exposing (RemoteData)
 import ServiceWorker as SW
 import Store
+import String.Transforms
 import Svg.Attributes
 import Svg.NoData
 import Task exposing (Task)
@@ -92,22 +94,15 @@ viewInner model =
                     , viewEntriesMap model.entries
                     , viewEntries model.entries ( formInput.front, formInput.back )
                     ]
-                , section [] [ viewAbout ]
+                , section [ class "vs3 vs4-ns" ]
+                    [ subHeading 2 [] [ text "Import/Export" ]
+                    , viewImportExport model.entries
+                    ]
+                , section [] [ viewAddToHomeScreen ]
                 ]
             , viewUpdatePrompt model.swUpdate
             , viewInstallPrompt model.installPrompt
             ]
-        ]
-
-
-viewAbout =
-    div [ class "vs3", HA.attribute "open" "true" ]
-        [ subHeading 2
-            [ class "dib v-mid" ]
-            [ text "Add to Home Screen" ]
-        , paragraph
-            [ class "measure" ]
-            [ text "You can add Ephemeral to your home screen for quicker access and standalone use. It will always be available offline through your web browser." ]
         ]
 
 
@@ -242,6 +237,39 @@ viewUpdatePrompt swUpdate =
         ]
 
 
+viewImportExport : RemoteData String (List Entry) -> Html Msg
+viewImportExport entryData =
+    div [ class "vs3" ]
+        (case entryData of
+            RemoteData.Success entries ->
+                [ styledButtonBlue False
+                    [ onClick (FileDownloadMsg <| ClickedDownload entries) ]
+                    [ text "Download Entries" ]
+                , paragraph
+                    [ class "measure" ]
+                    [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. In the future, you can use this file to import data into this application on another device." ]
+                ]
+
+            _ ->
+                [ styledButtonBlue True
+                    [ onClick <| NoOp ]
+                    [ text "Download Entries" ]
+                , paragraph [ class "measure" ] [ text "Note: Entries have not been loaded yet, so " ]
+                ]
+        )
+
+
+viewAddToHomeScreen =
+    div [ class "vs3 vs4-ns", HA.attribute "open" "true" ]
+        [ subHeading 2
+            [ class "dib v-mid" ]
+            [ text "Add to Home Screen" ]
+        , paragraph
+            [ class "measure" ]
+            [ text "You can add Ephemeral to your home screen for quicker access and standalone use. It will always be available offline through your web browser." ]
+        ]
+
+
 viewInstallPrompt : SW.InstallPrompt -> Html Msg
 viewInstallPrompt installPrompt =
     notificationRegion []
@@ -263,20 +291,13 @@ viewInstallPrompt installPrompt =
         ]
 
 
-viewBanner : Html msg
-viewBanner =
-    div [ class "vs3" ]
-        [ heading 1 [] [ text "Ephemeral" ]
-        , paragraph [] [ text "Write down words as you encounter them." ]
-        ]
-
-
 
 -- UPDATE
 
 
 type Msg
-    = GotTimeZone Time.Zone
+    = NoOp
+    | GotTimeZone Time.Zone
     | FromServiceWorker SW.ToElm
     | FromGeolocation Geo.ToElm
     | FromStore Store.ToElm
@@ -285,6 +306,12 @@ type Msg
     | AcceptInstallPrompt
     | DeferInstallPrompt
     | FormMsg Form.Msg
+    | FileDownloadMsg FileDownloadMsg
+
+
+type FileDownloadMsg
+    = ClickedDownload (List Entry)
+    | GotDownloadTime (List Entry) Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -374,6 +401,30 @@ update msg model =
                     Form.update formTransitionMsg model.form
             in
             ( { model | form = newForm }, Cmd.map FormMsg cmd )
+
+        -- Import/Export
+        FileDownloadMsg downloadMsg ->
+            case downloadMsg of
+                ClickedDownload entries ->
+                    -- Get the time, then save
+                    ( model, Task.perform (FileDownloadMsg << GotDownloadTime entries) Time.now )
+
+                GotDownloadTime entries time ->
+                    let
+                        entriesJson =
+                            entries
+                                |> JE.list Entry.encode
+                                |> String.Transforms.fromValue
+
+                        filename =
+                            "entries-" ++ String.fromInt (Time.posixToMillis time) ++ ".json"
+                    in
+                    ( model
+                    , File.Download.string filename "application/json" entriesJson
+                    )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 

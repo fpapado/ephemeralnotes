@@ -30,3 +30,7 @@
 ## Performance
 
 - [x] Import leaflet-wc dynamically, make placholder leaflet-map with aspect-ratio
+
+## Features
+
+- [ ] Printable "cards" mode, with print styles and grid
