@@ -13,6 +13,8 @@ import Url.Parser as UrlParser exposing ((</>), Parser, oneOf, s, string)
 
 type Route
     = Home
+    | Map
+    | Data
 
 
 parser : Parser (Route -> a) a
@@ -59,5 +61,11 @@ routeToString page =
             case page of
                 Home ->
                     []
+
+                Map ->
+                    [ "map" ]
+
+                Data ->
+                    [ "data" ]
     in
     "/" ++ String.join "/" pieces

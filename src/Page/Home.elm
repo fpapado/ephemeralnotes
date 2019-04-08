@@ -11,7 +11,6 @@ module Page.Home exposing
 -}
 
 import AddEntryForm as Form exposing (Form)
-import Asset
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
 import File.Download
@@ -25,6 +24,7 @@ import Json.Encode as JE
 import Location as L
 import Log
 import RemoteData exposing (RemoteData)
+import Route
 import ServiceWorker as SW
 import Store
 import String.Transforms

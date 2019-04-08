@@ -1,5 +1,8 @@
 module Main exposing (main)
 
+-- import Page.Data as Data
+-- import Page.Map as Map
+
 import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Navigation as Nav
@@ -81,6 +84,11 @@ type Msg
     | GotHomeMsg Home.Msg
 
 
+
+-- | GotMapMsg Map.Msg
+-- | GotDataMsg Data.Msg
+
+
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute model =
     case maybeRoute of
@@ -90,6 +98,19 @@ changeRouteTo maybeRoute model =
         Just Route.Home ->
             Home.init
                 |> updateWith (\m -> { model | page = Home m }) GotHomeMsg model
+
+        Just Route.Map ->
+            ( { model | page = NotFound }, Cmd.none )
+
+        -- Map.init
+        --     |> updateWith (\m -> { model | page = Map m }) GotMapMsg model
+        Just Route.Data ->
+            ( { model | page = NotFound }, Cmd.none )
+
+
+
+-- Data.init
+--     |> updateWith (\m -> { model | page = Data m }) GotDataMsg model
 
 
 {-| Deferred focus after a setTimeout, to allow the rendering to settle

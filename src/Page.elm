@@ -91,7 +91,29 @@ viewHeader : Page -> Html msg
 viewHeader activePage =
     header [ class "pv2 navy bg-white shadow-1" ]
         [ skipLink
-        , nav [ class "tc" ] [ a [ Route.href Route.Home, class "f3 fw7 link navy tc" ] [ text "Ephemeral" ] ]
+        , nav [ class "navigation-container" ]
+            [ a [ Route.href Route.Home, class "f3 fw7 link navy tc navigation-home" ] [ text "Ephemeral" ]
+            , viewNavBar activePage
+            ]
+        ]
+
+
+viewNavBar : Page -> Html msg
+viewNavBar page =
+    let
+        navLink route displayText =
+            div [ class "mh2" ]
+                [ a
+                    [ Route.href route
+                    , classList [ ( "f5 f4-ns link", True ), ( "red", isActive page route ) ]
+                    ]
+                    [ text displayText ]
+                ]
+    in
+    div [ class "navigation-bar w-100 bg-white" ]
+        [ navLink Route.Home "Entries"
+        , navLink Route.Map "Map"
+        , navLink Route.Data "Data"
         ]
 
 

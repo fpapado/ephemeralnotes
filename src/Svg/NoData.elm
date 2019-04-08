@@ -76,6 +76,4 @@ view ( defaultText1, defaultText2 ) ( text1, text2 ) attrs =
                 , p [ class "mv0" ] [ text t2 ]
                 ]
             ]
-
-        -- , foreignObject [ x "300", y "270", class "f2 fw6 near-black lh-title" ] [ text t2 ]
         ]
