@@ -125,7 +125,7 @@ viewNavBar page =
                  , classList
                     [ ( "db f5 f4-ns link", True )
                     , ( "near-black", not isActivePage )
-                    , ( "blue", isActivePage )
+                    , ( "blue fill-blue", isActivePage )
                     ]
                  ]
                     ++ ariaCurrent

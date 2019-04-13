@@ -58,10 +58,7 @@ leaflet-map:not(:defined) {
     z-index: 9999;
     box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
 
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 0.5rem;
     justify-content: center;
   }
   /* When sticking to the bottom, the bar items are spaced around, 

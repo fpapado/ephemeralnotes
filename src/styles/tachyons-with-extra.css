@@ -664,6 +664,9 @@ img {
 .blue {
   color: #0769d3;
 }
+.fill-blue {
+  fill: #0769d3;
+}
 .light-blue {
   color: #96ccff;
 }
