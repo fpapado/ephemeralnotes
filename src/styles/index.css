@@ -77,6 +77,6 @@ leaflet-map:not(:defined) {
   }
   /* Set a safe area for the footer (and other content) */
   .footer {
-    margin-bottom: 6rem;
+    margin-bottom: 4rem;
   }
 }
