@@ -84,12 +84,6 @@ viewShell children =
     div [ class "min-vh-100 flex flex-column bg-washed-blue near-black f-phantomsans" ] children
 
 
-{-| Might have to pull this out of the layout in the future
--}
-container attrs children =
-    div ([ class "pa3 flex-auto" ] ++ attrs) children
-
-
 viewHeader : Page -> Html msg
 viewHeader activePage =
     header [ class "pv2 navy bg-white shadow-1" ]
@@ -145,12 +139,8 @@ viewNavBar page =
 
 viewFooter : Html msg
 viewFooter =
-    -- The footer sets a safe area for the fixed bottom
-    footer [ class "footer" ]
-        [ container [ class "tc" ]
-            [ span [] [ text "Made by Fotis Papadogeorgopoulos" ]
-            ]
-        ]
+    -- The footer sets a safe area for the fixed bottom navigation
+    div [ class "footer" ] []
 
 
 isActive : Page -> Route -> Bool

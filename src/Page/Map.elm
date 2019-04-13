@@ -29,21 +29,17 @@ view context =
 
 viewContent : Context -> Html msg
 viewContent { entries } =
-    div []
-        [ centeredContainerWide
-            []
-            [ div [ class "vs4 vs5-ns" ]
-                [ div [ class "vs3 vs4-ns" ]
-                    [ heading 1 [] [ text "Map" ]
-                    , viewMap entries
-                    ]
-                ]
+    centeredContainerWide
+        [ class "w-100 flex flex-column flex-grow-1" ]
+        [ div [ class "flex flex-column flex-grow-1 vs3 vs4-ns" ]
+            [ heading 1 [] [ text "Map" ]
+            , viewMap [ class "flex flex-column flex-grow-1" ] entries
             ]
         ]
 
 
-viewMap : EntryData -> Html msg
-viewMap entryData =
+viewMap : List (Html.Attribute msg) -> EntryData -> Html msg
+viewMap attrs entryData =
     let
         markerNodes =
             case entryData of
@@ -59,11 +55,12 @@ viewMap entryData =
                 RemoteData.Success entries ->
                     List.map viewEntryMarkerKeyed entries
     in
-    div [ class "leaflet-map-wrapper" ]
+    div (attrs ++ [ class "leaflet-map-wrapper" ])
         [ Keyed.node "leaflet-map"
             [ HA.attribute "latitude" "60.1699"
             , HA.attribute "longitude" "24.9384"
             , HA.attribute "zoom" "12"
+            , class "flex flex-column flex-grow-1"
             ]
             markerNodes
         ]

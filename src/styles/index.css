@@ -9,11 +9,11 @@
 @import './enhanced-input.css';
 @import './grid-entries.css';
 
-/* Hide leaflet map if not defined */
+/* Propagate height for leaflet map */
 .leaflet-map-wrapper {
-  min-height: 32rem;
   background: #ddd;
 }
+/* Hide leaflet map if not defined */
 leaflet-map:not(:defined) {
   display: none;
   opacity: 0;

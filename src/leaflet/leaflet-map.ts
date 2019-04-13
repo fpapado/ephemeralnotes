@@ -98,6 +98,7 @@ class LeafletMap extends HTMLElement {
   }
 
   connectedCallback() {
+    this.$mapContainer.style.flexGrow = '1';
     this.upgradeProperty('latitude');
     this.upgradeProperty('longitude');
     this.upgradeProperty('zoom');
