@@ -25,7 +25,6 @@ import Location as L
 import Log
 import RemoteData exposing (RemoteData)
 import Route
-import ServiceWorker as SW
 import Store
 import String.Transforms
 import Svg.Attributes
@@ -40,42 +39,33 @@ import Ui exposing (..)
 
 
 type alias Model =
-    { timeZone : Time.Zone
-    , swUpdate : SW.SwUpdate
-    , installPrompt : SW.InstallPrompt
-    , entries : RemoteData String (List Entry)
-    , form : Form
+    { form : Form
+    }
+
+
+type alias Context =
+    { entries : RemoteData String (List Entry)
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { timeZone = Time.utc
-      , swUpdate = SW.updateNone
-      , installPrompt = SW.installPromptNone
-      , entries = RemoteData.Loading
-      , form = Form.empty
-      }
-    , Cmd.batch
-        [ Task.perform GotTimeZone Time.here
-        , Store.getEntries
-        ]
-    )
+    ( { form = Form.empty }, Cmd.none )
 
 
 
 -- VIEW
 
 
-view : Model -> { title : String, content : Html Msg }
-view model =
+view : Context -> Model -> { title : String, content : Html Msg }
+view context model =
     { title = "Home"
-    , content = viewInner model
+    , content = viewInner context model
     }
 
 
-viewInner : Model -> Html Msg
-viewInner model =
+viewInner : Context -> Model -> Html Msg
+viewInner context model =
     let
         formInput =
             Form.getInput model.form
@@ -91,17 +81,15 @@ viewInner model =
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
-                    , viewEntriesMap model.entries
-                    , viewEntries model.entries ( formInput.front, formInput.back )
+                    , viewEntriesMap context.entries
+                    , viewEntries context.entries ( formInput.front, formInput.back )
                     ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Import/Export" ]
-                    , viewImportExport model.entries
+                    , viewImportExport context.entries
                     ]
                 , section [] [ viewAddToHomeScreen ]
                 ]
-            , viewUpdatePrompt model.swUpdate
-            , viewInstallPrompt model.installPrompt
             ]
         ]
 
@@ -214,29 +202,6 @@ viewEntryKeyed ambiguousEntry =
             )
 
 
-viewUpdatePrompt : SW.SwUpdate -> Html Msg
-viewUpdatePrompt swUpdate =
-    notificationRegion []
-        [ SW.viewSwUpdate swUpdate
-            { none = div [] []
-            , available =
-                calloutContainer []
-                    [ prompt [ class "na2" ]
-                        [ div [ class "measure ma2" ]
-                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "A new version is available. You can reload now to get it." ]
-                            ]
-                        , div [ class "ma2 flex" ]
-                            [ styledButtonBlue False [ onClick AcceptUpdate, class "mr2" ] [ text "Reload" ]
-                            , styledButtonBlue False [ onClick DeferUpdate ] [ text "Later" ]
-                            ]
-                        ]
-                    ]
-            , accepted = div [] []
-            , deferred = div [] []
-            }
-        ]
-
-
 viewImportExport : RemoteData String (List Entry) -> Html Msg
 viewImportExport entryData =
     div [ class "vs3" ]
@@ -270,42 +235,15 @@ viewAddToHomeScreen =
         ]
 
 
-viewInstallPrompt : SW.InstallPrompt -> Html Msg
-viewInstallPrompt installPrompt =
-    notificationRegion []
-        [ SW.viewInstallPrompt installPrompt
-            { none = div [] []
-            , available =
-                calloutContainer []
-                    [ prompt [ class "na2" ]
-                        [ div [ class "measure ma2" ]
-                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to your home screen?" ]
-                            ]
-                        , div [ class "ma2 flex" ]
-                            [ styledButtonBlue False [ onClick AcceptInstallPrompt, class "mr2" ] [ text "Add" ]
-                            , styledButtonBlue False [ onClick DeferInstallPrompt ] [ text "Dismiss" ]
-                            ]
-                        ]
-                    ]
-            }
-        ]
-
-
 
 -- UPDATE
 
 
 type Msg
     = NoOp
-    | GotTimeZone Time.Zone
-    | FromServiceWorker SW.ToElm
+    | FormMsg Form.Msg
     | FromGeolocation Geo.ToElm
     | FromStore Store.ToElm
-    | AcceptUpdate
-    | DeferUpdate
-    | AcceptInstallPrompt
-    | DeferInstallPrompt
-    | FormMsg Form.Msg
     | FileDownloadMsg FileDownloadMsg
 
 
@@ -317,23 +255,13 @@ type FileDownloadMsg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotTimeZone tz ->
-            ( { model | timeZone = tz }, Cmd.none )
-
-        FromServiceWorker swMsg ->
-            case swMsg of
-                SW.UpdateAvailable ->
-                    ( { model | swUpdate = SW.updateAvailable }
-                    , Cmd.none
-                    )
-
-                SW.BeforeInstallPrompt ->
-                    ( { model | installPrompt = SW.installPromptAvailable }
-                    , Cmd.none
-                    )
-
-                SW.DecodingError err ->
-                    ( model, Log.error (JD.errorToString err) )
+        -- Form
+        FormMsg formTransitionMsg ->
+            let
+                ( newForm, cmd ) =
+                    Form.update formTransitionMsg model.form
+            in
+            ( { model | form = newForm }, Cmd.map FormMsg cmd )
 
         FromGeolocation geoMsg ->
             case geoMsg of
@@ -348,24 +276,18 @@ update msg model =
                 Geo.DecodingError err ->
                     ( model, Log.error (JD.errorToString err) )
 
+        -- Store
+        -- The form cares about GotEntry
         FromStore storeMsg ->
             case storeMsg of
-                Store.GotEntries entries ->
-                    ( { model | entries = RemoteData.Success entries }, Cmd.none )
-
-                -- The form cares about GotEntry
                 Store.GotEntry entryRes ->
                     let
                         entryData =
                             RemoteData.fromResult entryRes
 
-                        -- Merge the two data sources
-                        newEntries =
-                            RemoteData.map2 (\entry entries -> entry :: entries) entryData model.entries
-
-                        -- Update the form as well!
+                        -- Update the form when we get a new entry
                         -- Internally, the form knows only to reset when the save msg arrives when it is waiting for one
-                        -- NOTE: In the future, we could be attaching an id here
+                        -- NOTE: In the future, we could be attaching an id here, to de-duplicate and truly make it impossible
                         -- Get the result into the shape the form wants
                         formResult =
                             entryRes
@@ -376,31 +298,10 @@ update msg model =
                             Form.update (Form.GotSaveResult formResult) model.form
                     in
                     -- TODO: Consider notification
-                    ( { model | entries = newEntries, form = newForm }, Cmd.map FormMsg cmd )
+                    ( { model | form = newForm }, Cmd.map FormMsg cmd )
 
-                Store.BadMessage err ->
-                    ( model, Log.error (JD.errorToString err) )
-
-        AcceptUpdate ->
-            ( { model | swUpdate = SW.updateAccepted }, SW.acceptUpdate )
-
-        DeferUpdate ->
-            ( { model | swUpdate = SW.updateDeferred }, SW.deferUpdate )
-
-        -- TODO: Fix None to Accepted/Defered
-        AcceptInstallPrompt ->
-            ( { model | installPrompt = SW.installPromptNone }, SW.acceptInstallPrompt )
-
-        DeferInstallPrompt ->
-            ( { model | installPrompt = SW.installPromptNone }, SW.deferInstallPrompt )
-
-        -- Form
-        FormMsg formTransitionMsg ->
-            let
-                ( newForm, cmd ) =
-                    Form.update formTransitionMsg model.form
-            in
-            ( { model | form = newForm }, Cmd.map FormMsg cmd )
+                _ ->
+                    ( model, Cmd.none )
 
         -- Import/Export
         FileDownloadMsg downloadMsg ->
@@ -434,7 +335,6 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Sub.map FromServiceWorker SW.sub
-        , Sub.map FromGeolocation Geo.sub
+        [ Sub.map FromGeolocation Geo.sub
         , Sub.map FromStore Store.sub
         ]
