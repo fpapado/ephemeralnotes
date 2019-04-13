@@ -31,10 +31,8 @@ viewContent : Context -> Html msg
 viewContent { entries } =
     centeredContainerWide
         [ class "w-100 flex flex-column flex-grow-1" ]
-        [ div [ class "flex flex-column flex-grow-1 vs3 vs4-ns" ]
-            [ heading 1 [] [ text "Map" ]
-            , viewMap [ class "flex flex-column flex-grow-1" ] entries
-            ]
+        [ heading 1 [ class "visually-hidden" ] [ text "Map" ]
+        , viewMap [ class "flex flex-column flex-grow-1" ] entries
         ]
 
 
