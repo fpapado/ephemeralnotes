@@ -2,9 +2,10 @@ module Page exposing (FocusState(..), Page(..), view)
 
 import Browser exposing (Document)
 import Html exposing (Html, a, button, div, footer, h1, header, i, img, li, main_, nav, p, span, text, ul)
-import Html.Attributes exposing (class, classList, href, id, style, tabindex)
+import Html.Attributes as HA exposing (class, classList, href, id, style, tabindex)
 import Html.Events exposing (onBlur, onClick)
 import Route exposing (Route)
+import Svg.Feather as Feather
 import Ui
 
 
@@ -94,7 +95,11 @@ viewHeader activePage =
     header [ class "pv2 navy bg-white shadow-1" ]
         [ skipLink
         , nav [ class "navigation-container" ]
-            [ a [ Route.href Route.Home, class "f3 fw7 link navy tc navigation-home" ] [ text "Ephemeral" ]
+            [ a
+                [ Route.href Route.Home
+                , class "f3 fw7 link navy tc navigation-home"
+                ]
+                [ text "Ephemeral" ]
             , viewNavBar activePage
             ]
         ]
@@ -103,38 +108,49 @@ viewHeader activePage =
 viewNavBar : Page -> Html msg
 viewNavBar page =
     let
-        navLink route displayText =
-            div [ class "mh2" ]
-                [ a
-                    [ Route.href route
-                    , classList
-                        [ ( "f5 f4-ns navy link", True )
-                        , ( "blue", isActive page route )
-                        ]
+        navLink route displayText icon =
+            let
+                isActivePage =
+                    isActive page route
+
+                ariaCurrent =
+                    if isActivePage then
+                        [ HA.attribute "aria-current" "page" ]
+
+                    else
+                        []
+            in
+            a
+                ([ Route.href route
+                 , classList
+                    [ ( "db f5 f4-ns link", True )
+                    , ( "near-black", not isActivePage )
+                    , ( "blue", isActivePage )
                     ]
-                    [ text displayText ]
+                 ]
+                    ++ ariaCurrent
+                )
+                [ icon Feather.Decorative
+                , div [] [ text displayText ]
                 ]
     in
     div [ class "navigation-bar w-100 bg-white" ]
-        [ navLink Route.Home "Entries"
-        , navLink Route.Map "Map"
-        , navLink Route.Data "Data"
+        [ div [ class "navigation-bar-flex" ]
+            [ navLink Route.Home "Entries" Feather.clipboard
+            , navLink Route.Map "Map" Feather.map
+            , navLink Route.Data "Data" Feather.archive
+            ]
         ]
 
 
 viewFooter : Html msg
 viewFooter =
-    footer []
+    -- The footer sets a safe area for the fixed bottom
+    footer [ class "footer" ]
         [ container [ class "tc" ]
             [ span [] [ text "Made by Fotis Papadogeorgopoulos" ]
             ]
         ]
-
-
-navbarLink : Page -> Route -> List (Html msg) -> Html msg
-navbarLink page route linkContent =
-    li [ classList [ ( "nav-item", True ), ( "active", isActive page route ) ] ]
-        [ a [ class "nav-link", Route.href route ] linkContent ]
 
 
 isActive : Page -> Route -> Bool
