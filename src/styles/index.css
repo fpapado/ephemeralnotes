@@ -56,7 +56,7 @@ leaflet-map:not(:defined) {
     position: fixed;
     bottom: 0;
     left: 0;
-    z-index: 9999;
+    z-index: 9000;
     box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
 
     padding: 0.5rem;

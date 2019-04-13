@@ -333,7 +333,7 @@ viewUpdatePrompt swUpdate =
         [ SW.viewSwUpdate swUpdate
             { none = div [] []
             , available =
-                calloutContainer []
+                calloutContainer [ class "z-9999" ]
                     [ prompt [ class "na2" ]
                         [ div [ class "measure ma2" ]
                             [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "A new version is available. You can reload now to get it." ]
@@ -356,7 +356,7 @@ viewInstallPrompt installPrompt =
         [ SW.viewInstallPrompt installPrompt
             { none = div [] []
             , available =
-                calloutContainer []
+                calloutContainer [ class "z-9999" ]
                     [ prompt [ class "na2" ]
                         [ div [ class "measure ma2" ]
                             [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to your home screen?" ]
