@@ -21,6 +21,7 @@ parser : Parser (Route -> a) a
 parser =
     oneOf
         [ UrlParser.map Map (s "map")
+        , UrlParser.map Data (s "data")
         , UrlParser.map Home UrlParser.top
         ]
 

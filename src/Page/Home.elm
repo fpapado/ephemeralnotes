@@ -13,7 +13,6 @@ module Page.Home exposing
 import AddEntryForm as Form exposing (Form)
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
-import File.Download
 import Geolocation as Geo
 import Html exposing (..)
 import Html.Attributes as HA exposing (class, href)
@@ -26,10 +25,8 @@ import Log
 import RemoteData exposing (RemoteData)
 import Route
 import Store
-import String.Transforms
 import Svg.Attributes
 import Svg.NoData
-import Task exposing (Task)
 import Time
 import Ui exposing (..)
 
@@ -82,10 +79,6 @@ viewContent context model =
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
                     , viewEntries context.entries ( formInput.front, formInput.back )
-                    ]
-                , section [ class "vs3 vs4-ns" ]
-                    [ subHeading 2 [] [ text "Import/Export" ]
-                    , viewImportExport context.entries
                     ]
                 , section [] [ viewAddToHomeScreen ]
                 ]
@@ -157,28 +150,6 @@ viewEntryKeyed ambiguousEntry =
             )
 
 
-viewImportExport : RemoteData String (List Entry) -> Html Msg
-viewImportExport entryData =
-    div [ class "vs3" ]
-        (case entryData of
-            RemoteData.Success entries ->
-                [ styledButtonBlue False
-                    [ onClick (FileDownloadMsg <| ClickedDownload entries) ]
-                    [ text "Download Entries" ]
-                , paragraph
-                    [ class "measure" ]
-                    [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. In the future, you can use this file to import data into this application on another device." ]
-                ]
-
-            _ ->
-                [ styledButtonBlue True
-                    [ onClick <| NoOp ]
-                    [ text "Download Entries" ]
-                , paragraph [ class "measure" ] [ text "Note: Entries have not been loaded yet, so " ]
-                ]
-        )
-
-
 viewAddToHomeScreen =
     div [ class "vs3 vs4-ns", HA.attribute "open" "true" ]
         [ subHeading 2
@@ -199,12 +170,6 @@ type Msg
     | FormMsg Form.Msg
     | FromGeolocation Geo.ToElm
     | FromStore Store.ToElm
-    | FileDownloadMsg FileDownloadMsg
-
-
-type FileDownloadMsg
-    = ClickedDownload (List Entry)
-    | GotDownloadTime (List Entry) Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -257,27 +222,6 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
-
-        -- Import/Export
-        FileDownloadMsg downloadMsg ->
-            case downloadMsg of
-                ClickedDownload entries ->
-                    -- Get the time, then save
-                    ( model, Task.perform (FileDownloadMsg << GotDownloadTime entries) Time.now )
-
-                GotDownloadTime entries time ->
-                    let
-                        entriesJson =
-                            entries
-                                |> JE.list Entry.encode
-                                |> String.Transforms.fromValue
-
-                        filename =
-                            "entries-" ++ String.fromInt (Time.posixToMillis time) ++ ".json"
-                    in
-                    ( model
-                    , File.Download.string filename "application/json" entriesJson
-                    )
 
         NoOp ->
             ( model, Cmd.none )

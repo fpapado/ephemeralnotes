@@ -19,6 +19,7 @@ type Page
     = Other
     | Home
     | Map
+    | Data
 
 
 type FocusState
@@ -143,6 +144,9 @@ isActive page route =
             True
 
         ( Map, Route.Map ) ->
+            True
+
+        ( Data, Route.Data ) ->
             True
 
         _ ->

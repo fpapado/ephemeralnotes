@@ -14,6 +14,7 @@ import Json.Decode as JD exposing (Value)
 import Log
 import Page exposing (FocusState(..), Page)
 import Page.Blank as Blank
+import Page.Data as Data
 import Page.Home as Home
 import Page.Map as Map
 import Page.NotFound as NotFound
@@ -43,6 +44,7 @@ type PageModel
     | NotFound
     | Home Home.Model
     | Map
+    | Data Data.Model
 
 
 
@@ -103,6 +105,10 @@ view model =
             -- Map does not have any Msg at the moment, so we ignore it
             viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries })
 
+        Data data ->
+            -- Data does not have a model, but it does have a Msg
+            viewPage Page.Data GotDataMsg (Data.view { entries = model.entries })
+
 
 
 -- UPDATE
@@ -119,6 +125,7 @@ type Msg
     | FocusedPastMain
       -- Pages
     | GotHomeMsg Home.Msg
+    | GotDataMsg Data.Msg
       -- Subs
     | FromServiceWorker SW.ToElm
     | FromStore Store.ToElm
@@ -149,7 +156,8 @@ changeRouteTo maybeRoute model =
             ( { model | page = Map }, Cmd.none )
 
         Just Route.Data ->
-            ( { model | page = NotFound }, Cmd.none )
+            Data.init
+                |> updateWith (\m -> { model | page = Data m }) GotDataMsg model
 
 
 
@@ -265,6 +273,15 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        ( GotDataMsg subMsg, { page } ) ->
+            case page of
+                Data data ->
+                    Data.update subMsg data
+                        |> updateWith (\m -> { model | page = Data m }) GotDataMsg model
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
 updateWith toModel toMsg model ( subModel, subCmd ) =
@@ -293,6 +310,10 @@ subscriptions model =
 
                 -- Map does not have any subscriptions
                 Map ->
+                    Sub.none
+
+                -- Data does not have any subscriptions
+                Data data ->
                     Sub.none
 
         alwaysSubs =
