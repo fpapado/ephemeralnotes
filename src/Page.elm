@@ -18,6 +18,7 @@ under Other.
 type Page
     = Other
     | Home
+    | Map
 
 
 type FocusState
@@ -105,7 +106,10 @@ viewNavBar page =
             div [ class "mh2" ]
                 [ a
                     [ Route.href route
-                    , classList [ ( "f5 f4-ns link", True ), ( "red", isActive page route ) ]
+                    , classList
+                        [ ( "f5 f4-ns navy link", True )
+                        , ( "blue", isActive page route )
+                        ]
                     ]
                     [ text displayText ]
                 ]
@@ -138,9 +142,16 @@ isActive page route =
         ( Home, Route.Home ) ->
             True
 
+        ( Map, Route.Map ) ->
+            True
+
         _ ->
             False
 
 
 skipLink =
-    a [ href "#main", class "pa3 tc near-white bg-blue skip-link" ] [ text "skip to content" ]
+    a
+        [ href "#main"
+        , class "pa3 tc near-white bg-blue skip-link"
+        ]
+        [ text "skip to content" ]

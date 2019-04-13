@@ -2,6 +2,7 @@ module Ui exposing
     ( buttonLink
     , calloutContainer
     , centeredContainer
+    , centeredContainerWide
     , checkbox
     , heading
     , notificationRegion
@@ -44,6 +45,10 @@ subSubHeading level attrs children =
 
 centeredContainer attrs children =
     div (class "mw7 center" :: attrs) children
+
+
+centeredContainerWide attrs children =
+    div (class "mw9 center" :: attrs) children
 
 
 styledButton attrs children =

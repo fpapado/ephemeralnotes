@@ -15,6 +15,7 @@ import Log
 import Page exposing (FocusState(..), Page)
 import Page.Blank as Blank
 import Page.Home as Home
+import Page.Map as Map
 import Page.NotFound as NotFound
 import Process
 import RemoteData exposing (RemoteData)
@@ -41,6 +42,7 @@ type PageModel
     = Redirect
     | NotFound
     | Home Home.Model
+    | Map
 
 
 
@@ -97,6 +99,10 @@ view model =
         Home home ->
             viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries } home)
 
+        Map ->
+            -- Map does not have any Msg at the moment, so we ignore it
+            viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries })
+
 
 
 -- UPDATE
@@ -139,10 +145,9 @@ changeRouteTo maybeRoute model =
                 |> updateWith (\m -> { model | page = Home m }) GotHomeMsg model
 
         Just Route.Map ->
-            ( { model | page = NotFound }, Cmd.none )
+            -- Map page has no initialiser
+            ( { model | page = Map }, Cmd.none )
 
-        -- Map.init
-        --     |> updateWith (\m -> { model | page = Map m }) GotMapMsg model
         Just Route.Data ->
             ( { model | page = NotFound }, Cmd.none )
 
@@ -285,6 +290,10 @@ subscriptions model =
 
                 Home home ->
                     Sub.map GotHomeMsg (Home.subscriptions home)
+
+                -- Map does not have any subscriptions
+                Map ->
+                    Sub.none
 
         alwaysSubs =
             [ Sub.map FromServiceWorker SW.sub, Sub.map FromStore Store.sub ]

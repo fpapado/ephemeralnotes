@@ -20,8 +20,8 @@ type Route
 parser : Parser (Route -> a) a
 parser =
     oneOf
-        -- , Parser.map Entries (s "entries")
-        [ UrlParser.map Home UrlParser.top
+        [ UrlParser.map Map (s "map")
+        , UrlParser.map Home UrlParser.top
         ]
 
 

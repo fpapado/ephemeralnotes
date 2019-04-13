@@ -60,12 +60,12 @@ init =
 view : Context -> Model -> { title : String, content : Html Msg }
 view context model =
     { title = "Home"
-    , content = viewInner context model
+    , content = viewContent context model
     }
 
 
-viewInner : Context -> Model -> Html Msg
-viewInner context model =
+viewContent : Context -> Model -> Html Msg
+viewContent context model =
     let
         formInput =
             Form.getInput model.form
@@ -81,7 +81,6 @@ viewInner context model =
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
-                    , viewEntriesMap context.entries
                     , viewEntries context.entries ( formInput.front, formInput.back )
                     ]
                 , section [ class "vs3 vs4-ns" ]
@@ -92,50 +91,6 @@ viewInner context model =
                 ]
             ]
         ]
-
-
-viewEntriesMap : RemoteData String (List Entry) -> Html msg
-viewEntriesMap entryData =
-    let
-        markerNodes =
-            case entryData of
-                RemoteData.NotAsked ->
-                    []
-
-                RemoteData.Loading ->
-                    []
-
-                RemoteData.Failure err ->
-                    []
-
-                RemoteData.Success entries ->
-                    List.map viewEntryMarkerKeyed entries
-    in
-    div [ class "leaflet-map-wrapper" ]
-        [ Keyed.node "leaflet-map"
-            [ HA.attribute "latitude" "60.1699"
-            , HA.attribute "longitude" "24.9384"
-            , HA.attribute "zoom" "12"
-            ]
-            markerNodes
-        ]
-
-
-viewEntryMarkerKeyed : Entry -> ( String, Html msg )
-viewEntryMarkerKeyed ambiguousEntry =
-    case ambiguousEntry of
-        Entry.V1 entry ->
-            ( Entry.Id.toString entry.id
-            , Html.node "leaflet-marker"
-                [ HA.attribute "latitude" (String.fromFloat (L.latToFloat entry.location.lat))
-                , HA.attribute "longitude" (String.fromFloat (L.lonToFloat entry.location.lon))
-                ]
-                [ div [ class "vs2" ]
-                    [ paragraph [ class "fw6" ] [ text entry.front ]
-                    , paragraph [] [ text entry.back ]
-                    ]
-                ]
-            )
 
 
 viewEntries : RemoteData String (List Entry) -> ( String, String ) -> Html Msg
