@@ -12,10 +12,12 @@ module Location exposing
     , lonFromFloat
     , lonToFloat
     , nullIsland
+    , toGpsPrecisionString
     )
 
 import Json.Decode as D
 import Json.Encode as E
+import Round
 
 
 
@@ -151,6 +153,20 @@ failIfMaybe err m =
 
         Nothing ->
             D.fail err
+
+
+{-| Get a string representation of a GPS coordinate.
+In practice, this means up to 5 digits
+@see <https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude>
+
+> The fifth decimal place is worth up to 1.1 m: it distinguish trees from each other.
+> Accuracy to this level with commercial GPS units can only be achieved with
+> differential correction.
+
+-}
+toGpsPrecisionString : LatLon -> String
+toGpsPrecisionString { lat, lon } =
+    Round.round 5 (latToFloat lat) ++ ", " ++ Round.round 5 (lonToFloat lon)
 
 
 

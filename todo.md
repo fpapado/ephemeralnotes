@@ -34,3 +34,4 @@
 ## Features
 
 - [ ] Printable "cards" mode, with print styles and grid
+- [ ] Remove "null island" default, pick something else

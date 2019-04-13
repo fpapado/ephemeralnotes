@@ -133,17 +133,14 @@ viewEntryKeyed ambiguousEntry =
     case ambiguousEntry of
         Entry.V1 entry ->
             ( Entry.Id.toString entry.id
-            , li [ class "flex flex-column vs3 pa3 br2 bg-white ba bw1 b--near-black shadow-4 near-black" ]
+            , li [ class "flex flex-column pa3 br2 bg-white ba bw1 b--near-black shadow-4 near-black" ]
                 [ div [ class "vs2 mb3" ]
                     [ paragraph [ class "fw6" ] [ text entry.front ]
                     , paragraph [] [ text entry.back ]
                     ]
                 , div [ class "mt-auto vs2" ]
                     [ paragraph []
-                        [ text <|
-                            String.fromFloat (L.latToFloat entry.location.lat)
-                                ++ ", "
-                                ++ String.fromFloat (L.lonToFloat entry.location.lon)
+                        [ text <| L.toGpsPrecisionString entry.location
                         ]
                     , paragraph []
                         [ Html.node "local-time"
