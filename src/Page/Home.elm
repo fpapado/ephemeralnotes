@@ -18,6 +18,7 @@ import Html exposing (..)
 import Html.Attributes as HA exposing (class, href)
 import Html.Events as HE exposing (onClick)
 import Html.Keyed as Keyed
+import Iso8601
 import Json.Decode as JD
 import Json.Encode as JE
 import Location as L
@@ -137,14 +138,24 @@ viewEntryKeyed ambiguousEntry =
                     [ paragraph [ class "fw6" ] [ text entry.front ]
                     , paragraph [] [ text entry.back ]
                     ]
-                , div [ class "mt-auto" ]
+                , div [ class "mt-auto vs2" ]
                     [ paragraph []
                         [ text <|
                             String.fromFloat (L.latToFloat entry.location.lat)
                                 ++ ", "
                                 ++ String.fromFloat (L.lonToFloat entry.location.lon)
                         ]
-                    , paragraph [] [ text (String.fromInt <| Time.posixToMillis entry.time) ]
+                    , paragraph []
+                        [ Html.node "local-time"
+                            [ HA.attribute "datetime" (Iso8601.fromTime entry.time)
+                            , HA.attribute "month" "short"
+                            , HA.attribute "day" "numeric"
+                            , HA.attribute "year" "numeric"
+                            , HA.attribute "hour" "numeric"
+                            , HA.attribute "minute" "numeric"
+                            ]
+                            []
+                        ]
                     ]
                 ]
             )
