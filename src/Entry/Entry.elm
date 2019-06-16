@@ -69,7 +69,7 @@ encode entry =
     case entry of
         V1 e ->
             E.object
-                [ ( "schema_version", E.string "v1" )
+                [ ( "schema_version", E.int 1 )
                 , ( "id", E.string (Entry.Id.toString e.id) )
                 , ( "front", E.string e.front )
                 , ( "back", E.string e.back )

@@ -8,8 +8,10 @@ import Html exposing (..)
 import Html.Attributes as HA exposing (class, href)
 import Html.Events as HE exposing (onClick)
 import Html.Keyed as Keyed
+import Json.Decode as JD
 import Json.Encode as JE
 import RemoteData exposing (RemoteData)
+import Route
 import String.Transforms
 import Task exposing (Task)
 import Time
@@ -21,13 +23,21 @@ import Ui exposing (..)
 
 
 type alias Model =
-    { uploadStatus : RemoteData String String
+    { uploadData : UploadData
     }
+
+
+
+-- Upload data can fail if we cannot decode it
+
+
+type alias UploadData =
+    RemoteData JD.Error (List Entry)
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { uploadStatus = RemoteData.NotAsked
+    ( { uploadData = RemoteData.NotAsked
       }
     , Cmd.none
     )
@@ -74,7 +84,11 @@ update msg model =
             ( model, Task.perform FileLoaded (File.toString file) )
 
         FileLoaded fileContents ->
-            ( { model | uploadStatus = RemoteData.succeed fileContents }, Cmd.none )
+            let
+                entries =
+                    JD.decodeString (JD.list Entry.decoder) fileContents
+            in
+            ( { model | uploadData = RemoteData.fromResult entries }, Cmd.none )
 
         GotDownloadTime entries time ->
             let
@@ -120,12 +134,7 @@ viewContent entryData model =
                     , section [ class "vs3 vs4-ns" ]
                         [ subHeading 2 [] [ text "Import" ]
                         , viewImport
-                        , case model.uploadStatus of
-                            RemoteData.Success fileContent ->
-                                div [] [ text fileContent ]
-
-                            _ ->
-                                text ""
+                        , viewUploadData model.uploadData
                         ]
                     ]
                 ]
@@ -178,3 +187,45 @@ requestFile =
 viewImport : Html Msg
 viewImport =
     div [ class "vs3" ] [ styledButtonBlue False [ onClick FileUploadRequested ] [ text "Import" ] ]
+
+
+viewUploadData : UploadData -> Html msg
+viewUploadData uploadData =
+    -- NOTE: We set an aria-live region, to announce the import result
+    -- We could do this by moving the focus, but there is nothing really actionable there
+    div [ class "vs4" ]
+        [ div [ HA.attribute "aria-live" "polite" ] <|
+            [ case uploadData of
+                RemoteData.Success fileContent ->
+                    div [ class "vs3" ]
+                        [ paragraph []
+                            [ text "Successfully imported "
+                            , b [] [ text (String.fromInt (List.length fileContent) ++ " items!") ]
+                            ]
+                        , paragraph
+                            []
+                            [ text "You can visit the "
+                            , a [ Route.href Route.Home ] [ text "Entries page" ]
+                            , text " to find them."
+                            ]
+                        ]
+
+                RemoteData.Failure jdError ->
+                    paragraph [] [ text "We could not import the file you specified, because its format is different than what we expected. You can find the details below." ]
+
+                _ ->
+                    text ""
+            ]
+
+        -- NOTE: We keep the details of the upload error out of the live region, to avoid verbose announcements
+        , div []
+            [ case uploadData of
+                RemoteData.Failure jdError ->
+                    pre
+                        []
+                        [ text <| JD.errorToString jdError ]
+
+                _ ->
+                    text ""
+            ]
+        ]

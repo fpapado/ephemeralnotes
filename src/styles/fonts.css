@@ -44,4 +44,7 @@
     /* Normalise font-weight if not specified */
     font-variation-settings: 'wght' 1;
   }
+  b {
+    font-variation-settings: 'wght' 700;
+  }
 }
