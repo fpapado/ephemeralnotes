@@ -35,3 +35,5 @@
 
 - [ ] Printable "cards" mode, with print styles and grid
 - [ ] Remove "null island" default, pick something else
+- [ ] Also store accuracy from Geolocation
+- [ ]  Send "App is ready to use offline" notification

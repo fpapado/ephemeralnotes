@@ -98,16 +98,16 @@ view model =
         NotFound ->
             viewPage Page.Other (\_ -> Ignored) NotFound.view
 
-        Home home ->
-            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries } home)
+        Home homeModel ->
+            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries } homeModel)
 
         Map ->
             -- Map does not have any Msg at the moment, so we ignore it
             viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries })
 
-        Data data ->
+        Data dataModel ->
             -- Data does not have a model, but it does have a Msg
-            viewPage Page.Data GotDataMsg (Data.view { entries = model.entries })
+            viewPage Page.Data GotDataMsg (Data.view { entries = model.entries } dataModel)
 
 
 

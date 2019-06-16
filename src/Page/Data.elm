@@ -1,7 +1,9 @@
 module Page.Data exposing (Model, Msg, init, update, view)
 
 import Entry.Entry as Entry exposing (Entry)
+import File exposing (File)
 import File.Download
+import File.Select
 import Html exposing (..)
 import Html.Attributes as HA exposing (class, href)
 import Html.Events as HE exposing (onClick)
@@ -19,12 +21,16 @@ import Ui exposing (..)
 
 
 type alias Model =
-    {}
+    { uploadStatus : RemoteData String String
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {}, Cmd.none )
+    ( { uploadStatus = RemoteData.NotAsked
+      }
+    , Cmd.none
+    )
 
 
 type alias Context =
@@ -36,6 +42,10 @@ type alias EntryData =
     RemoteData String (List Entry)
 
 
+jsonMime =
+    "application/json"
+
+
 
 -- UPDATE
 
@@ -43,6 +53,9 @@ type alias EntryData =
 type Msg
     = ClickedDownload (List Entry)
     | GotDownloadTime (List Entry) Time.Posix
+    | FileUploadRequested
+    | FileSelected File
+    | FileLoaded String
     | NoOp
 
 
@@ -53,6 +66,15 @@ update msg model =
         ClickedDownload entries ->
             -- Get the time, then save
             ( model, Task.perform (GotDownloadTime entries) Time.now )
+
+        FileUploadRequested ->
+            ( model, requestFile )
+
+        FileSelected file ->
+            ( model, Task.perform FileLoaded (File.toString file) )
+
+        FileLoaded fileContents ->
+            ( { model | uploadStatus = RemoteData.succeed fileContents }, Cmd.none )
 
         GotDownloadTime entries time ->
             let
@@ -65,7 +87,7 @@ update msg model =
                     "entries-" ++ String.fromInt (Time.posixToMillis time) ++ ".json"
             in
             ( model
-            , File.Download.string filename "application/json" entriesJson
+            , File.Download.string filename jsonMime entriesJson
             )
 
         NoOp ->
@@ -76,15 +98,15 @@ update msg model =
 -- VIEW
 
 
-view : Context -> { title : String, content : Html Msg }
-view { entries } =
+view : Context -> Model -> { title : String, content : Html Msg }
+view { entries } model =
     { title = "Data"
-    , content = viewContent entries
+    , content = viewContent entries model
     }
 
 
-viewContent : EntryData -> Html Msg
-viewContent entryData =
+viewContent : EntryData -> Model -> Html Msg
+viewContent entryData model =
     div []
         [ centeredContainer
             []
@@ -92,8 +114,18 @@ viewContent entryData =
                 [ div [ class "vs3 vs4-ns" ]
                     [ heading 1 [] [ text "Data" ]
                     , section [ class "vs3 vs4-ns" ]
-                        [ subHeading 2 [] [ text "Download" ]
-                        , viewImportExport entryData
+                        [ subHeading 2 [] [ text "Export" ]
+                        , viewExport entryData
+                        ]
+                    , section [ class "vs3 vs4-ns" ]
+                        [ subHeading 2 [] [ text "Import" ]
+                        , viewImport
+                        , case model.uploadStatus of
+                            RemoteData.Success fileContent ->
+                                div [] [ text fileContent ]
+
+                            _ ->
+                                text ""
                         ]
                     ]
                 ]
@@ -105,8 +137,8 @@ viewContent entryData =
 -- TODO: Handle the loading state for the download here
 
 
-viewImportExport : EntryData -> Html Msg
-viewImportExport entryData =
+viewExport : EntryData -> Html Msg
+viewExport entryData =
     div [ class "vs3" ]
         (case entryData of
             RemoteData.Success entries ->
@@ -125,3 +157,24 @@ viewImportExport entryData =
                 , paragraph [ class "measure" ] [ text "We have not loaded the entries yet, so we cannot save them." ]
                 ]
         )
+
+
+requestFile : Cmd Msg
+requestFile =
+    File.Select.file [ jsonMime ] FileSelected
+
+
+{-|
+
+    Steps when importing:
+        - Click upload
+        - Select file
+        - Separate action to process? Or do we start reading?
+        - Try to parse -> Can fail
+        - Try to save in db -> can fail?
+        - On success? How are we notified? Notify the user of success, and tell them about the entries page.
+
+-}
+viewImport : Html Msg
+viewImport =
+    div [ class "vs3" ] [ styledButtonBlue False [ onClick FileUploadRequested ] [ text "Import" ] ]
