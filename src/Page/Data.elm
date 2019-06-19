@@ -1,4 +1,4 @@
-module Page.Data exposing (Model, Msg, init, update, view)
+module Page.Data exposing (Model, Msg, init, subscriptions, update, view)
 
 import Entry.Entry as Entry exposing (Entry)
 import File exposing (File)
@@ -12,6 +12,7 @@ import Json.Decode as JD
 import Json.Encode as JE
 import RemoteData exposing (RemoteData)
 import Route
+import Store
 import String.Transforms
 import Svg.Feather as Feather
 import Task exposing (Task)
@@ -75,8 +76,22 @@ type Msg
     | FileSelected File
     | FileLoaded String
     | ValidationStarted String
+      -- TODO: Listen to the Store.ToElm port, and get the Success data
+    | FromStore Store.ToElm
+      -- TODO: Validate that an Entry ID is a UUID
       -- | SaveEntries (List Entry)
     | NoOp
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Sub.map FromStore Store.sub
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -110,13 +125,13 @@ update msg model =
 
         ValidationStarted fileContents ->
             let
-                entries =
+                entriesRes =
                     JD.decodeString (JD.list Entry.decoder) fileContents
 
                 ( uploadData, nextCmd ) =
-                    case entries of
-                        Result.Ok entryList ->
-                            ( Saving entryList, Cmd.none )
+                    case entriesRes of
+                        Result.Ok entries ->
+                            ( Saving entries, Store.storeBatchImportedEntries entries )
 
                         Result.Err decodingError ->
                             ( ValidationError decodingError, Cmd.none )
@@ -136,6 +151,18 @@ update msg model =
             ( model
             , File.Download.string filename jsonMime entriesJson
             )
+
+        -- The import cares about GotEntry
+        FromStore storeMsg ->
+            case storeMsg of
+                -- TODO: Need to associate a message id here, otherwise the initial load while on /data appears to be an import success :D
+                Store.GotEntries entries ->
+                    -- TODO: The GotEntries appears like it cannot fail, but it could. We should encode that in the types
+                    ( { model | uploadData = SavingSuccess entries }, Cmd.none )
+
+                -- Ignore any other msg from the store
+                _ ->
+                    ( model, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )
@@ -241,6 +268,9 @@ viewUploadData uploadData =
                         ]
 
                 Saving entries ->
+                    div [] [ paragraph [] [ text "Saving..." ] ]
+
+                SavingSuccess entries ->
                     div [ class "vs3 pa3 bg-washed-green ba bw1 br2" ]
                         [ paragraph [ class "dark-green" ]
                             [ span [ class "v-mid mr2" ] [ Feather.checkCircle Feather.Decorative ]

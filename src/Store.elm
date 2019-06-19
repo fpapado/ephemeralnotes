@@ -1,6 +1,7 @@
 port module Store exposing
     ( ToElm(..)
     , getEntries
+    , storeBatchImportedEntries
     , storeEntry
     , sub
     )
@@ -15,6 +16,7 @@ type
     ToElm
     -- TODO: Intead of unwrapping to DecodingError, make GotEntries Result JD.Error (List Entry)
     -- And then DecodingError would become an explicit UnknownMsg
+    -- TODO: Probably have to associate an ID here, so we know whether GotEntries is in response to init, or a form, or import
     = GotEntries (List Entry)
     | GotEntry (Result String Entry)
     | BadMessage JD.Error
@@ -22,6 +24,7 @@ type
 
 type FromElm
     = StoreEntry EntryV1Partial
+    | StoreBatchImportedEntries (List Entry)
     | GetEntries
 
 
@@ -44,6 +47,11 @@ getEntries =
 storeEntry : EntryV1Partial -> Cmd msg
 storeEntry entry =
     send (StoreEntry entry)
+
+
+storeBatchImportedEntries : List Entry -> Cmd msg
+storeBatchImportedEntries entries =
+    send (StoreBatchImportedEntries entries)
 
 
 
@@ -85,6 +93,12 @@ encodeFromElm data =
             JE.object
                 [ ( "tag", JE.string "StoreEntry" )
                 , ( "data", Entry.encodePartial entry )
+                ]
+
+        StoreBatchImportedEntries entries ->
+            JE.object
+                [ ( "tag", JE.string "StoreBatchImportedEntries" )
+                , ( "data", JE.list Entry.encode entries )
                 ]
 
         GetEntries ->

@@ -27,6 +27,7 @@ const GotEntry = (data: Result<string, EntryToElm>) => ({
 
 export type FromElm =
   | {tag: 'StoreEntry'; data: PartialEntryFromElm}
+  | {tag: 'StoreBatchImportedEntries'; data: Array<EntryV1>}
   | {tag: 'GetEntries'};
 
 /** Respond to a Store.FromElm message */
@@ -67,6 +68,11 @@ function handleSubMessage(
         sendToElm(GotEntries(entriesToElm));
       });
       return;
+
+    case 'StoreBatchImportedEntries':
+      // TODO: Should we be wrapping all the ports in try/catch? :thinking:
+      // TODO: storeBatchEntries().then(entries => {...}; sendToElm(GotBatchImportedEntries(entriesToElm)))
+      throw 'TODO: StoreBatchImportedEntries';
 
     default:
       console.warn('Unknown message: ', msg);

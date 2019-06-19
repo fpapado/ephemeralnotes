@@ -312,9 +312,9 @@ subscriptions model =
                 Map ->
                     Sub.none
 
-                -- Data does not have any subscriptions
+                -- Data has subscriptions
                 Data data ->
-                    Sub.none
+                    Sub.map GotDataMsg (Data.subscriptions data)
 
         alwaysSubs =
             [ Sub.map FromServiceWorker SW.sub, Sub.map FromStore Store.sub ]
