@@ -13,6 +13,7 @@ import Json.Encode as JE
 import RemoteData exposing (RemoteData)
 import Route
 import String.Transforms
+import Svg.Feather as Feather
 import Task exposing (Task)
 import Time
 import Ui exposing (..)
@@ -28,16 +29,23 @@ type alias Model =
 
 
 
--- Upload data can fail if we cannot decode it
+-- Custom type that models the various states of uploading and importing data
+-- TODO: Can any of these things fail granularly?
 
 
-type alias UploadData =
-    RemoteData JD.Error (List Entry)
+type UploadData
+    = NotAsked
+    | Selecting
+    | Validating String
+    | ValidationError JD.Error
+    | Saving (List Entry)
+    | SavingError
+    | SavingSuccess (List Entry)
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { uploadData = RemoteData.NotAsked
+    ( { uploadData = NotAsked
       }
     , Cmd.none
     )
@@ -66,6 +74,8 @@ type Msg
     | FileUploadRequested
     | FileSelected File
     | FileLoaded String
+    | ValidationStarted String
+      -- | SaveEntries (List Entry)
     | NoOp
 
 
@@ -84,11 +94,34 @@ update msg model =
             ( model, Task.perform FileLoaded (File.toString file) )
 
         FileLoaded fileContents ->
+            ( { model | uploadData = Validating fileContents }
+              -- Queue a task on the spot, for the validation
+              -- NOTE: This feels a bit hacky because we could do all the uploading + validating + saving
+              -- in one go, with sync functions + task chaining.
+              -- However, we *want* to yield to the model, and render, so that
+              -- we can update the user on the status of each step. For example,
+              -- did the pipeline fail because the file was wrong or because they don't have enough space on their device?
+              -- You could argue, though, that we can still do that in the pipeline case,
+              -- but without being able to communicate every step.
+              -- Perhaps that is fine? Perhaps it is less complexity than adding 4 extra states
+              -- and a few messages? Let's find out!
+            , Task.perform identity (Task.succeed (ValidationStarted fileContents))
+            )
+
+        ValidationStarted fileContents ->
             let
                 entries =
                     JD.decodeString (JD.list Entry.decoder) fileContents
+
+                ( uploadData, nextCmd ) =
+                    case entries of
+                        Result.Ok entryList ->
+                            ( Saving entryList, Cmd.none )
+
+                        Result.Err decodingError ->
+                            ( ValidationError decodingError, Cmd.none )
             in
-            ( { model | uploadData = RemoteData.fromResult entries }, Cmd.none )
+            ( { model | uploadData = uploadData }, nextCmd )
 
         GotDownloadTime entries time ->
             let
@@ -119,19 +152,25 @@ view { entries } model =
     }
 
 
+multiStyles : List ( String, String ) -> List (Html.Attribute msg)
+multiStyles styles =
+    styles
+        |> List.map (\( name, value ) -> HA.style name value)
+
+
 viewContent : EntryData -> Model -> Html Msg
 viewContent entryData model =
     div []
         [ centeredContainer
             []
             [ div [ class "vs4 vs5-ns" ]
-                [ div [ class "vs3 vs4-ns" ]
+                [ div [ class "vs3" ]
                     [ heading 1 [] [ text "Data" ]
-                    , section [ class "vs3 vs4-ns" ]
+                    , section [ class "vs3" ]
                         [ subHeading 2 [] [ text "Export" ]
                         , viewExport entryData
                         ]
-                    , section [ class "vs3 vs4-ns" ]
+                    , section [ class "vs3" ]
                         [ subHeading 2 [] [ text "Import" ]
                         , viewImport
                         , viewUploadData model.uploadData
@@ -153,7 +192,7 @@ viewExport entryData =
             RemoteData.Success entries ->
                 [ styledButtonBlue False
                     [ onClick (ClickedDownload entries) ]
-                    [ text "Download Entries" ]
+                    [ text "Export Entries" ]
                 , paragraph
                     [ class "measure" ]
                     [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. In the future, you can use this file to import data into this application on another device." ]
@@ -196,11 +235,19 @@ viewUploadData uploadData =
     div [ class "vs4" ]
         [ div [ HA.attribute "aria-live" "polite" ] <|
             [ case uploadData of
-                RemoteData.Success fileContent ->
-                    div [ class "vs3" ]
-                        [ paragraph []
-                            [ text "Successfully imported "
-                            , b [] [ text (String.fromInt (List.length fileContent) ++ " items!") ]
+                Validating fileContents ->
+                    div []
+                        [ paragraph [] [ text "Validating" ]
+                        ]
+
+                Saving entries ->
+                    div [ class "vs3 pa3 bg-washed-green ba bw1 br2" ]
+                        [ paragraph [ class "dark-green" ]
+                            [ span [ class "v-mid mr2" ] [ Feather.checkCircle Feather.Decorative ]
+                            , span [ class "v-mid" ]
+                                [ text "Successfully imported "
+                                , b [] [ text (String.fromInt (List.length entries) ++ " items!") ]
+                                ]
                             ]
                         , paragraph
                             []
@@ -210,8 +257,15 @@ viewUploadData uploadData =
                             ]
                         ]
 
-                RemoteData.Failure jdError ->
-                    paragraph [] [ text "We could not import the file you specified, because its format is different than what we expected. You can find the details below." ]
+                ValidationError error ->
+                    div
+                        [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
+                        [ paragraph [ class "dark-red" ]
+                            [ span [ class "v-mid" ]
+                                [ text "We could not import the file you specified, because its contents are different than what we expected. You can find the details below."
+                                ]
+                            ]
+                        ]
 
                 _ ->
                     text ""
@@ -220,10 +274,10 @@ viewUploadData uploadData =
         -- NOTE: We keep the details of the upload error out of the live region, to avoid verbose announcements
         , div []
             [ case uploadData of
-                RemoteData.Failure jdError ->
+                ValidationError error ->
                     pre
                         []
-                        [ text <| JD.errorToString jdError ]
+                        [ text <| JD.errorToString error ]
 
                 _ ->
                     text ""
