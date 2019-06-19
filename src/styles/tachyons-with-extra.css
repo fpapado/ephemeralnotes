@@ -655,6 +655,15 @@ img {
 .light-red {
   color: #ff725c;
 }
+.light-green {
+  color: #9eebcf;
+}
+.green {
+  color: #19a974;
+}
+.dark-green {
+  color: #137752;
+}
 .navy {
   color: #001b44;
 }
@@ -702,6 +711,18 @@ img {
 }
 .bg-light-yellow {
   background-color: #fbf1a9;
+}
+.bg-light-green {
+  background-color: #9eebcf;
+}
+.bg-green {
+  background-color: #19a974;
+}
+.bg-washed-green {
+  background-color: #e8fdf5;
+}
+.bg-dark-green {
+  background-color: #137752;
 }
 .bg-navy {
   background-color: #001b44;
@@ -1281,6 +1302,9 @@ img {
 .measure {
   max-width: 30em;
 }
+/* .measure {
+  max-width: 55ch;
+} */
 .measure-wide {
   max-width: 34em;
 }
