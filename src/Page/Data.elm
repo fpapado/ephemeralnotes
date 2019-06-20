@@ -156,7 +156,7 @@ update msg model =
         FromStore storeMsg ->
             case storeMsg of
                 -- TODO: Need to associate a message id here, otherwise the initial load while on /data appears to be an import success :D
-                Store.GotEntries entries ->
+                Store.GotBatchImportedEntries entries ->
                     -- TODO: The GotEntries appears like it cannot fail, but it could. We should encode that in the types
                     ( { model | uploadData = SavingSuccess entries }, Cmd.none )
 
