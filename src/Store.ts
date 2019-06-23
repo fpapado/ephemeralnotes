@@ -21,7 +21,10 @@ const GotEntries = (data: EntryToElm[]) => ({
   data,
 });
 
-const GotBatchImportedEntries = (data: EntryToElm[]) => ({
+const GotBatchImportedEntries = (
+  // TODO: Write a more accurate union type for IDBRequest
+  data: Result<DOMException['name'], EntryToElm[]>
+) => ({
   tag: 'GotBatchImportedEntries',
   data,
 });
@@ -86,11 +89,16 @@ function handleSubMessage(
             ...entry,
             schema_version: 1,
           }));
-          sendToElm(GotBatchImportedEntries(entriesToElm));
+          sendToElm(GotBatchImportedEntries(Result_Ok(entriesToElm)));
         })
-        .catch(err => {
-          // TODO: Report these to Elm
+        .catch((err: IDBRequest['error']) => {
+          // TODO: Remove debugging
           console.error('Error in StoreBatchImportedEntries', err);
+          sendToElm(
+            GotBatchImportedEntries(
+              Result_Error(err ? err.name : 'UnaccountedError')
+            )
+          );
         });
       return;
 
@@ -153,17 +161,21 @@ async function storePartialEntry(entry: PartialEntryFromElm) {
 }
 
 async function storeBatchEntries(entries: Array<EntryV1>) {
-  const db = await openEntryDB();
-  console.log('Will add entries', entries);
-  // Add all entries in a single transaction
-  const tx = db.transaction('entries', 'readwrite');
-  // TODO: This can fail if importing items with the same id
-  // Perhaps we should have an "overwrite same items" checkbox?
-  for (const entry of entries) {
-    tx.store.add(entry);
+  try {
+    const db = await openEntryDB();
+    console.log('Will add entries', entries);
+    // Add all entries in a single transaction
+    const tx = db.transaction('entries', 'readwrite');
+    // TODO: This can fail if importing items with the same id
+    // Perhaps we should have an "overwrite same items" checkbox?
+    for (const entry of entries) {
+      tx.store.add(entry);
+    }
+    await tx.done;
+    return entries;
+  } catch (err) {
+    throw err;
   }
-  await tx.done;
-  return entries;
 }
 
 async function openEntryDB() {

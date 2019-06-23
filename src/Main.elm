@@ -219,14 +219,19 @@ update msg model =
                     ( { model | entries = RemoteData.Success entries }, Cmd.none )
 
                 -- TODO: Add to the model here
-                Store.GotBatchImportedEntries importedEntries ->
+                Store.GotBatchImportedEntries res ->
                     let
                         existingEntries =
                             model.entries
 
-                        -- Merge the two data sources
                         newEntries =
-                            RemoteData.map (\existing -> importedEntries ++ existing) existingEntries
+                            case res of
+                                Ok importedEntries ->
+                                    -- Merge the two data sources
+                                    RemoteData.map (\existing -> importedEntries ++ existing) existingEntries
+
+                                Err err ->
+                                    existingEntries
                     in
                     ( { model | entries = newEntries }, Cmd.none )
 

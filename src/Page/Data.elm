@@ -37,10 +37,10 @@ type alias Model =
 type UploadData
     = NotAsked
     | Selecting
-    | Validating String
     | ValidationError JD.Error
     | Saving (List Entry)
-    | SavingError
+      -- TODO: Use Store.RequestError here
+    | SavingError String
     | SavingSuccess (List Entry)
 
 
@@ -75,11 +75,7 @@ type Msg
     | FileUploadRequested
     | FileSelected File
     | FileLoaded String
-    | ValidationStarted String
-      -- TODO: Listen to the Store.ToElm port, and get the Success data
     | FromStore Store.ToElm
-      -- TODO: Validate that an Entry ID is a UUID
-      -- | SaveEntries (List Entry)
     | NoOp
 
 
@@ -109,21 +105,9 @@ update msg model =
             ( model, Task.perform FileLoaded (File.toString file) )
 
         FileLoaded fileContents ->
-            ( { model | uploadData = Validating fileContents }
-              -- Queue a task on the spot, for the validation
-              -- NOTE: This feels a bit hacky because we could do all the uploading + validating + saving
-              -- in one go, with sync functions + task chaining.
-              -- However, we *want* to yield to the model, and render, so that
-              -- we can update the user on the status of each step. For example,
-              -- did the pipeline fail because the file was wrong or because they don't have enough space on their device?
-              -- You could argue, though, that we can still do that in the pipeline case,
-              -- but without being able to communicate every step.
-              -- Perhaps that is fine? Perhaps it is less complexity than adding 4 extra states
-              -- and a few messages? Let's find out!
-            , Task.perform identity (Task.succeed (ValidationStarted fileContents))
-            )
-
-        ValidationStarted fileContents ->
+            -- We have loaded the file, and we must now validate it
+            -- If invalid, fail with a decodingError
+            -- If valid, send a Cmd to the Store to save the entries
             let
                 entriesRes =
                     JD.decodeString (JD.list Entry.decoder) fileContents
@@ -156,9 +140,13 @@ update msg model =
         FromStore storeMsg ->
             case storeMsg of
                 -- TODO: Need to associate a message id here, otherwise the initial load while on /data appears to be an import success :D
-                Store.GotBatchImportedEntries entries ->
-                    -- TODO: The GotEntries appears like it cannot fail, but it could. We should encode that in the types
-                    ( { model | uploadData = SavingSuccess entries }, Cmd.none )
+                Store.GotBatchImportedEntries res ->
+                    case res of
+                        Ok entries ->
+                            ( { model | uploadData = SavingSuccess entries }, Cmd.none )
+
+                        Err err ->
+                            ( { model | uploadData = SavingError "We could not store the entries" }, Cmd.none )
 
                 -- Ignore any other msg from the store
                 _ ->
@@ -262,13 +250,29 @@ viewUploadData uploadData =
     div [ class "vs4" ]
         [ div [ HA.attribute "aria-live" "polite" ] <|
             [ case uploadData of
-                Validating fileContents ->
-                    div []
-                        [ paragraph [] [ text "Validating" ]
-                        ]
-
                 Saving entries ->
                     div [] [ paragraph [] [ text "Saving..." ] ]
+
+                ValidationError error ->
+                    div
+                        [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
+                        [ paragraph [ class "dark-red" ]
+                            [ span [ class "v-mid" ]
+                                [ text "We could not import the file you specified, because its contents are different than what we expected. You can find the details below."
+                                ]
+                            ]
+                        ]
+
+                SavingError error ->
+                    div
+                        [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
+                        [ paragraph [ class "dark-red" ]
+                            [ span [ class "v-mid" ]
+                                [ text "We could not save the entries: "
+                                , text error
+                                ]
+                            ]
+                        ]
 
                 SavingSuccess entries ->
                     div [ class "vs3 pa3 bg-washed-green ba bw1 br2" ]
@@ -284,16 +288,6 @@ viewUploadData uploadData =
                             [ text "You can visit the "
                             , a [ Route.href Route.Home ] [ text "Entries page" ]
                             , text " to find them."
-                            ]
-                        ]
-
-                ValidationError error ->
-                    div
-                        [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
-                        [ paragraph [ class "dark-red" ]
-                            [ span [ class "v-mid" ]
-                                [ text "We could not import the file you specified, because its contents are different than what we expected. You can find the details below."
-                                ]
                             ]
                         ]
 
