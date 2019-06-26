@@ -7,6 +7,7 @@ import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Navigation as Nav
 import Entry.Entry as Entry exposing (Entry)
+import Entry.Id
 import Html exposing (..)
 import Html.Attributes as HA exposing (class)
 import Html.Events as HE exposing (onClick)
@@ -22,6 +23,7 @@ import Process
 import RemoteData exposing (RemoteData)
 import Route exposing (Route)
 import ServiceWorker as SW
+import Set exposing (Set)
 import Store
 import Task
 import Time
@@ -228,7 +230,9 @@ update msg model =
                             case res of
                                 Ok importedEntries ->
                                     -- Merge the two data sources
-                                    RemoteData.map (\existing -> importedEntries ++ existing) existingEntries
+                                    RemoteData.map
+                                        (mergeEntryLists importedEntries)
+                                        existingEntries
 
                                 Err err ->
                                     existingEntries
@@ -386,6 +390,44 @@ viewInstallPrompt installPrompt =
                     ]
             }
         ]
+
+
+{-| Merge two lists of entries, keeping only a single id, prioritising the first list. |
+-}
+mergeEntryLists : List Entry -> List Entry -> List Entry
+mergeEntryLists list1 list2 =
+    let
+        rawMerged =
+            list1 ++ list2
+
+        initState =
+            ( [], Set.empty )
+
+        addIfNotSeen : Entry -> ( List Entry, Set String ) -> ( List Entry, Set String )
+        addIfNotSeen candidate ( listSoFar, seenIds ) =
+            let
+                -- Extract the id from the Entry, so we can compare it
+                -- TODO: Consider a tie-breaker with Version as well
+                id =
+                    case candidate of
+                        Entry.V1 entry ->
+                            Entry.Id.toString entry.id
+
+                haveSeenIdBefore =
+                    Set.member id seenIds
+            in
+            case haveSeenIdBefore of
+                -- If the id is in the ones we have seen, skip it
+                True ->
+                    ( listSoFar, seenIds )
+
+                -- If the id is not in the ones we have seen, add the item to the list
+                -- and the ids to the set
+                False ->
+                    ( candidate :: listSoFar, Set.insert id seenIds )
+    in
+    List.foldl addIfNotSeen initState rawMerged
+        |> Tuple.first
 
 
 

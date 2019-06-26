@@ -161,21 +161,17 @@ async function storePartialEntry(entry: PartialEntryFromElm) {
 }
 
 async function storeBatchEntries(entries: Array<EntryV1>) {
-  try {
-    const db = await openEntryDB();
-    console.log('Will add entries', entries);
-    // Add all entries in a single transaction
-    const tx = db.transaction('entries', 'readwrite');
-    // TODO: This can fail if importing items with the same id
-    // Perhaps we should have an "overwrite same items" checkbox?
-    for (const entry of entries) {
-      tx.store.add(entry);
-    }
-    await tx.done;
-    return entries;
-  } catch (err) {
-    throw err;
+  const db = await openEntryDB();
+  console.log('Will add entries', entries);
+  // Add all entries in a single transaction
+  const tx = db.transaction('entries', 'readwrite');
+  // TODO: This can fail if importing items with the same id
+  // Perhaps we should have an "overwrite same items" checkbox?
+  for (const entry of entries) {
+    tx.store.put(entry);
   }
+  await tx.done;
+  return entries;
 }
 
 async function openEntryDB() {
