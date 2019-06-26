@@ -8,6 +8,7 @@ import Html exposing (..)
 import Html.Attributes as HA exposing (class, href)
 import Html.Events as HE exposing (onClick)
 import Html.Keyed as Keyed
+import HumanError exposing (HumanError)
 import Json.Decode as JD
 import Json.Encode as JE
 import RemoteData exposing (RemoteData)
@@ -39,8 +40,7 @@ type UploadData
     | Selecting
     | ValidationError JD.Error
     | Saving (List Entry)
-      -- TODO: Use Store.RequestError here
-    | SavingError String
+    | SavingError Store.RequestError
     | SavingSuccess (List Entry)
 
 
@@ -138,17 +138,17 @@ update msg model =
 
         -- The import cares about GotEntry
         FromStore storeMsg ->
-            case storeMsg of
-                -- TODO: Need to associate a message id here, otherwise the initial load while on /data appears to be an import success :D
-                Store.GotBatchImportedEntries res ->
+            -- We only care about the GotBatchImportedEntries if we are waiting for it
+            case ( model.uploadData, storeMsg ) of
+                ( Saving _, Store.GotBatchImportedEntries res ) ->
                     case res of
                         Ok entries ->
                             ( { model | uploadData = SavingSuccess entries }, Cmd.none )
 
                         Err err ->
-                            ( { model | uploadData = SavingError "We could not store the entries" }, Cmd.none )
+                            ( { model | uploadData = SavingError err }, Cmd.none )
 
-                -- Ignore any other msg from the store
+                -- Ignore any other msg from the store, and in any other state
                 _ ->
                     ( model, Cmd.none )
 
@@ -269,7 +269,7 @@ viewUploadData uploadData =
                         [ paragraph [ class "dark-red" ]
                             [ span [ class "v-mid" ]
                                 [ text "We could not save the entries: "
-                                , text error
+                                , text (HumanError.toString (humanRequestError error))
                                 ]
                             ]
                         ]
@@ -307,3 +307,43 @@ viewUploadData uploadData =
                     text ""
             ]
         ]
+
+
+humanRequestError : Store.RequestError -> HumanError
+humanRequestError err =
+    case err of
+        Store.AbortError ->
+            { expectation = HumanError.Expected
+            , details = Just "The import process was aborted, likely because some other error occured."
+            , recoverable = HumanError.Unrecoverable
+            }
+
+        Store.ConstraintError ->
+            { expectation = HumanError.Expected
+            , details = Just "We could not complete the import process, because the data being imported seems to conflict with that already store."
+            , recoverable = HumanError.Recoverable (HumanError.CustomRecovery "This can happen if you manually edited the data file. Does each entry have an id field?")
+            }
+
+        Store.QuotaExceededError ->
+            { expectation = HumanError.Expected
+            , details = Just "We could not import the data, because it seems that the application has run out of its allocated space."
+            , recoverable = HumanError.Recoverable (HumanError.CustomRecovery "You could try freeing up space on your device. If that is not possible, consider exporting your existing data, so you will not lose it. You can then import both files to another device, and continue from there.")
+            }
+
+        Store.VersionError ->
+            { expectation = HumanError.Expected
+            , details = Just "The import failed because the versions of the data being imported do not match the ones stored."
+            , recoverable = HumanError.Recoverable (HumanError.CustomRecovery "This might be fixable by closing all tabs that have the application open, and opening it up again.")
+            }
+
+        Store.UnknownError ->
+            { expectation = HumanError.Expected
+            , details = Just "The import process failed for an unknown reason, and we could not get more details there."
+            , recoverable = HumanError.Recoverable HumanError.TryAgain
+            }
+
+        Store.UnaccountedError ->
+            { expectation = HumanError.Unexpected
+            , details = Just "This is possibly an error in the code. Please get in touch if you run into this!"
+            , recoverable = HumanError.Unrecoverable
+            }

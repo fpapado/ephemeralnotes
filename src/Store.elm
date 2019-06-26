@@ -1,5 +1,6 @@
 port module Store exposing
-    ( ToElm(..)
+    ( RequestError(..)
+    , ToElm(..)
     , getEntries
     , storeBatchImportedEntries
     , storeEntry

@@ -217,6 +217,7 @@ update msg model =
         -- Store subscription messages
         ( FromStore storeMsg, _ ) ->
             case storeMsg of
+                -- For GotEntries, the expectation is that we replace the entry list completely
                 Store.GotEntries entries ->
                     ( { model | entries = RemoteData.Success entries }, Cmd.none )
 
