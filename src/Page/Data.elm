@@ -41,7 +41,7 @@ type UploadData
     | ValidationError JD.Error
     | Saving (List Entry)
     | SavingError Store.RequestError
-    | SavingSuccess (List Entry)
+    | SavingSuccess Int
 
 
 init : ( Model, Cmd Msg )
@@ -268,8 +268,7 @@ viewUploadData uploadData =
                         [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
                         [ paragraph [ class "dark-red" ]
                             [ span [ class "v-mid" ]
-                                [ text "We could not save the entries: "
-                                , text (HumanError.toString (humanRequestError error))
+                                [ text (HumanError.toString (humanRequestError error))
                                 ]
                             ]
                         ]
@@ -280,7 +279,7 @@ viewUploadData uploadData =
                             [ span [ class "v-mid mr2" ] [ Feather.checkCircle Feather.Decorative ]
                             , span [ class "v-mid" ]
                                 [ text "Successfully imported "
-                                , b [] [ text (String.fromInt (List.length entries) ++ " items!") ]
+                                , b [] [ text <| String.fromInt entries ++ " items!" ]
                                 ]
                             ]
                         , paragraph
@@ -314,36 +313,36 @@ humanRequestError err =
     case err of
         Store.AbortError ->
             { expectation = HumanError.Expected
-            , details = Just "The import process was aborted, likely because some other error occured."
-            , recoverable = HumanError.Unrecoverable
+            , summary = Just "The import process was aborted, likely because some other error occured."
+            , recovery = HumanError.Unrecoverable
             }
 
         Store.ConstraintError ->
             { expectation = HumanError.Expected
-            , details = Just "We could not complete the import process, because the data being imported seems to conflict with that already store."
-            , recoverable = HumanError.Recoverable (HumanError.CustomRecovery "This can happen if you manually edited the data file. Does each entry have an id field?")
+            , summary = Just "We could not complete the import process, because the data being imported seems to conflict with that already stored."
+            , recovery = HumanError.Recoverable (HumanError.CustomRecovery "This can happen if you manually edited the data file. Does each entry have an id field?")
             }
 
         Store.QuotaExceededError ->
             { expectation = HumanError.Expected
-            , details = Just "We could not import the data, because it seems that the application has run out of its allocated space."
-            , recoverable = HumanError.Recoverable (HumanError.CustomRecovery "You could try freeing up space on your device. If that is not possible, consider exporting your existing data, so you will not lose it. You can then import both files to another device, and continue from there.")
+            , summary = Just "We could not import the data, because it seems that the application has run out of its allocated space."
+            , recovery = HumanError.Recoverable (HumanError.CustomRecovery "You could try freeing up space on your device. If that is not possible, consider exporting your existing data, so you will not lose it. You can then import both files to another device, and continue from there.")
             }
 
         Store.VersionError ->
             { expectation = HumanError.Expected
-            , details = Just "The import failed because the versions of the data being imported do not match the ones stored."
-            , recoverable = HumanError.Recoverable (HumanError.CustomRecovery "This might be fixable by closing all tabs that have the application open, and opening it up again.")
+            , summary = Just "The import failed because the versions of the data being imported do not match the ones stored."
+            , recovery = HumanError.Recoverable (HumanError.CustomRecovery "This might be fixable by closing all tabs that have the application open, and opening it up again.")
             }
 
         Store.UnknownError ->
             { expectation = HumanError.Expected
-            , details = Just "The import process failed for an unknown reason, and we could not get more details there."
-            , recoverable = HumanError.Recoverable HumanError.TryAgain
+            , summary = Just "The import process failed for an unknown reason, and we could not get more details about it."
+            , recovery = HumanError.Recoverable HumanError.TryAgain
             }
 
         Store.UnaccountedError ->
             { expectation = HumanError.Unexpected
-            , details = Just "This is possibly an error in the code. Please get in touch if you run into this!"
-            , recoverable = HumanError.Unrecoverable
+            , summary = Just "This is possibly an error in the code. Please get in touch if you run into this!"
+            , recovery = HumanError.Unrecoverable
             }

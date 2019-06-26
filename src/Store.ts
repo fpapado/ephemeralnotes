@@ -23,7 +23,7 @@ const GotEntries = (data: EntryToElm[]) => ({
 
 const GotBatchImportedEntries = (
   // TODO: Write a more accurate union type for IDBRequest
-  data: Result<DOMException['name'], EntryToElm[]>
+  data: Result<DOMException['name'], number>
 ) => ({
   tag: 'GotBatchImportedEntries',
   data,
@@ -43,7 +43,7 @@ export type FromElm =
   | {tag: 'GetEntries'};
 
 /** Respond to a Store.FromElm message */
-function handleSubMessage(
+async function handleSubMessage(
   sendToElm: Elm.Main.App['ports']['storeToElm']['send'],
   msg: FromElm
 ) {
@@ -83,23 +83,32 @@ function handleSubMessage(
 
     case 'StoreBatchImportedEntries':
       // TODO: Should we be wrapping all the ports in try/catch? :thinking:
-      storeBatchEntries(msg.data)
-        .then(entries => {
+      try {
+        const importNum = await storeBatchEntries(msg.data);
+
+        // Immediately inform Elm that we imported entries OK
+        sendToElm(GotBatchImportedEntries(Result_Ok(importNum)));
+
+        // Additionally, get all the entries and send them to Elm
+        getEntries().then(entries => {
           const entriesToElm = entries.map(entry => ({
             ...entry,
             schema_version: 1,
           }));
-          sendToElm(GotBatchImportedEntries(Result_Ok(entriesToElm)));
-        })
-        .catch((err: IDBRequest['error']) => {
-          // TODO: Remove debugging
-          console.error('Error in StoreBatchImportedEntries', err);
-          sendToElm(
-            GotBatchImportedEntries(
-              Result_Error(err ? err.name : 'UnaccountedError')
-            )
-          );
+          sendToElm(GotEntries(entriesToElm));
         });
+      } catch (err) {
+        console.error(
+          'Error in StoreBatchImportedEntries:',
+          err && err instanceof DOMException ? err.name : 'UnaccountedError'
+        );
+        // Inform Elm that an error happened
+        sendToElm(
+          GotBatchImportedEntries(
+            Result_Error(err ? err.name : 'UnaccountedError')
+          )
+        );
+      }
       return;
 
     default:
@@ -162,16 +171,20 @@ async function storePartialEntry(entry: PartialEntryFromElm) {
 
 async function storeBatchEntries(entries: Array<EntryV1>) {
   const db = await openEntryDB();
-  console.log('Will add entries', entries);
+
+  console.log('Will add batch entries', entries);
+
   // Add all entries in a single transaction
   const tx = db.transaction('entries', 'readwrite');
-  // TODO: This can fail if importing items with the same id
+
+  // TODO: This will overwrite items with the same id
   // Perhaps we should have an "overwrite same items" checkbox?
   for (const entry of entries) {
-    tx.store.put(entry);
+    // NOTE: It is important to await here, to propagate the error
+    await tx.store.put(entry);
   }
   await tx.done;
-  return entries;
+  return entries.length;
 }
 
 async function openEntryDB() {

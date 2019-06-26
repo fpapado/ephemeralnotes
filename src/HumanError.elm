@@ -26,8 +26,8 @@ module HumanError exposing
 
 type alias HumanError =
     { expectation : Expectation
-    , recoverable : RecoveryLevel
-    , details : Maybe String
+    , summary : Maybe String
+    , recovery : RecoveryLevel
     }
 
 
@@ -56,21 +56,21 @@ toString err =
 
             Unexpected ->
                 "unexpected error, that shouldn't be possible."
-        , case err.recoverable of
-            Unrecoverable ->
-                "There is no way to recover from it."
-
-            Recoverable recovery ->
-                case recovery of
-                    TryAgain ->
-                        "You can try performing the action again."
-
-                    CustomRecovery customRec ->
-                        customRec
-        , case err.details of
+        , case err.summary of
             Nothing ->
                 ""
 
             Just details ->
                 details
+        , case err.recovery of
+            Unrecoverable ->
+                "There is no way to recover from it."
+
+            Recoverable recoveryAction ->
+                case recoveryAction of
+                    TryAgain ->
+                        "You can try performing the action again."
+
+                    CustomRecovery customRec ->
+                        customRec
         ]

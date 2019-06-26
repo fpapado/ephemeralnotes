@@ -221,25 +221,6 @@ update msg model =
                 Store.GotEntries entries ->
                     ( { model | entries = RemoteData.Success entries }, Cmd.none )
 
-                -- TODO: Add to the model here
-                Store.GotBatchImportedEntries res ->
-                    let
-                        existingEntries =
-                            model.entries
-
-                        newEntries =
-                            case res of
-                                Ok importedEntries ->
-                                    -- Merge the two data sources
-                                    RemoteData.map
-                                        (mergeEntryLists importedEntries)
-                                        existingEntries
-
-                                Err err ->
-                                    existingEntries
-                    in
-                    ( { model | entries = newEntries }, Cmd.none )
-
                 Store.GotEntry entryRes ->
                     let
                         entryData =
@@ -250,6 +231,9 @@ update msg model =
                             RemoteData.map2 (\entry entries -> entry :: entries) entryData model.entries
                     in
                     ( { model | entries = newEntries }, Cmd.none )
+
+                Store.GotBatchImportedEntries num ->
+                    ( model, Cmd.none )
 
                 Store.BadMessage err ->
                     ( model, Log.error (JD.errorToString err) )

@@ -19,7 +19,7 @@ type
     -- And then DecodingError would become an explicit UnknownMsg
     -- TODO: Probably have to associate an ID here, so we know whether GotEntries is in response to init, or a form, or import
     = GotEntries (List Entry)
-    | GotBatchImportedEntries (Result RequestError (List Entry))
+    | GotBatchImportedEntries (Result RequestError Int)
     | GotEntry (Result String Entry)
     | BadMessage JD.Error
 
@@ -160,7 +160,7 @@ toElmInnerDecoder tag =
                                         |> JD.map (GotBatchImportedEntries << Err)
 
                                 "Ok" ->
-                                    JD.field "data" (JD.list Entry.decoder)
+                                    JD.field "data" JD.int
                                         |> JD.map (GotBatchImportedEntries << Ok)
 
                                 _ ->
