@@ -32,7 +32,6 @@ type alias Model =
 
 
 -- Custom type that models the various states of uploading and importing data
--- TODO: Can any of these things fail granularly?
 
 
 type UploadData
@@ -258,7 +257,7 @@ viewUploadData uploadData =
                         [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
                         [ paragraph [ class "dark-red" ]
                             [ span [ class "v-mid" ]
-                                [ text "We could not import the file you specified, because its contents are different than what we expected. You can find the details below."
+                                [ text "We could not import the file you specified, because its contents are different than what we expected. It might be possible to fix this by following the errors below and editing the file manually."
                                 ]
                             ]
                         ]
@@ -294,12 +293,12 @@ viewUploadData uploadData =
                     text ""
             ]
 
-        -- NOTE: We keep the details of the upload error out of the live region, to avoid verbose announcements
-        , div []
+        -- NOTE: We keep the details of the ValidationError out of the live region, to avoid verbose announcements
+        , div [ class "ph3 pv2 bg-white ba bw1 br2" ]
             [ case uploadData of
                 ValidationError error ->
                     pre
-                        []
+                        [ class "pre overflow-x-auto" ]
                         [ text <| JD.errorToString error ]
 
                 _ ->
