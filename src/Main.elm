@@ -6,6 +6,7 @@ module Main exposing (main)
 import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Navigation as Nav
+import DarkMode
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
 import Html exposing (..)
@@ -38,6 +39,7 @@ type alias Model =
     , swUpdate : SW.SwUpdate
     , installPrompt : SW.InstallPrompt
     , entries : RemoteData String (List Entry)
+    , darkMode : DarkMode.Mode
     }
 
 
@@ -65,6 +67,7 @@ init flags url navKey =
                 , swUpdate = SW.updateNone
                 , installPrompt = SW.installPromptNone
                 , entries = RemoteData.Loading
+                , darkMode = DarkMode.Light
                 }
     in
     -- Return those, plus the Main init msg
@@ -101,11 +104,11 @@ view model =
             viewPage Page.Other (\_ -> Ignored) NotFound.view
 
         Home homeModel ->
-            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries } homeModel)
+            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries, darkMode = model.darkMode } homeModel)
 
         Map ->
             -- Map does not have any Msg at the moment, so we ignore it
-            viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries })
+            viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries, darkMode = model.darkMode })
 
         Data dataModel ->
             -- Data does not have a model, but it does have a Msg
@@ -131,6 +134,7 @@ type Msg
       -- Subs
     | FromServiceWorker SW.ToElm
     | FromStore Store.ToElm
+    | FromDarkMode DarkMode.ToElm
       -- SW prompts
     | AcceptUpdate
     | DeferUpdate
@@ -238,6 +242,15 @@ update msg model =
                 Store.BadMessage err ->
                     ( model, Log.error (JD.errorToString err) )
 
+        -- Dark mode
+        ( FromDarkMode darkModeMsg, _ ) ->
+            case darkModeMsg of
+                DarkMode.ModeSet mode ->
+                    ( { model | darkMode = mode }, Cmd.none )
+
+                DarkMode.BadMessage err ->
+                    ( model, Log.error (JD.errorToString err) )
+
         -- Global page concerns
         -- For example, the Service Worker messages can apear anywhere
         -- Service worker messages
@@ -323,7 +336,10 @@ subscriptions model =
                     Sub.map GotDataMsg (Data.subscriptions data)
 
         alwaysSubs =
-            [ Sub.map FromServiceWorker SW.sub, Sub.map FromStore Store.sub ]
+            [ Sub.map FromServiceWorker SW.sub
+            , Sub.map FromStore Store.sub
+            , Sub.map FromDarkMode DarkMode.sub
+            ]
     in
     Sub.batch (alwaysSubs ++ [ pageSubs ])
 

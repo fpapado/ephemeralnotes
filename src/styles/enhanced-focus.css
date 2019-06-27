@@ -36,8 +36,8 @@
   outline: none;
   box-shadow: 0 0 0 0.2em rgba(3, 102, 214, 0.85);
 }
-.focus-shadow-light:focus {
+.focus-shadow-faint:focus {
   /* Enhance outline that follows border */
   outline: none;
-  box-shadow: 0 0 0 0.2em rgba(3, 102, 214, 0.5);
+  box-shadow: 0 0 0 0.2em var(--shadow-faint);
 }

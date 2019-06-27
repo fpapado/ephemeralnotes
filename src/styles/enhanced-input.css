@@ -30,7 +30,7 @@
 .enhanced-checkbox-input:focus + .enhanced-checkbox-label::before {
   outline: 4px solid transparent;
   outline-offset: 4px;
-  box-shadow: 0 0 0 4px rgba(3, 102, 214, 0.5);
+  box-shadow: 0 0 0 4px var(--shadow-faint);
 }
 
 .enhanced-checkbox-label::before {

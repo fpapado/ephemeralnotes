@@ -4,6 +4,7 @@ import {listenForWaitingSW} from './sw-utils';
 import {Elm} from './Main/index';
 import {getLocation, Result, Location, LocationError} from './Geolocation';
 import * as Store from './Store';
+import * as DarkMode from './DarkMode';
 
 export function runWith(Elm_: typeof Elm) {
   // Start Elm app
@@ -158,5 +159,11 @@ export function runWith(Elm_: typeof Elm) {
   app.ports.storeFromElm.subscribe(unkMsg => {
     let msg = unkMsg as Store.FromElm;
     Store.handleSubMessage(app.ports.storeToElm.send, msg);
+  });
+
+  // DarkMode <-> Elm
+  app.ports.darkModeFromElm.subscribe(unkMsg => {
+    let msg = unkMsg as DarkMode.FromElm;
+    DarkMode.handleSubMessage(app.ports.darkModeToElm.send, msg);
   });
 }

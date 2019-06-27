@@ -11,6 +11,33 @@
 @import './grid-entries.css';
 @import './switch-toggle.css';
 
+:root {
+  --color-bg: #f6fffe;
+  --color-fg: #111111;
+  --shadow-faint: rgba(3, 102, 214, 0.5);
+  color-scheme: light dark;
+}
+
+.dark-mode {
+  --color-bg: #111717;
+  --color-fg: #f4f4f4;
+  --shadow-faint: #96ccff;
+}
+
+.color-fg {
+  color: var(--color-fg);
+}
+
+.bg-color-bg {
+  background-color: var(--color-bg);
+}
+
+.elm-root {
+  transition: color, background-color;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
+}
+
 /* Propagate height for leaflet map */
 .leaflet-map-wrapper {
   background: #ddd;

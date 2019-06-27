@@ -81,7 +81,7 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
 
 
 viewShell children =
-    div [ class "min-vh-100 flex flex-column bg-washed-blue near-black f-phantomsans" ] children
+    div [ class "min-vh-100 flex flex-column bg-color-bg color-fg f-phantomsans elm-root" ] children
 
 
 viewHeader : Page -> Html msg

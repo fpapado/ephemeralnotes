@@ -24,6 +24,12 @@ export namespace Elm {
         storeToElm: {
           send(data: any): void;
         };
+        darkModeFromElm: {
+          subscribe(callback: (data: unknown) => void): void;
+        };
+        darkModeToElm: {
+          send(data: any): void;
+        };
       };
     }
     export function init(options: {

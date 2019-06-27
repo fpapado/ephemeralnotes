@@ -1,8 +1,10 @@
 port module DarkMode exposing
     ( Mode(..)
+    , ToElm(..)
+    , inverse
     , modeToString
-    , setMode
     , sub
+    , toggleMode
     , viewSwitch
     )
 
@@ -52,9 +54,19 @@ send msgOut =
         |> darkModeFromElm
 
 
-setMode : Mode -> Cmd msg
-setMode mode =
-    send (SetMode mode)
+toggleMode : Mode -> Cmd msg
+toggleMode mode =
+    send (SetMode (inverse mode))
+
+
+inverse : Mode -> Mode
+inverse mode =
+    case mode of
+        Light ->
+            Dark
+
+        Dark ->
+            Light
 
 
 
@@ -93,10 +105,10 @@ modeToString : Mode -> String
 modeToString mode =
     case mode of
         Light ->
-            "light"
+            "Light"
 
         Dark ->
-            "dark"
+            "Dark"
 
 
 toElmDecoder : JD.Decoder ToElm
@@ -138,8 +150,8 @@ modeDecoder str =
 @see <https://scottaohara.github.io/aria-switch-control/>
 @note we are not using the role="switch"+aria-checked=true|false, due to compatibility issues <https://scottaohara.github.io/a11y_styled_form_controls/src/checkbox--switch/>
 -}
-viewSwitch : Mode -> Html msg
-viewSwitch mode =
+viewSwitch : { onClick : msg, mode : Mode } -> Html msg
+viewSwitch { onClick, mode } =
     let
         textLabel =
             modeToString mode
@@ -156,6 +168,7 @@ viewSwitch mode =
         [ button
             [ class "switch-toggle"
             , HA.attribute "aria-pressed" (boolToStringAttr isChecked)
+            , HE.onClick onClick
             ]
             [ text "Dark mode"
             , span [ HA.attribute "aria-hidden" "true" ] []

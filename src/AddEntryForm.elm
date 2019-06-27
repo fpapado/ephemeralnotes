@@ -320,7 +320,7 @@ view form_ =
                     ]
                     [ text "Word" ]
                 , input
-                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
+                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-faint"
                     , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-front"
@@ -339,7 +339,7 @@ view form_ =
                     ]
                     [ text "Translation" ]
                 , input
-                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-light"
+                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--near-black br1 focus-shadow-faint"
                     , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-back"
@@ -396,7 +396,7 @@ viewError error =
         , HA.id errorSummaryId
         , HA.attribute "role" "group"
         , HA.attribute "aria-labelledby" headingId
-        , class "vs2 pa3 bg-washed-red ba bw1 br2 b--light-red focus-shadow-light"
+        , class "vs2 pa3 bg-washed-red near-black ba bw1 br2 b--light-red focus-shadow-faint"
         ]
         [ subSubHeading 3 [ HA.id headingId ] [ text "There is a problem" ]
         , paragraph [] [ text humanText ]
