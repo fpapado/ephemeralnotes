@@ -60,7 +60,7 @@ viewMap attrs mode entryData =
             [ HA.attribute "latitude" "60.1699"
             , HA.attribute "longitude" "24.9384"
             , HA.attribute "zoom" "12"
-            , HA.attribute "theme" (DarkMode.modeToString mode)
+            , HA.attribute "theme" (String.toLower <| DarkMode.modeToString mode)
             , class "flex flex-column flex-grow-1"
             ]
             markerNodes
