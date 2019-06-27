@@ -7,6 +7,7 @@ import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Navigation as Nav
 import Entry.Entry as Entry exposing (Entry)
+import Entry.Id
 import Html exposing (..)
 import Html.Attributes as HA exposing (class)
 import Html.Events as HE exposing (onClick)
@@ -22,6 +23,7 @@ import Process
 import RemoteData exposing (RemoteData)
 import Route exposing (Route)
 import ServiceWorker as SW
+import Set exposing (Set)
 import Store
 import Task
 import Time
@@ -98,16 +100,16 @@ view model =
         NotFound ->
             viewPage Page.Other (\_ -> Ignored) NotFound.view
 
-        Home home ->
-            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries } home)
+        Home homeModel ->
+            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries } homeModel)
 
         Map ->
             -- Map does not have any Msg at the moment, so we ignore it
             viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries })
 
-        Data data ->
+        Data dataModel ->
             -- Data does not have a model, but it does have a Msg
-            viewPage Page.Data GotDataMsg (Data.view { entries = model.entries })
+            viewPage Page.Data GotDataMsg (Data.view { entries = model.entries } dataModel)
 
 
 
@@ -215,6 +217,7 @@ update msg model =
         -- Store subscription messages
         ( FromStore storeMsg, _ ) ->
             case storeMsg of
+                -- For GotEntries, the expectation is that we replace the entry list completely
                 Store.GotEntries entries ->
                     ( { model | entries = RemoteData.Success entries }, Cmd.none )
 
@@ -228,6 +231,9 @@ update msg model =
                             RemoteData.map2 (\entry entries -> entry :: entries) entryData model.entries
                     in
                     ( { model | entries = newEntries }, Cmd.none )
+
+                Store.GotBatchImportedEntries num ->
+                    ( model, Cmd.none )
 
                 Store.BadMessage err ->
                     ( model, Log.error (JD.errorToString err) )
@@ -312,9 +318,9 @@ subscriptions model =
                 Map ->
                     Sub.none
 
-                -- Data does not have any subscriptions
+                -- Data has subscriptions
                 Data data ->
-                    Sub.none
+                    Sub.map GotDataMsg (Data.subscriptions data)
 
         alwaysSubs =
             [ Sub.map FromServiceWorker SW.sub, Sub.map FromStore Store.sub ]
@@ -369,6 +375,44 @@ viewInstallPrompt installPrompt =
                     ]
             }
         ]
+
+
+{-| Merge two lists of entries, keeping only a single id, prioritising the first list. |
+-}
+mergeEntryLists : List Entry -> List Entry -> List Entry
+mergeEntryLists list1 list2 =
+    let
+        rawMerged =
+            list1 ++ list2
+
+        initState =
+            ( [], Set.empty )
+
+        addIfNotSeen : Entry -> ( List Entry, Set String ) -> ( List Entry, Set String )
+        addIfNotSeen candidate ( listSoFar, seenIds ) =
+            let
+                -- Extract the id from the Entry, so we can compare it
+                -- TODO: Consider a tie-breaker with Version as well
+                id =
+                    case candidate of
+                        Entry.V1 entry ->
+                            Entry.Id.toString entry.id
+
+                haveSeenIdBefore =
+                    Set.member id seenIds
+            in
+            case haveSeenIdBefore of
+                -- If the id is in the ones we have seen, skip it
+                True ->
+                    ( listSoFar, seenIds )
+
+                -- If the id is not in the ones we have seen, add the item to the list
+                -- and the ids to the set
+                False ->
+                    ( candidate :: listSoFar, Set.insert id seenIds )
+    in
+    List.foldl addIfNotSeen initState rawMerged
+        |> Tuple.first
 
 
 

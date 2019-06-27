@@ -145,7 +145,8 @@ class LeafletPin extends HTMLElement {
     if (this.hasOwnProperty(prop)) {
       let value = this[prop];
       delete this[prop];
-      this[prop] = value;
+      // FIXME: TS does not like this, and it could very well be our fault :)
+      this[prop] = value as any;
     }
   }
 }

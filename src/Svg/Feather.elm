@@ -1,6 +1,7 @@
 module Svg.Feather exposing
     ( Purpose(..)
     , archive
+    , checkCircle
     , clipboard
     , map
     )
@@ -71,4 +72,12 @@ map =
         [ Svg.polygon [ points "1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" ] []
         , Svg.line [ x1 "8", y1 "2", x2 "8", y2 "18" ] []
         , Svg.line [ x1 "16", y1 "6", x2 "16", y2 "22" ] []
+        ]
+
+
+checkCircle : Purpose -> Html msg
+checkCircle =
+    svgFeatherIcon
+        [ Svg.path [ d "M22 11.08V12a10 10 0 1 1-5.93-9.14" ] []
+        , Svg.polyline [ points "22 4 12 14.01 9 11.01" ] []
         ]

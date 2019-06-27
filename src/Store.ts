@@ -10,13 +10,22 @@ import {Result, Result_Ok, Result_Error} from './Geolocation';
 
 // Store <-> Elm
 
-// ToElm
+// To Elm
 
 type EntryToElm = EntryV1 & {schema_version: number};
-type PartialEntryFromElm = Omit<EntryV1, 'id'> & {schema_version: number};
+
+// To Elm type constructors
 
 const GotEntries = (data: EntryToElm[]) => ({
   tag: 'GotEntries',
+  data,
+});
+
+const GotBatchImportedEntries = (
+  // TODO: Write a more accurate union type for IDBRequest
+  data: Result<DOMException['name'], number>
+) => ({
+  tag: 'GotBatchImportedEntries',
   data,
 });
 
@@ -25,12 +34,16 @@ const GotEntry = (data: Result<string, EntryToElm>) => ({
   data,
 });
 
+// From Elm
+type PartialEntryFromElm = Omit<EntryV1, 'id'> & {schema_version: number};
+
 export type FromElm =
   | {tag: 'StoreEntry'; data: PartialEntryFromElm}
+  | {tag: 'StoreBatchImportedEntries'; data: Array<EntryV1>}
   | {tag: 'GetEntries'};
 
 /** Respond to a Store.FromElm message */
-function handleSubMessage(
+async function handleSubMessage(
   sendToElm: Elm.Main.App['ports']['storeToElm']['send'],
   msg: FromElm
 ) {
@@ -45,7 +58,7 @@ function handleSubMessage(
 
   switch (msg.tag) {
     case 'StoreEntry':
-      storeAndGetEntry(msg.data)
+      storeAndGetPartialEntry(msg.data)
         .then(entry => {
           if (entry) {
             const entryToElm = {...entry, schema_version: 1};
@@ -66,6 +79,36 @@ function handleSubMessage(
         }));
         sendToElm(GotEntries(entriesToElm));
       });
+      return;
+
+    case 'StoreBatchImportedEntries':
+      // TODO: Should we be wrapping all the ports in try/catch? :thinking:
+      try {
+        const importNum = await storeBatchEntries(msg.data);
+
+        // Immediately inform Elm that we imported entries OK
+        sendToElm(GotBatchImportedEntries(Result_Ok(importNum)));
+
+        // Additionally, get all the entries and send them to Elm
+        getEntries().then(entries => {
+          const entriesToElm = entries.map(entry => ({
+            ...entry,
+            schema_version: 1,
+          }));
+          sendToElm(GotEntries(entriesToElm));
+        });
+      } catch (err) {
+        console.error(
+          'Error in StoreBatchImportedEntries:',
+          err && err instanceof DOMException ? err.name : 'UnaccountedError'
+        );
+        // Inform Elm that an error happened
+        sendToElm(
+          GotBatchImportedEntries(
+            Result_Error(err ? err.name : 'UnaccountedError')
+          )
+        );
+      }
       return;
 
     default:
@@ -102,8 +145,8 @@ interface DBV1 extends DBSchema {
   };
 }
 
-async function storeAndGetEntry(entry: PartialEntryFromElm) {
-  const key = await storeEntry(entry);
+async function storeAndGetPartialEntry(entry: PartialEntryFromElm) {
+  const key = await storePartialEntry(entry);
   return getEntry(key);
 }
 
@@ -117,13 +160,31 @@ async function getEntries() {
   return db.getAllFromIndex(ENTRY_STORE_NAME, Index.Time);
 }
 
-async function storeEntry(entry: PartialEntryFromElm) {
+async function storePartialEntry(entry: PartialEntryFromElm) {
   const db = await openEntryDB();
   // Generate a random id
   // TODO: Find the difference between this and autoIncrement
   const id = nanoid();
   const newEntry = {...entry, id};
   return db.add(ENTRY_STORE_NAME, newEntry);
+}
+
+async function storeBatchEntries(entries: Array<EntryV1>) {
+  const db = await openEntryDB();
+
+  console.log('Will add batch entries', entries);
+
+  // Add all entries in a single transaction
+  const tx = db.transaction('entries', 'readwrite');
+
+  // TODO: This will overwrite items with the same id
+  // Perhaps we should have an "overwrite same items" checkbox?
+  for (const entry of entries) {
+    // NOTE: It is important to await here, to propagate the error
+    await tx.store.put(entry);
+  }
+  await tx.done;
+  return entries.length;
 }
 
 async function openEntryDB() {

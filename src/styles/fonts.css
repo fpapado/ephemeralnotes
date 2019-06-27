@@ -9,7 +9,7 @@
 @font-face {
   font-family: 'PhantomSansVariable';
   font-display: swap;
-  src: url(/assets/fonts/phantom-sans-v4-variable.woff2) format('woff2');
+  src: url(/assets/fonts/phantom-sans-v5-variable.woff2) format('woff2');
   font-weight: 1 999;
 }
 
@@ -18,8 +18,8 @@
   font-family: 'PhantomSans';
   /* TODO: reconsider font-display for these */
   font-display: swap;
-  src: url(/assets/fonts/phantom-sans-v4-regular.woff2) format('woff2'),
-    url(/assets/fonts/phantom-sans-v4-regular.woff) format('woff');
+  src: url(/assets/fonts/phantom-sans-v5-regular.woff2) format('woff2'),
+    url(/assets/fonts/phantom-sans-v5-regular.woff) format('woff');
   font-weight: 400;
 }
 
@@ -27,8 +27,8 @@
 @font-face {
   font-family: 'PhantomSans';
   font-display: swap;
-  src: url(/assets/fonts/phantom-sans-v4-bold.woff2) format('woff2'),
-    url(/assets/fonts/phantom-sans-v4-bold.woff) format('woff');
+  src: url(/assets/fonts/phantom-sans-v5-bold.woff2) format('woff2'),
+    url(/assets/fonts/phantom-sans-v5-bold.woff) format('woff');
   font-weight: 700;
 }
 
@@ -43,5 +43,8 @@
     font-family: 'PhantomSansVariable', Arial, Helvetica, sans-serif;
     /* Normalise font-weight if not specified */
     font-variation-settings: 'wght' 1;
+  }
+  b {
+    font-variation-settings: 'wght' 700;
   }
 }
