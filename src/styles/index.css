@@ -9,6 +9,7 @@
 @import './visually-hidden.css';
 @import './enhanced-input.css';
 @import './grid-entries.css';
+@import './switch-toggle.css';
 
 /* Propagate height for leaflet map */
 .leaflet-map-wrapper {

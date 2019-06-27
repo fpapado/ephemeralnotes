@@ -11,6 +11,7 @@ module Page.Home exposing
 -}
 
 import AddEntryForm as Form exposing (Form)
+import DarkMode
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
 import Geolocation as Geo
@@ -76,6 +77,7 @@ viewContent context model =
                     [ heading 1 [] [ text "Ephemeral" ]
                     , paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. It works offline and everything is stored locally, on your device." ]
                     ]
+                , div [ class "mw5" ] [ DarkMode.viewSwitch DarkMode.Dark ]
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
