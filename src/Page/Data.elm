@@ -180,15 +180,18 @@ viewContent entryData model =
             [ div [ class "vs4 vs5-ns" ]
                 [ div [ class "vs3" ]
                     [ heading 1 [] [ text "Data" ]
-                    , section [ class "vs3" ]
-                        [ subHeading 2 [] [ text "Export" ]
-                        , viewExport entryData
+                    , paragraph []
+                        [ text "Data is saved locally to your device, in the browser you are using. It is never transmitted to a server or remote location. We recommend that you export your data regularly, to keep them backed up. You can use the utilities below to import and export data between your devices."
                         ]
-                    , section [ class "vs3" ]
-                        [ subHeading 2 [] [ text "Import" ]
-                        , viewImport
-                        , viewUploadData model.uploadData
-                        ]
+                    ]
+                , section [ class "vs3" ]
+                    [ subHeading 2 [] [ text "Export" ]
+                    , viewExport entryData
+                    ]
+                , section [ class "vs3" ]
+                    [ subHeading 2 [] [ text "Import" ]
+                    , viewImport
+                    , viewUploadData model.uploadData
                     ]
                 ]
             ]
@@ -207,9 +210,13 @@ viewExport entryData =
                 [ styledButtonBlue False
                     [ onClick (ClickedDownload entries) ]
                     [ text "Export Entries" ]
-                , paragraph
-                    [ class "measure" ]
-                    [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. In the future, you can use this file to import data into this application on another device." ]
+                , details [ class "vs3 f4" ]
+                    [ summary []
+                        [ text "About the export format" ]
+                    , paragraph
+                        []
+                        [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. In the future, you can use this file to import data into this application on another device." ]
+                    ]
                 ]
 
             _ ->
@@ -294,16 +301,16 @@ viewUploadData uploadData =
             ]
 
         -- NOTE: We keep the details of the ValidationError out of the live region, to avoid verbose announcements
-        , div [ class "ph3 pv2 bg-white ba bw1 br2" ]
-            [ case uploadData of
-                ValidationError error ->
-                    pre
+        , case uploadData of
+            ValidationError error ->
+                div [ class "ph3 pv2 bg-white ba bw1 br2" ]
+                    [ pre
                         [ class "pre overflow-x-auto" ]
                         [ text <| JD.errorToString error ]
+                    ]
 
-                _ ->
-                    text ""
-            ]
+            _ ->
+                text ""
         ]
 
 
