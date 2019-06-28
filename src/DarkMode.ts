@@ -100,6 +100,7 @@ async function getUserModePreference() {
 async function setInitialDarkMode() {
   const initialDarkMode = await getInitialDarkMode();
   setDocumentClass(initialDarkMode);
+  setThemeColorTagContent(initialDarkMode);
   return initialDarkMode;
 }
 

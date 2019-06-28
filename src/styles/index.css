@@ -30,6 +30,10 @@ html {
   --shadow-faint: #96ccff;
 }
 
+.b--color-faint {
+  border-color: var(--color-fg-faint);
+}
+
 .color-fg {
   color: var(--color-fg);
 }
