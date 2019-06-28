@@ -2,6 +2,7 @@ port module DarkMode exposing
     ( Mode(..)
     , ToElm(..)
     , inverse
+    , modeDecoder
     , modeToString
     , sub
     , toggleMode

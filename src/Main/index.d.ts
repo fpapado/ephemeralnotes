@@ -1,6 +1,7 @@
 // WARNING: Do not manually modify this file. It was generated using:
 // https://github.com/dillonkearns/elm-typescript-interop
 // Type definitions for Elm ports
+import * as DarkMode from '../DarkMode';
 
 export namespace Elm {
   namespace Main {
@@ -34,7 +35,7 @@ export namespace Elm {
     }
     export function init(options: {
       node?: HTMLElement | null;
-      flags: null;
+      flags: {initialDarkMode: DarkMode.Mode};
     }): Elm.Main.App;
   }
 }

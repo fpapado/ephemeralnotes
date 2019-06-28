@@ -6,9 +6,13 @@ import {getLocation, Result, Location, LocationError} from './Geolocation';
 import * as Store from './Store';
 import * as DarkMode from './DarkMode';
 
-export function runWith(Elm_: typeof Elm) {
+export async function runWith(Elm_: typeof Elm) {
+  // TODO: Consider `await` to make the rest of the paints synchronous
+  // Perhaps we could use it to pass to Elm?
+  const initialDarkMode = await DarkMode.setInitialDarkMode();
+
   // Start Elm app
-  const app = Elm_.Main.init({flags: null});
+  const app = Elm_.Main.init({flags: {initialDarkMode}});
 
   // PORTS
 

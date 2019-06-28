@@ -1,8 +1,5 @@
 module Main exposing (main)
 
--- import Page.Data as Data
--- import Page.Map as Map
-
 import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Navigation as Nav
@@ -32,6 +29,10 @@ import Ui exposing (..)
 import Url exposing (Url)
 
 
+
+-- MODEL
+
+
 type alias Model =
     { navKey : Nav.Key
     , page : PageModel
@@ -52,12 +53,48 @@ type PageModel
 
 
 
--- MODEL
+-- INIT
 
 
-init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url navKey =
+type alias Flags =
+    { initDarkMode : DarkMode.Mode
+    }
+
+
+defaultFlags : Flags
+defaultFlags =
+    { initDarkMode = DarkMode.Light
+    }
+
+
+flagsDecoder : JD.Decoder Flags
+flagsDecoder =
+    JD.map Flags
+        (JD.field "initialDarkMode" JD.string
+            |> JD.andThen DarkMode.modeDecoder
+        )
+
+
+init : JD.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init flagsValue url navKey =
     let
+        -- Decode the flags, and use their data
+        flagRes =
+            JD.decodeValue flagsDecoder flagsValue
+
+        _ =
+            Debug.log <| Debug.toString "YOOOOO"
+
+        -- Unwrap and skip the flag decoding error, passing default flags if so
+        -- This is probably fine, since atm flags are meant to be optional/preferences
+        flags =
+            case flagRes of
+                Ok flags_ ->
+                    flags_
+
+                Err decodingError ->
+                    defaultFlags
+
         -- Get the updated page model and init cmd
         ( modelWithPage, cmdWithPage ) =
             changeRouteTo (Route.fromUrl url)
@@ -67,7 +104,7 @@ init flags url navKey =
                 , swUpdate = SW.updateNone
                 , installPrompt = SW.installPromptNone
                 , entries = RemoteData.Loading
-                , darkMode = DarkMode.Light
+                , darkMode = flags.initDarkMode
                 }
     in
     -- Return those, plus the Main init msg
@@ -435,7 +472,7 @@ mergeEntryLists list1 list2 =
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program JD.Value Model Msg
 main =
     Browser.application
         { init = init
