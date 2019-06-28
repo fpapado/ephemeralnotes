@@ -58,6 +58,9 @@ function setMode(mode: Mode) {
   // First, set the mode in HTML
   setDocumentClass(mode);
 
+  // Set the meta theme-color content, if it exists
+  setThemeColorTagContent(mode);
+
   // Then, persist the mode
   persistUserModePreference(mode);
 }
@@ -69,6 +72,20 @@ function setDocumentClass(mode: Mode) {
     root.classList.add(DARK_CLASS);
   } else {
     root.classList.remove(DARK_CLASS);
+  }
+}
+
+function setThemeColorTagContent(mode: Mode) {
+  const themeColorTag: HTMLMetaElement | null = document.querySelector(
+    'meta[name="theme-color"]'
+  );
+
+  if (themeColorTag !== null) {
+    if (mode === DARK) {
+      themeColorTag.content = '#1b2029';
+    } else {
+      themeColorTag.content = '#ffffff';
+    }
   }
 }
 
