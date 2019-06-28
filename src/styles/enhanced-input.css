@@ -35,7 +35,7 @@
   outline: 4px solid transparent;
   outline-offset: 4px;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 4px var(--shadow-faint);
+  box-shadow: 0 0 0 4px var(--color-accent-faint);
 }
 
 .enhanced-checkbox-label::before {
@@ -49,7 +49,7 @@
   border: 2px solid currentColor;
   /* br1 */
   border-radius: 0.125rem;
-  background: #ffffff;
+  background: var(--color-bg-lighter);
 }
 
 .enhanced-checkbox--readonly .enhanced-checkbox-label::before {
@@ -75,7 +75,7 @@
   border: solid;
   border-width: 0 0 5px 5px;
   border-top-color: transparent;
-  color: #111;
+  color: var(--color-fg);
   opacity: 0;
   background: transparent;
 }

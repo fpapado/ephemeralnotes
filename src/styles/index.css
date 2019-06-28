@@ -17,7 +17,7 @@ html {
   --color-fg: #111111;
   --color-fg-faint: #aaaaaa;
   --color-accent: #0769d3;
-  --shadow-faint: rgba(3, 102, 214, 0.5);
+  --color-accent-faint: rgba(3, 102, 214, 0.5);
   color-scheme: light dark;
 }
 
@@ -27,11 +27,23 @@ html {
   --color-fg: #f4f4f4;
   --color-fg-faint: #666;
   --color-accent: #96ccff;
-  --shadow-faint: #96ccff;
+  --color-accent-faint: #96ccff;
+}
+
+.b--color-faint {
+  border-color: var(--color-fg-faint);
+}
+
+.b--color-fg {
+  border-color: var(--color-fg);
 }
 
 .color-fg {
   color: var(--color-fg);
+}
+
+.color-bg {
+  color: var(--color-bg);
 }
 
 .color-fg-faint {
