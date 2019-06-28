@@ -21,6 +21,7 @@ type Page
     | Home
     | Map
     | Data
+    | Settings
 
 
 type FocusState
@@ -133,6 +134,7 @@ viewNavBar page =
             [ navLink Route.Home "Entries" Feather.clipboard
             , navLink Route.Map "Map" Feather.map
             , navLink Route.Data "Data" Feather.archive
+            , navLink Route.Settings "Settings" Feather.gear
             ]
         ]
 
@@ -153,6 +155,9 @@ isActive page route =
             True
 
         ( Data, Route.Data ) ->
+            True
+
+        ( Settings, Route.Settings ) ->
             True
 
         _ ->

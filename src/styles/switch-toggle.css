@@ -15,6 +15,9 @@
   text-align: left;
   transition: box-shadow 0.2s ease-in-out;
   width: 100%;
+  transition: color, background-color;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
 }
 
 .switch-toggle:focus {

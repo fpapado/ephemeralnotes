@@ -151,8 +151,8 @@ modeDecoder str =
 @see <https://scottaohara.github.io/aria-switch-control/>
 @note we are not using the role="switch"+aria-checked=true|false, due to compatibility issues <https://scottaohara.github.io/a11y_styled_form_controls/src/checkbox--switch/>
 -}
-viewSwitch : { onClick : msg, mode : Mode } -> Html msg
-viewSwitch { onClick, mode } =
+viewSwitch : { onClick : msg, describedBy : Maybe String, mode : Mode } -> Html msg
+viewSwitch { onClick, describedBy, mode } =
     let
         textLabel =
             modeToString mode
@@ -167,8 +167,9 @@ viewSwitch { onClick, mode } =
     in
     div [ class "fw6 f4" ]
         [ button
-            [ class "switch-toggle"
+            [ class "switch-toggle color-fg"
             , HA.attribute "aria-pressed" (boolToStringAttr isChecked)
+            , HA.attribute "aria-describedby" (Maybe.withDefault "" describedBy)
             , HE.onClick onClick
             ]
             [ text "Dark mode"

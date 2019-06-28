@@ -15,6 +15,7 @@ type Route
     = Home
     | Map
     | Data
+    | Settings
 
 
 parser : Parser (Route -> a) a
@@ -22,6 +23,7 @@ parser =
     oneOf
         [ UrlParser.map Map (s "map")
         , UrlParser.map Data (s "data")
+        , UrlParser.map Settings (s "settings")
         , UrlParser.map Home UrlParser.top
         ]
 
@@ -68,5 +70,8 @@ routeToString page =
 
                 Data ->
                     [ "data" ]
+
+                Settings ->
+                    [ "settings" ]
     in
     "/" ++ String.join "/" pieces

@@ -17,6 +17,7 @@ import Page.Data as Data
 import Page.Home as Home
 import Page.Map as Map
 import Page.NotFound as NotFound
+import Page.Settings as Settings
 import Process
 import RemoteData exposing (RemoteData)
 import Route exposing (Route)
@@ -50,6 +51,7 @@ type PageModel
     | Home Home.Model
     | Map
     | Data Data.Model
+    | Settings
 
 
 
@@ -141,7 +143,7 @@ view model =
             viewPage Page.Other (\_ -> Ignored) NotFound.view
 
         Home homeModel ->
-            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries, darkMode = model.darkMode } homeModel)
+            viewPage Page.Home GotHomeMsg (Home.view { entries = model.entries } homeModel)
 
         Map ->
             -- Map does not have any Msg at the moment, so we ignore it
@@ -150,6 +152,10 @@ view model =
         Data dataModel ->
             -- Data does not have a model, but it does have a Msg
             viewPage Page.Data GotDataMsg (Data.view { entries = model.entries } dataModel)
+
+        Settings ->
+            -- Data does not have a model, but it does have a Msg
+            viewPage Page.Settings GotSettingsMsg (Settings.view { darkMode = model.darkMode })
 
 
 
@@ -168,6 +174,7 @@ type Msg
       -- Pages
     | GotHomeMsg Home.Msg
     | GotDataMsg Data.Msg
+    | GotSettingsMsg Settings.Msg
       -- Subs
     | FromServiceWorker SW.ToElm
     | FromStore Store.ToElm
@@ -202,10 +209,9 @@ changeRouteTo maybeRoute model =
             Data.init
                 |> updateWith (\m -> { model | page = Data m }) GotDataMsg model
 
-
-
--- Data.init
---     |> updateWith (\m -> { model | page = Data m }) GotDataMsg model
+        Just Route.Settings ->
+            -- Settings has no initialiser
+            ( { model | page = Settings }, Cmd.none )
 
 
 {-| Deferred focus after a setTimeout, to allow the rendering to settle
@@ -338,6 +344,15 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        ( GotSettingsMsg subMsg, { page } ) ->
+            case page of
+                Settings ->
+                    ( (), Settings.update subMsg )
+                        |> updateWith (\m -> { model | page = Settings }) GotSettingsMsg model
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
 updateWith toModel toMsg model ( subModel, subCmd ) =
@@ -371,6 +386,10 @@ subscriptions model =
                 -- Data has subscriptions
                 Data data ->
                     Sub.map GotDataMsg (Data.subscriptions data)
+
+                -- Settings does not have any subscriptions
+                Settings ->
+                    Sub.none
 
         alwaysSubs =
             [ Sub.map FromServiceWorker SW.sub

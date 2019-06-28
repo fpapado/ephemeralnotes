@@ -166,12 +166,6 @@ view { entries } model =
     }
 
 
-multiStyles : List ( String, String ) -> List (Html.Attribute msg)
-multiStyles styles =
-    styles
-        |> List.map (\( name, value ) -> HA.style name value)
-
-
 viewContent : EntryData -> Model -> Html Msg
 viewContent entryData model =
     div []

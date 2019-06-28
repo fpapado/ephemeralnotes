@@ -11,7 +11,6 @@ module Page.Home exposing
 -}
 
 import AddEntryForm as Form exposing (Form)
-import DarkMode
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
 import Geolocation as Geo
@@ -44,7 +43,6 @@ type alias Model =
 
 type alias Context =
     { entries : RemoteData String (List Entry)
-    , darkMode : DarkMode.Mode
     }
 
 
@@ -77,12 +75,6 @@ viewContent context model =
                 [ section [ class "vs3 vs4-ns" ]
                     [ heading 1 [] [ text "Ephemeral" ]
                     , paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. It works offline and everything is stored locally, on your device." ]
-                    ]
-                , div [ class "mw5" ]
-                    [ DarkMode.viewSwitch
-                        { onClick = ToggleDarkMode context.darkMode
-                        , mode = context.darkMode
-                        }
                     ]
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
@@ -186,17 +178,11 @@ type Msg
     | FormMsg Form.Msg
     | FromGeolocation Geo.ToElm
     | FromStore Store.ToElm
-    | ToggleDarkMode DarkMode.Mode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        -- DarkMode
-        -- TODO: Could do some optimistic UI updates here by storing it in themodel?
-        ToggleDarkMode mode ->
-            ( model, DarkMode.toggleMode mode )
-
         -- Form
         FormMsg formTransitionMsg ->
             let
