@@ -1,11 +1,9 @@
 module Main exposing (main)
 
--- import Page.Data as Data
--- import Page.Map as Map
-
 import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Navigation as Nav
+import DarkMode
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
 import Html exposing (..)
@@ -19,6 +17,7 @@ import Page.Data as Data
 import Page.Home as Home
 import Page.Map as Map
 import Page.NotFound as NotFound
+import Page.Settings as Settings
 import Process
 import RemoteData exposing (RemoteData)
 import Route exposing (Route)
@@ -31,6 +30,10 @@ import Ui exposing (..)
 import Url exposing (Url)
 
 
+
+-- MODEL
+
+
 type alias Model =
     { navKey : Nav.Key
     , page : PageModel
@@ -38,6 +41,7 @@ type alias Model =
     , swUpdate : SW.SwUpdate
     , installPrompt : SW.InstallPrompt
     , entries : RemoteData String (List Entry)
+    , darkMode : DarkMode.Mode
     }
 
 
@@ -47,15 +51,49 @@ type PageModel
     | Home Home.Model
     | Map
     | Data Data.Model
+    | Settings
 
 
 
--- MODEL
+-- INIT
 
 
-init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url navKey =
+type alias Flags =
+    { initDarkMode : DarkMode.Mode
+    }
+
+
+defaultFlags : Flags
+defaultFlags =
+    { initDarkMode = DarkMode.Light
+    }
+
+
+flagsDecoder : JD.Decoder Flags
+flagsDecoder =
+    JD.map Flags
+        (JD.field "initialDarkMode" JD.string
+            |> JD.andThen DarkMode.modeDecoder
+        )
+
+
+init : JD.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init flagsValue url navKey =
     let
+        -- Decode the flags, and use their data
+        flagRes =
+            JD.decodeValue flagsDecoder flagsValue
+
+        -- Unwrap and skip the flag decoding error, passing default flags if so
+        -- This is probably fine, since atm flags are meant to be optional/preferences
+        flags =
+            case flagRes of
+                Ok flags_ ->
+                    flags_
+
+                Err decodingError ->
+                    defaultFlags
+
         -- Get the updated page model and init cmd
         ( modelWithPage, cmdWithPage ) =
             changeRouteTo (Route.fromUrl url)
@@ -65,6 +103,7 @@ init flags url navKey =
                 , swUpdate = SW.updateNone
                 , installPrompt = SW.installPromptNone
                 , entries = RemoteData.Loading
+                , darkMode = flags.initDarkMode
                 }
     in
     -- Return those, plus the Main init msg
@@ -105,11 +144,15 @@ view model =
 
         Map ->
             -- Map does not have any Msg at the moment, so we ignore it
-            viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries })
+            viewPage Page.Map (\_ -> Ignored) (Map.view { entries = model.entries, darkMode = model.darkMode })
 
         Data dataModel ->
             -- Data does not have a model, but it does have a Msg
             viewPage Page.Data GotDataMsg (Data.view { entries = model.entries } dataModel)
+
+        Settings ->
+            -- Data does not have a model, but it does have a Msg
+            viewPage Page.Settings GotSettingsMsg (Settings.view { darkMode = model.darkMode })
 
 
 
@@ -128,9 +171,11 @@ type Msg
       -- Pages
     | GotHomeMsg Home.Msg
     | GotDataMsg Data.Msg
+    | GotSettingsMsg Settings.Msg
       -- Subs
     | FromServiceWorker SW.ToElm
     | FromStore Store.ToElm
+    | FromDarkMode DarkMode.ToElm
       -- SW prompts
     | AcceptUpdate
     | DeferUpdate
@@ -161,10 +206,9 @@ changeRouteTo maybeRoute model =
             Data.init
                 |> updateWith (\m -> { model | page = Data m }) GotDataMsg model
 
-
-
--- Data.init
---     |> updateWith (\m -> { model | page = Data m }) GotDataMsg model
+        Just Route.Settings ->
+            -- Settings has no initialiser
+            ( { model | page = Settings }, Cmd.none )
 
 
 {-| Deferred focus after a setTimeout, to allow the rendering to settle
@@ -238,6 +282,15 @@ update msg model =
                 Store.BadMessage err ->
                     ( model, Log.error (JD.errorToString err) )
 
+        -- Dark mode
+        ( FromDarkMode darkModeMsg, _ ) ->
+            case darkModeMsg of
+                DarkMode.ModeSet mode ->
+                    ( { model | darkMode = mode }, Cmd.none )
+
+                DarkMode.BadMessage err ->
+                    ( model, Log.error (JD.errorToString err) )
+
         -- Global page concerns
         -- For example, the Service Worker messages can apear anywhere
         -- Service worker messages
@@ -288,6 +341,15 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        ( GotSettingsMsg subMsg, { page } ) ->
+            case page of
+                Settings ->
+                    ( (), Settings.update subMsg )
+                        |> updateWith (\m -> { model | page = Settings }) GotSettingsMsg model
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
 updateWith toModel toMsg model ( subModel, subCmd ) =
@@ -322,8 +384,15 @@ subscriptions model =
                 Data data ->
                     Sub.map GotDataMsg (Data.subscriptions data)
 
+                -- Settings does not have any subscriptions
+                Settings ->
+                    Sub.none
+
         alwaysSubs =
-            [ Sub.map FromServiceWorker SW.sub, Sub.map FromStore Store.sub ]
+            [ Sub.map FromServiceWorker SW.sub
+            , Sub.map FromStore Store.sub
+            , Sub.map FromDarkMode DarkMode.sub
+            ]
     in
     Sub.batch (alwaysSubs ++ [ pageSubs ])
 
@@ -419,7 +488,7 @@ mergeEntryLists list1 list2 =
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program JD.Value Model Msg
 main =
     Browser.application
         { init = init

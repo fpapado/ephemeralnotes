@@ -15,13 +15,17 @@
 </head>
 
 <body>
-  <div class="min-vh-100 flex flex-column bg-washed-blue near-black f-phantomsans">
-    <header class="pv2 navy bg-white shadow-1">
+  <div class="min-vh-100 flex flex-column bg-color-bg color-fg f-phantomsans elm-root">
+    <header class="pv2 bg-color-lighter color-fg-faint bb">
       <a href="#main" class="pa3 tc near-white bg-blue skip-link">
         skip to content
       </a>
-      <nav class="tc">
-        <a href="/" class="f3 fw7 link navy tc">Ephemeral</a>
+      <nav class="navigation-container">
+        <a href="/" class="f3 fw7 link color-accent tc navigation-home">Ephemeral</a>
+        <div class="navigation-bar w-100 bg-color-lighter">
+          <div class="navigation-bar-flex shell-min-nav">
+          </div>
+        </div>
       </nav>
     </header>
     <main id="main" class="pa3 flex flex-column flex-auto" tabindex="-1">
@@ -32,7 +36,7 @@
             <p class="mv0 f5 f4-ns lh-copy">
               Sorry, Ephemeral requires Javascript to run. This is because it does everything on the client, after the
               initial hand-off
-              from the server. I don't want to have people's data, and a server-only version would need that to be
+              from the server. I don't want to have people's data, and a server-only version (one that can work without client Javascript) would need that to be
               effective.
             </p>
           </div>

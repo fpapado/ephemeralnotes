@@ -166,12 +166,6 @@ view { entries } model =
     }
 
 
-multiStyles : List ( String, String ) -> List (Html.Attribute msg)
-multiStyles styles =
-    styles
-        |> List.map (\( name, value ) -> HA.style name value)
-
-
 viewContent : EntryData -> Model -> Html Msg
 viewContent entryData model =
     div []
@@ -303,7 +297,7 @@ viewUploadData uploadData =
         -- NOTE: We keep the details of the ValidationError out of the live region, to avoid verbose announcements
         , case uploadData of
             ValidationError error ->
-                div [ class "ph3 pv2 bg-white ba bw1 br2" ]
+                div [ class "ph3 pv2 bg-color-bg color-fg ba bw1 br2" ]
                     [ pre
                         [ class "pre overflow-x-auto" ]
                         [ text <| JD.errorToString error ]

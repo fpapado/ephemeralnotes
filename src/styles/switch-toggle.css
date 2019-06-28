@@ -1,0 +1,82 @@
+/**
+  * Based on the work and research by Scott O' Hara
+  * https://github.com/scottaohara/a11y_styled_form_controls
+  * https://github.com/scottaohara/a11y_styled_form_controls/blob/master/LICENSE
+*/
+.switch-toggle {
+  background: none;
+  border: none;
+  display: block;
+  font-size: inherit;
+  line-height: 1;
+  margin: 1em 0 0;
+  padding: 0.5em 0;
+  position: relative;
+  text-align: left;
+  transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+.switch-toggle:focus {
+  outline: none;
+}
+
+/* negate 'flash' of text color when pressing a button in some browsers */
+.switch-toggle:active {
+  color: inherit;
+}
+
+/* using the before/after pseudo elements of the span to create the "switch" */
+.switch-toggle span:before,
+.switch-toggle span:after {
+  border: 1px solid #565656;
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* styling specific to the knob of the switch */
+.switch-toggle span:after {
+  background: #fff;
+  border-radius: 100%;
+  height: 1.5em;
+  right: 0.25em;
+  transform: translateX(-1.25em) translateY(-50%);
+  transition: transform 0.1825s ease-in-out;
+  width: 1.5em;
+}
+
+/* styling specific to the knob "container" */
+.switch-toggle span:before {
+  background: #eee;
+  border-radius: 1.75em;
+  height: 1.75em;
+  right: 0.25em;
+  transition: background 0.2s ease-in-out;
+  width: 2.75em;
+}
+
+.switch-toggle span {
+  pointer-events: none;
+}
+
+.switch-toggle:hover span:before,
+.switch-toggle:focus span:before {
+  outline: 4px solid transparent;
+  box-shadow: 0 0 0 3px var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* change the position of the knob to indicate it has been checked*/
+.switch-toggle[aria-pressed='true'] span:after {
+  /* Make a performant animation by FLIP-ing (inverting) the transform */
+  transform: none;
+  transform: translateY(-50%);
+}
+
+/* update the color of the "container" to further visually indicate state */
+.switch-toggle[aria-pressed='true'] span:before {
+  background: var(--color-accent);
+}

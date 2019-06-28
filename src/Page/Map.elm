@@ -1,5 +1,6 @@
 module Page.Map exposing (view)
 
+import DarkMode
 import Entry.Entry as Entry exposing (Entry)
 import Entry.Id
 import Html exposing (..)
@@ -13,6 +14,7 @@ import Ui exposing (centeredContainerWide, heading, paragraph)
 
 type alias Context =
     { entries : EntryData
+    , darkMode : DarkMode.Mode
     }
 
 
@@ -28,16 +30,16 @@ view context =
 
 
 viewContent : Context -> Html msg
-viewContent { entries } =
+viewContent { entries, darkMode } =
     centeredContainerWide
         [ class "w-100 flex flex-column flex-grow-1" ]
         [ heading 1 [ class "visually-hidden" ] [ text "Map" ]
-        , viewMap [ class "flex flex-column flex-grow-1" ] entries
+        , viewMap [ class "flex flex-column flex-grow-1" ] darkMode entries
         ]
 
 
-viewMap : List (Html.Attribute msg) -> EntryData -> Html msg
-viewMap attrs entryData =
+viewMap : List (Html.Attribute msg) -> DarkMode.Mode -> EntryData -> Html msg
+viewMap attrs mode entryData =
     let
         markerNodes =
             case entryData of
@@ -58,6 +60,7 @@ viewMap attrs entryData =
             [ HA.attribute "latitude" "60.1699"
             , HA.attribute "longitude" "24.9384"
             , HA.attribute "zoom" "12"
+            , HA.attribute "theme" (String.toLower <| DarkMode.modeToString mode)
             , class "flex flex-column flex-grow-1"
             ]
             markerNodes

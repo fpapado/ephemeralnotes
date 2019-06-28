@@ -51,17 +51,21 @@ ${styleResult.text ? `<style>${styleResult.text}</style>` : ''}
 export type AddToLayerCb = (marker: L.Marker) => void;
 export type RemoveFromLayerCb = (marker: L.Marker) => void;
 
-type ObservedAttribute = 'latitude' | 'longitude' | 'zoom';
+type ObservedAttribute = 'latitude' | 'longitude' | 'zoom' | 'theme';
 type ReflectedAttribute = 'latitude' | 'longitude' | 'zoom';
-type Property = 'latitude' | 'longitude' | 'zoom';
+type Property = 'latitude' | 'longitude' | 'zoom' | 'theme';
+
+type Theme = 'dark' | 'light';
 
 class LeafletMap extends HTMLElement {
   latitude?: number;
   longitude?: number;
   zoom?: number;
+  theme?: Theme;
   private $mapContainer: HTMLDivElement;
   private observer: MutationObserver;
   private map?: L.Map | null;
+  private tileLayer?: L.TileLayer | null;
   private markersLayer?: L.LayerGroup | null;
   private isConnectedForReal = false;
 
@@ -102,6 +106,7 @@ class LeafletMap extends HTMLElement {
     this.upgradeProperty('latitude');
     this.upgradeProperty('longitude');
     this.upgradeProperty('zoom');
+    this.upgradeProperty('theme');
 
     // Only actually parse the stylesheet when the first instance is connected.
     if (styleResult.sheet && styleResult.sheet.cssRules.length === 0) {
@@ -109,16 +114,14 @@ class LeafletMap extends HTMLElement {
     }
 
     this.map = L.map(this.$mapContainer);
+    this.tileLayer = L.tileLayer(getTileUrl(this.theme), {
+      attribution:
+        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+      // id: 'stamen.toner',
+      maxZoom: 13,
+    });
 
-    L.tileLayer(
-      'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
-      {
-        attribution:
-          'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-        // id: 'stamen.toner',
-        maxZoom: 13,
-      }
-    ).addTo(this.map);
+    this.tileLayer.addTo(this.map);
 
     this.markersLayer = (L as any).markerClusterGroup();
     this.map.addLayer(this.markersLayer!);
@@ -150,9 +153,16 @@ class LeafletMap extends HTMLElement {
   }
 
   attributeChangedCallback(name: ObservedAttribute, oldVal: any, newVal: any) {
-    this[name] = parseFloat(newVal);
-    if (this.isConnectedForReal) {
-      this.setMapView();
+    if (name === 'theme') {
+      if (this.tileLayer) {
+        this.tileLayer.setUrl(getTileUrl(newVal));
+      }
+    }
+    if (name === 'latitude' || name === 'longitude' || name === 'zoom') {
+      this[name] = parseFloat(newVal);
+      if (this.isConnectedForReal) {
+        this.setMapView();
+      }
     }
   }
 
@@ -199,15 +209,27 @@ class LeafletMap extends HTMLElement {
     if (this.hasOwnProperty(prop)) {
       let value = this[prop];
       delete this[prop];
-      this[prop] = value;
+      // FIXME: this is hellish
+      this[prop] = value as any;
     } else {
       const attr = this.getAttribute(prop);
-      if (attr) {
-        this[prop] = parseFloat(attr);
+      if (prop === 'latitude' || prop === 'longitude' || prop === 'zoom') {
+        this[prop] = parseFloat(attr as any);
+      } else {
+        this[prop] = attr as any;
       }
     }
   }
 }
 
-export const define = () =>
+export const define = () => {
   window.customElements.define('leaflet-map', LeafletMap);
+};
+
+function getTileUrl(theme?: Theme) {
+  if (theme === 'dark') {
+    return 'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png';
+  } else {
+    return 'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png';
+  }
+}

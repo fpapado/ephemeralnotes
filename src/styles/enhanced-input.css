@@ -9,6 +9,10 @@
   height: 40px;
 }
 
+.enhanced-input-text:focus {
+  border-color: var(--color-accent);
+}
+
 .enhanced-checkbox-container {
   position: relative;
   padding-left: 40px;
@@ -30,7 +34,8 @@
 .enhanced-checkbox-input:focus + .enhanced-checkbox-label::before {
   outline: 4px solid transparent;
   outline-offset: 4px;
-  box-shadow: 0 0 0 4px rgba(3, 102, 214, 0.5);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px var(--shadow-faint);
 }
 
 .enhanced-checkbox-label::before {
@@ -70,6 +75,7 @@
   border: solid;
   border-width: 0 0 5px 5px;
   border-top-color: transparent;
+  color: #111;
   opacity: 0;
   background: transparent;
 }

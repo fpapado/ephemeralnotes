@@ -4,10 +4,15 @@ import {listenForWaitingSW} from './sw-utils';
 import {Elm} from './Main/index';
 import {getLocation, Result, Location, LocationError} from './Geolocation';
 import * as Store from './Store';
+import * as DarkMode from './DarkMode';
 
-export function runWith(Elm_: typeof Elm) {
+export async function runWith(Elm_: typeof Elm) {
+  // TODO: Consider `await` to make the rest of the paints synchronous
+  // Perhaps we could use it to pass to Elm?
+  const initialDarkMode = await DarkMode.setInitialDarkMode();
+
   // Start Elm app
-  const app = Elm_.Main.init({flags: null});
+  const app = Elm_.Main.init({flags: {initialDarkMode}});
 
   // PORTS
 
@@ -158,5 +163,11 @@ export function runWith(Elm_: typeof Elm) {
   app.ports.storeFromElm.subscribe(unkMsg => {
     let msg = unkMsg as Store.FromElm;
     Store.handleSubMessage(app.ports.storeToElm.send, msg);
+  });
+
+  // DarkMode <-> Elm
+  app.ports.darkModeFromElm.subscribe(unkMsg => {
+    let msg = unkMsg as DarkMode.FromElm;
+    DarkMode.handleSubMessage(app.ports.darkModeToElm.send, msg);
   });
 }
