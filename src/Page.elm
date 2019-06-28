@@ -87,12 +87,12 @@ viewShell children =
 
 viewHeader : Page -> Html msg
 viewHeader activePage =
-    header [ class "pv2 navy bg-white shadow-1" ]
+    header [ class "pv2 bg-color-lighter color-fg-faint bb" ]
         [ skipLink
         , nav [ class "navigation-container" ]
             [ a
                 [ Route.href Route.Home
-                , class "f3 fw7 link navy tc navigation-home"
+                , class "f3 fw7 link color-accent tc navigation-home"
                 ]
                 [ text "Ephemeral" ]
             , viewNavBar activePage
@@ -119,8 +119,8 @@ viewNavBar page =
                 ([ Route.href route
                  , classList
                     [ ( "db f5 f4-ns link", True )
-                    , ( "near-black", not isActivePage )
-                    , ( "blue fill-blue", isActivePage )
+                    , ( "color-fg", not isActivePage )
+                    , ( "color-accent", isActivePage )
                     ]
                  ]
                     ++ ariaCurrent
@@ -129,7 +129,7 @@ viewNavBar page =
                 , div [] [ text displayText ]
                 ]
     in
-    div [ class "navigation-bar w-100 bg-white" ]
+    div [ class "navigation-bar w-100 bg-color-lighter lh-title" ]
         [ div [ class "navigation-bar-flex" ]
             [ navLink Route.Home "Entries" Feather.clipboard
             , navLink Route.Map "Map" Feather.map

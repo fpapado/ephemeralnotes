@@ -58,7 +58,7 @@ viewContent darkMode =
             []
             [ div [ class "vs4" ]
                 [ heading 1 [] [ text "Settings" ]
-                , div [ class "vs3 measure" ]
+                , div [ class "vs3 f4 measure" ]
                     [ DarkMode.viewSwitch
                         { onClick = ToggleDarkMode darkMode
                         , describedBy = Just darkModeDescriptionId

@@ -11,16 +11,22 @@
 @import './grid-entries.css';
 @import './switch-toggle.css';
 
-:root {
+html {
   --color-bg: #f6fffe;
+  --color-bg-lighter: #fff;
   --color-fg: #111111;
+  --color-fg-faint: #aaaaaa;
+  --color-accent: #0769d3;
   --shadow-faint: rgba(3, 102, 214, 0.5);
   color-scheme: light dark;
 }
 
 .dark-mode {
-  --color-bg: #111717;
+  --color-bg: hsl(180, 15%, 7.8%);
+  --color-bg-lighter: hsl(180, 15%, 14%);
   --color-fg: #f4f4f4;
+  --color-fg-faint: #666;
+  --color-accent: #96ccff;
   --shadow-faint: #96ccff;
 }
 
@@ -28,14 +34,40 @@
   color: var(--color-fg);
 }
 
+.color-fg-faint {
+  color: var(--color-fg-faint);
+}
+
+.color-accent {
+  color: var(--color-accent);
+}
+
 .bg-color-bg {
   background-color: var(--color-bg);
 }
 
-.elm-root {
-  transition: color, background-color;
+.bg-color-lighter {
+  background-color: var(--color-bg-lighter);
+}
+
+.elm-root,
+header,
+.navigation-bar {
+  transition-property: color, background-color, border-color;
   transition-duration: 0.5s;
   transition-timing-function: ease;
+}
+
+/** Static shell tricks */
+.shell-min-nav {
+  /* f5 * lh-title + svg height */
+  min-height: calc(1rem * 1.25 + 20px * 1.25);
+}
+/* f4 * lh-title + svg height */
+@media screen and (min-width: 30em) {
+  .shell-min-nav {
+    min-height: calc(1.25rem * 1.25 + 20px * 1.25);
+  }
 }
 
 /* Propagate height for leaflet map */
@@ -85,7 +117,9 @@ leaflet-map:not(:defined) {
     bottom: 0;
     left: 0;
     z-index: 9000;
-    box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
+    border-color: var(--color-fg-faint);
+    border-top-width: 1px;
+    border-top-style: solid;
 
     padding: 0.5rem;
     justify-content: center;

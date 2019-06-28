@@ -84,9 +84,6 @@ init flagsValue url navKey =
         flagRes =
             JD.decodeValue flagsDecoder flagsValue
 
-        _ =
-            Debug.log <| Debug.toString "YOOOOO"
-
         -- Unwrap and skip the flag decoding error, passing default flags if so
         -- This is probably fine, since atm flags are meant to be optional/preferences
         flags =
