@@ -47,16 +47,7 @@ module.exports = {
       preload: ['main'],
       chunks: 'initial',
     }),
-    ifProduction(
-      new ForkTsCheckerWebpackPlugin({
-        async: false,
-        useTypescriptIncrementalApi: true,
-        memoryLimit: 4096,
-      }),
-      new ForkTsCheckerWebpackPlugin({
-        useTypescriptIncrementalApi: true,
-      })
-    ),
+    ifNotProduction(new ForkTsCheckerWebpackPlugin()),
     new ForkTsCheckerNotifierWebpackPlugin({
       title: 'Typescript',
       excludeWarnings: false,
@@ -123,7 +114,12 @@ module.exports = {
       },
       {
         test: /.tsx?$/,
-        use: [{loader: 'ts-loader', options: {transpileOnly: true}}],
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {transpileOnly: ifProduction(false, true)},
+          },
+        ],
       },
       {
         test: /\.css$/,
