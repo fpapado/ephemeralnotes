@@ -22,8 +22,8 @@ html {
 }
 
 .dark-mode {
-  --color-bg: hsl(180, 15%, 7.8%);
-  --color-bg-lighter: hsl(180, 15%, 14%);
+  --color-bg: #111717;
+  --color-bg-lighter: #1b2029;
   --color-fg: #f4f4f4;
   --color-fg-faint: #666;
   --color-accent: #96ccff;
@@ -54,7 +54,7 @@ html {
 header,
 .navigation-bar {
   transition-property: color, background-color, border-color;
-  transition-duration: 0.5s;
+  transition-duration: 0.4s;
   transition-timing-function: ease;
 }
 
