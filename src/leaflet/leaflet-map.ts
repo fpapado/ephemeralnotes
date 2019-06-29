@@ -1,4 +1,4 @@
-import L from 'leaflet';
+import L, {control} from 'leaflet';
 
 // NOTE: This plugin assumes a global 'L' being available, because it is old-school cool
 // doing import '' means that side-effects can be run
@@ -113,12 +113,16 @@ class LeafletMap extends HTMLElement {
       (styleResult.sheet as any).replaceSync(styleText);
     }
 
-    this.map = L.map(this.$mapContainer);
+    this.map = L.map(this.$mapContainer, {
+      bounceAtZoomLimits: true,
+      zoomControl: false,
+    });
+    this.map.addControl(control.zoom({position: 'bottomright'}));
     this.tileLayer = L.tileLayer(getTileUrl(this.theme), {
       attribution:
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
       // id: 'stamen.toner',
-      maxZoom: 13,
+      maxZoom: 17,
     });
 
     this.tileLayer.addTo(this.map);
