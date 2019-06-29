@@ -18,6 +18,7 @@ html {
   --color-fg-faint: #aaaaaa;
   --color-accent: #0769d3;
   --color-accent-faint: rgba(3, 102, 214, 0.5);
+  --map-bg: #dddddd;
   color-scheme: light dark;
 }
 
@@ -28,6 +29,7 @@ html {
   --color-fg-faint: #666;
   --color-accent: #96ccff;
   --color-accent-faint: #96ccff;
+  --map-bg: var(--color-bg-lighter);
 }
 
 .b--color-faint {
