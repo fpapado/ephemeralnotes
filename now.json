@@ -11,49 +11,57 @@
   ],
   "routes": [
     {
-      "src": "main-.*",
+      "src": "^/(main-.*)",
+      "dest": "/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
-      "src": "leaflet-.*",
+      "src": "^/(leaflet-.*)",
+      "dest": "/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
-      "src": "vendors~.*",
+      "src": "^/(vendors~.*)",
+      "dest": "/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
-      "src": "^/workbox-.*/.*.js",
+      "src": "^/workbox-(.*)",
+      "dest": "/workbox-$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
-      "src": "^/assets/fonts/phantom-sans-v.*",
+      "src": "^/assets/fonts/(.*)",
+      "dest": "/assets/fonts/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
       "src": "^/assets/images/marker.*",
+      "dest": "/assets/images/marker$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
-      "src": "precache-manifest.*.js",
+      "src": "^/(precache-manifest.*.js)",
+      "dest": "/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
       "src": "sw.js",
+      "dest": "sw.js",
       "headers": {
         "cache-control": "no-cache"
       }
