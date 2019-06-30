@@ -46,6 +46,13 @@
       }
     },
     {
+      "src": "^/favicon.ico",
+      "dest": "/favicon.ico",
+      "headers": {
+        "cache-control": "no-cache"
+      }
+    },
+    {
       "src": "^/assets/fonts/(.*)",
       "dest": "/assets/fonts/$1",
       "headers": {
