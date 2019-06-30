@@ -73,7 +73,7 @@ viewContent context model =
         [ Ui.centeredContainer
             []
             [ div [ class "vs4 vs5-ns" ]
-                [ section [ class "vs3 vs4-ns" ]
+                [ div [ class "vs3" ]
                     [ heading 1 [] [ text "Ephemeral" ]
                     , About.viewPitch
                     ]
