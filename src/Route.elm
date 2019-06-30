@@ -16,6 +16,7 @@ type Route
     | Map
     | Data
     | Settings
+    | About
 
 
 parser : Parser (Route -> a) a
@@ -24,6 +25,7 @@ parser =
         [ UrlParser.map Map (s "map")
         , UrlParser.map Data (s "data")
         , UrlParser.map Settings (s "settings")
+        , UrlParser.map About (s "about")
         , UrlParser.map Home UrlParser.top
         ]
 
@@ -73,5 +75,8 @@ routeToString page =
 
                 Settings ->
                     [ "settings" ]
+
+                About ->
+                    [ "about" ]
     in
     "/" ++ String.join "/" pieces

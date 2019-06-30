@@ -22,6 +22,7 @@ type Page
     | Map
     | Data
     | Settings
+    | About
 
 
 type FocusState
@@ -49,14 +50,14 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
                 -- When focusing, set tabindex to -1
                 Focusing ->
                     [ id "main"
-                    , class "pa3 flex flex-column flex-auto"
+                    , class "ph3 pb3 flex flex-column flex-auto"
                     , tabindex -1
                     ]
 
                 -- When the user tabs past, then the state should be set to FocusPastMain
                 FocusOnMain ->
                     [ id "main"
-                    , class "pa3 flex flex-column flex-auto"
+                    , class "ph3 pb3 flex flex-column flex-auto"
                     , tabindex -1
                     , onBlur onBlurredMain
                     ]
@@ -64,7 +65,7 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
                 -- In other cases, no need for focus attributes
                 _ ->
                     [ id "main"
-                    , class "pa3 flex flex-column flex-auto"
+                    , class "ph3 pb3 flex flex-column flex-auto"
                     ]
 
         viewMain =
@@ -87,14 +88,26 @@ viewShell children =
 
 viewHeader : Page -> Html msg
 viewHeader activePage =
-    header [ class "pv2 bg-color-lighter color-fg-faint bb" ]
+    header [ class "navigation-header pv2 bg-color-lighter color-fg-faint bb lh-title" ]
         [ skipLink
         , nav [ class "navigation-container" ]
-            [ a
-                [ Route.href Route.Home
-                , class "f3 fw7 link color-accent tc navigation-home"
+            [ div [ class "flex items-center mw7 center" ]
+                [ a
+                    [ Route.href Route.Home
+                    , class "w-100 db f3 fw7 link color-accent tc navigation-home"
+                    ]
+                    [ text "Ephemeral" ]
+                , a
+                    [ Route.href Route.About
+                    , classList
+                        [ ( "db ml2 link lh-solid", True )
+                        , ( "color-fg", not (isActive activePage Route.About) )
+                        , ( "color-accent", isActive activePage Route.About )
+                        ]
+                    ]
+                    [ Feather.info (Feather.Content { label = "Info" })
+                    ]
                 ]
-                [ text "Ephemeral" ]
             , viewNavBar activePage
             ]
         ]
@@ -158,6 +171,9 @@ isActive page route =
             True
 
         ( Settings, Route.Settings ) ->
+            True
+
+        ( About, Route.About ) ->
             True
 
         _ ->

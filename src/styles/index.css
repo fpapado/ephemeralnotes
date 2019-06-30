@@ -103,6 +103,16 @@ leaflet-map:not(:defined) {
   * On short and wide screens?
   * On short and narrow screens?
 */
+/* The navigation header (header) is sticky top, except on TODO */
+.navigation-header {
+  position: fixed;
+  top: 0;
+  z-index: 9000;
+  width: 100%;
+}
+main {
+  padding-top: 5rem;
+}
 /* Enhance from narrow -> wide screen */
 .navigation-container {
   text-align: center;
@@ -125,6 +135,9 @@ leaflet-map:not(:defined) {
 @media screen and (min-height: 34rem) {
   .navigation-container {
     display: block;
+  }
+  main {
+    padding-top: 4rem;
   }
   .navigation-bar {
     position: fixed;
