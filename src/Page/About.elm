@@ -91,7 +91,7 @@ viewFaq =
             , paragraph []
                 [ text "Locally, on your device. Web browsers, like Chrome, Firefox and Safari, provide ways to store data, local to a device per website. The storage limit is around 50MB, which is plenty of words and locations." ]
             , paragraph []
-                [ text "Apart from the initial code required to run the application, no other data is transmitted to the server. No analytics, no synchronisation, nothing." ]
+                [ text "Apart from the code required to run the application, no other data is stored on the server. No analytics, no synchronisation, nothing." ]
             , paragraph []
                 [ text "The entries stored are typically permanent, though a browser may clear data if you are low on storage and haven't accessed the content in a while. This is the reason we provide the "
                 , a [ Route.href Route.Data, class "color-accent" ] [ text "Data page." ]
