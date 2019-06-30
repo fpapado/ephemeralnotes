@@ -20,6 +20,7 @@ html {
   --color-accent-faint: rgba(3, 102, 214, 0.5);
   --map-bg: #dddddd;
   color-scheme: light dark;
+  hyphens: auto;
 }
 
 .dark-mode {
@@ -103,13 +104,6 @@ leaflet-map:not(:defined) {
   * On short and wide screens?
   * On short and narrow screens?
 */
-/* The navigation header (header) is sticky top, except on TODO */
-.navigation-header {
-  position: fixed;
-  top: 0;
-  z-index: 9000;
-  width: 100%;
-}
 /* Enhance from narrow -> wide screen */
 .navigation-container {
   display: flex;
@@ -133,15 +127,15 @@ leaflet-map:not(:defined) {
   display: flex;
   align-items: center;
 }
+main {
+  padding-top: 1rem;
+}
 /* Horizontal spacing without leftover space */
 .navigation-bar-flex > * + * {
   margin-left: 1rem;
 }
-/** Safe area for main (more predictable like this, than sticky) */
-main {
-  padding-top: 5rem;
-}
 
+/** On taller screens, the navigation becomes sticky bottom */
 @media screen and (min-height: 34rem) {
   .navigation-container {
     display: block;
@@ -181,12 +175,22 @@ main {
     justify-content: space-around;
     justify-content: space-evenly;
   }
-  /** Safe area for main (more predictable like this, than sticky) */
-  main {
-    padding-top: 4rem;
-  }
   /* Set a safe area for the footer (and other content) */
   .footer {
     margin-bottom: 4rem;
+  }
+}
+
+/** On even taller screens, the title + info header is sticky as well */
+@media screen and (min-height: 48rem) {
+  .navigation-header {
+    position: fixed;
+    top: 0;
+    z-index: 9000;
+    width: 100%;
+  }
+  /** Safe area for main (more predictable like this, than sticky) */
+  main {
+    padding-top: 4rem;
   }
 }
