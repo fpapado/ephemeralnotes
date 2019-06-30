@@ -92,15 +92,17 @@ viewHeader activePage =
         [ skipLink
         , nav [ class "navigation-container" ]
             [ div [ class "navigation-title-about flex items-center mw7" ]
-                [ a
-                    [ Route.href Route.Home
-                    , class "w-100 db f3 fw7 link color-accent tc navigation-home"
+                [ div [ class "w-100" ]
+                    [ a
+                        [ Route.href Route.Home
+                        , class "f3 fw7 link color-accent tc navigation-home"
+                        ]
+                        [ text "Ephemeral" ]
                     ]
-                    [ text "Ephemeral" ]
                 , a
                     [ Route.href Route.About
                     , classList
-                        [ ( "db ml2 link lh-solid", True )
+                        [ ( "ml2 link lh-solid", True )
                         , ( "color-fg", not (isActive activePage Route.About) )
                         , ( "color-accent", isActive activePage Route.About )
                         ]

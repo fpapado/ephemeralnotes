@@ -32,10 +32,10 @@
 }
 
 .enhanced-checkbox-input:focus + .enhanced-checkbox-label::before {
-  outline: 4px solid transparent;
-  outline-offset: 4px;
+  outline: 3px solid transparent;
+  outline-offset: 3px;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 4px var(--color-accent-faint);
+  box-shadow: 0 0 0 3px var(--color-accent-faint);
 }
 
 .enhanced-checkbox-label::before {

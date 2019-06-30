@@ -17,8 +17,7 @@
   transition: color 0.15s ease-in, background-color 0.15s ease-in;
 }
 .link:focus {
-  outline: 4px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-accent);
 }
 .button-link {
   text-decoration: none;
@@ -34,10 +33,10 @@
 .focus-shadow:focus {
   /* Enhance outline that follows border */
   outline: none;
-  box-shadow: 0 0 0 0.2em var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent);
 }
 .focus-shadow-faint:focus {
   /* Enhance outline that follows border */
   outline: none;
-  box-shadow: 0 0 0 0.2em var(--color-accent-faint);
+  box-shadow: 0 0 0 3px var(--color-accent-faint);
 }
