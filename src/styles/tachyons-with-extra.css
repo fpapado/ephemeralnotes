@@ -1405,6 +1405,9 @@ img {
 .z-unset {
   z-index: unset;
 }
+.wb-all {
+  word-break: break-all;
+}
 @media screen and (min-width: 30em) {
   .ba-ns {
     border-style: solid;

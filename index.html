@@ -1,71 +1,194 @@
 <!DOCTYPE html>
-<html lang="en" class="fonts-not-asked">
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="description"
+      content="Ephemeral is an app for writing down words and their translations, as you encounter them."
+    />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="Ephemeral is an app for writing down words and their translations, as you encounter them.">
+    <title>Ephemeral</title>
 
-  <title>Ephemeral</title>
+    <link rel="manifest" href="/assets/manifest.json" />
+    <link
+      rel="preload"
+      href="/assets/fonts/phantom-sans-v5-variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+  </head>
 
-  <link rel="manifest" href="/assets/manifest.json">
-  <link rel="preload" href="/assets/fonts/phantom-sans-v5-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-</head>
-
-<body>
-  <div class="min-vh-100 flex flex-column bg-color-bg color-fg f-phantomsans elm-root">
-    <header class="pv2 bg-color-lighter color-fg-faint bb">
-      <a href="#main" class="pa3 tc near-white bg-blue skip-link">
-        skip to content
-      </a>
-      <nav class="navigation-container">
-        <a href="/" class="f3 fw7 link color-accent tc navigation-home">Ephemeral</a>
-        <div class="navigation-bar w-100 bg-color-lighter">
-          <div class="navigation-bar-flex shell-min-nav">
+  <body>
+    <div
+      class="min-vh-100 flex flex-column bg-color-bg color-fg f-phantomsans elm-root"
+    >
+      <header
+        class="navigation-header pv2 bg-color-lighter color-fg-faint bb lh-title"
+      >
+        <a href="#main" class="pa3 tc near-white bg-blue skip-link"
+          >skip to content</a
+        >
+        <nav class="navigation-container">
+          <div class="navigation-title-about flex items-center mw7">
+            <div class="w-100">
+              <a href="/" class="f3 fw7 link color-accent tc navigation-home"
+                >Ephemeral</a
+              >
+            </div>
+            <a href="/about" class="ml2 link lh-solid color-fg"
+              ><svg
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                height="20"
+                width="20"
+                focusable="false"
+                aria-label="Info"
+                role="img"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="8"></line></svg
+            ></a>
           </div>
+          <div class="navigation-bar bg-color-lighter lh-title">
+            <div class="navigation-bar-flex">
+              <a
+                href="/"
+                class="db f5 f4-ns link color-accent"
+                aria-current="page"
+                ><svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  height="20"
+                  width="20"
+                  focusable="false"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+                  ></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                <div>Entries</div></a
+              ><a href="/map" class="db f5 f4-ns link color-fg"
+                ><svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  height="20"
+                  width="20"
+                  focusable="false"
+                  aria-hidden="true"
+                >
+                  <polygon
+                    points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"
+                  ></polygon>
+                  <line x1="8" y1="2" x2="8" y2="18"></line>
+                  <line x1="16" y1="6" x2="16" y2="22"></line>
+                </svg>
+                <div>Map</div></a
+              ><a href="/data" class="db f5 f4-ns link color-fg"
+                ><svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  height="20"
+                  width="20"
+                  focusable="false"
+                  aria-hidden="true"
+                >
+                  <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                  <rect x="1" y="3" width="22" height="5"></rect>
+                  <line x1="10" y1="12" x2="14" y2="12"></line>
+                </svg>
+                <div>Data</div></a
+              ><a href="/settings" class="db f5 f4-ns link color-fg"
+                ><svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  height="20"
+                  width="20"
+                  focusable="false"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                  ></path>
+                </svg>
+                <div>Settings</div></a
+              >
+            </div>
+          </div>
+        </nav>
+      </header>
+      <main id="main" class="ph3 pb3 flex flex-column flex-auto" tabindex="-1">
+        <div>
+          <noscript>
+            <div class="measure center vs4">
+              <h1 class="mv4 f3 f2-ns lh-title fw7">
+                Javascript is turned off :(
+              </h1>
+              <p class="mv0 f5 f4-ns lh-copy">
+                Sorry, Ephemeral requires Javascript to run. This is because it
+                does everything on the client, after the initial hand-off from
+                the server. I don't want to have people's data, and a
+                server-only version (one that can work without client
+                Javascript) would need that to be effective.
+              </p>
+            </div>
+          </noscript>
         </div>
-      </nav>
-    </header>
-    <main id="main" class="pa3 flex flex-column flex-auto" tabindex="-1">
-      <div>
-        <noscript>
-          <div class="measure center vs4">
-            <h1 class="mv4 f3 f2-ns lh-title fw7">Javascript is turned off :(</h1>
-            <p class="mv0 f5 f4-ns lh-copy">
-              Sorry, Ephemeral requires Javascript to run. This is because it does everything on the client, after the
-              initial hand-off
-              from the server. I don't want to have people's data, and a server-only version (one that can work without client Javascript) would need that to be
-              effective.
-            </p>
-          </div>
-        </noscript>
-      </div>
-    </main>
-    <footer>
-      <div class="pa3 flex-auto tc"><span>Made by Fotis Papadogeorgopoulos</span></div>
-    </footer>
-  </div>
+      </main>
+      <footer>
+        <div class="pa3 flex-auto tc">
+          <span>Made by Fotis Papadogeorgopoulos</span>
+        </div>
+      </footer>
+    </div>
 
-  <script>
-    // Check that service workers are registered
-    if ('serviceWorker' in navigator) {
-      // Use the window load event to keep the page load performant
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
-          console.log('SW registered: ', registration);
-        }).catch(registrationError => {
-          console.log('SW registration failed: ', registrationError);
+    <script>
+      // Check that service workers are registered
+      if ('serviceWorker' in navigator) {
+        // Use the window load event to keep the page load performant
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then(registration => {
+              console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
         });
-      });
 
-      // Log if the app was installed
-      window.addEventListener('appinstalled', (evt) => {
-        app.logEvent('a2hs', 'installed');
-      });
-    }
-  </script>
-</body>
-
+        // Log if the app was installed
+        window.addEventListener('appinstalled', evt => {
+          app.logEvent('a2hs', 'installed');
+        });
+      }
+    </script>
+  </body>
 </html>

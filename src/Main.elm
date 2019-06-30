@@ -12,6 +12,7 @@ import Html.Events as HE exposing (onClick)
 import Json.Decode as JD exposing (Value)
 import Log
 import Page exposing (FocusState(..), Page)
+import Page.About as About
 import Page.Blank as Blank
 import Page.Data as Data
 import Page.Home as Home
@@ -52,6 +53,7 @@ type PageModel
     | Map
     | Data Data.Model
     | Settings
+    | About
 
 
 
@@ -154,6 +156,10 @@ view model =
             -- Data does not have a model, but it does have a Msg
             viewPage Page.Settings GotSettingsMsg (Settings.view { darkMode = model.darkMode })
 
+        About ->
+            -- About does not have a model, or a message
+            viewPage Page.About (\_ -> Ignored) About.view
+
 
 
 -- UPDATE
@@ -209,6 +215,10 @@ changeRouteTo maybeRoute model =
         Just Route.Settings ->
             -- Settings has no initialiser
             ( { model | page = Settings }, Cmd.none )
+
+        Just Route.About ->
+            -- About has no initialiser
+            ( { model | page = About }, Cmd.none )
 
 
 {-| Deferred focus after a setTimeout, to allow the rendering to settle
@@ -386,6 +396,10 @@ subscriptions model =
 
                 -- Settings does not have any subscriptions
                 Settings ->
+                    Sub.none
+
+                -- About does not have any subscriptions
+                About ->
                     Sub.none
 
         alwaysSubs =

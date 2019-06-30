@@ -1,10 +1,15 @@
 module Svg.Feather exposing
     ( Purpose(..)
+    , alertCircle
     , archive
     , checkCircle
     , clipboard
+    , download
     , gear
+    , info
     , map
+    , svgFeatherIcon
+    , upload
     )
 
 import Html exposing (Html)
@@ -89,4 +94,40 @@ checkCircle =
     svgFeatherIcon
         [ Svg.path [ d "M22 11.08V12a10 10 0 1 1-5.93-9.14" ] []
         , Svg.polyline [ points "22 4 12 14.01 9 11.01" ] []
+        ]
+
+
+alertCircle : Purpose -> Html msg
+alertCircle =
+    svgFeatherIcon
+        [ Svg.circle [ cx "12", cy "12", r "10" ] []
+        , Svg.line [ x1 "12", y1 "8", x2 "12", y2 "12" ] []
+        , Svg.line [ x1 "12", y1 "16", x2 "12", y2 "16" ] []
+        ]
+
+
+download : Purpose -> Html msg
+download =
+    svgFeatherIcon
+        [ Svg.path [ d "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" ] []
+        , Svg.polyline [ points "7 10 12 15 17 10" ] []
+        , Svg.line [ x1 "12", y1 "15", x2 "12", y2 "3" ] []
+        ]
+
+
+info : Purpose -> Html msg
+info =
+    svgFeatherIcon
+        [ Svg.circle [ cx "12", cy "12", r "10" ] []
+        , Svg.line [ x1 "12", y1 "16", x2 "12", y2 "12" ] []
+        , Svg.line [ x1 "12", y1 "8", x2 "12", y2 "8" ] []
+        ]
+
+
+upload : Purpose -> Html msg
+upload =
+    svgFeatherIcon
+        [ Svg.path [ d "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" ] []
+        , Svg.polyline [ points "17 8 12 3 7 8" ] []
+        , Svg.line [ x1 "12", y1 "3", x2 "12", y2 "15" ] []
         ]

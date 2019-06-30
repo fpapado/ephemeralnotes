@@ -23,6 +23,7 @@ import Json.Decode as JD
 import Json.Encode as JE
 import Location as L
 import Log
+import Page.About as About
 import RemoteData exposing (RemoteData)
 import Route
 import Store
@@ -72,16 +73,16 @@ viewContent context model =
         [ Ui.centeredContainer
             []
             [ div [ class "vs4 vs5-ns" ]
-                [ section [ class "vs3 vs4-ns" ]
+                [ div [ class "vs3" ]
                     [ heading 1 [] [ text "Ephemeral" ]
-                    , paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. It works offline and everything is stored locally, on your device." ]
+                    , About.viewPitch
                     ]
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
                     , viewEntries context.entries ( formInput.front, formInput.back )
                     ]
-                , section [] [ viewAddToHomeScreen ]
+                , section [] [ About.viewAddToHomeScreen ]
                 ]
             ]
         ]
@@ -156,17 +157,6 @@ viewEntryKeyed ambiguousEntry =
                     ]
                 ]
             )
-
-
-viewAddToHomeScreen =
-    div [ class "vs3 vs4-ns", HA.attribute "open" "true" ]
-        [ subHeading 2
-            [ class "dib v-mid" ]
-            [ text "Add to Home Screen" ]
-        , paragraph
-            [ class "measure" ]
-            [ text "You can add Ephemeral to your home screen for quicker access and standalone use. It will always be available offline through your web browser." ]
-        ]
 
 
 

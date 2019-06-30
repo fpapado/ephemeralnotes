@@ -209,7 +209,7 @@ viewExport entryData =
                         [ text "About the export format" ]
                     , paragraph
                         []
-                        [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. In the future, you can use this file to import data into this application on another device." ]
+                        [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. You can also use this file to import data into this application on another device." ]
                     ]
                 ]
 
