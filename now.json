@@ -1,82 +1,82 @@
 {
+  "version": 2,
   "name": "ephemeral-v2",
   "alias": "ephemeral-v2",
-  "type": "static",
-  "scale": {
-    "bru1": {
-      "min": 0,
-      "max": 1
-    },
-    "sfo1": {
-      "min": 0,
-      "max": 1
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@now/static-build",
+      "config": {"distDir": "dist"}
     }
-  },
-  "static": {
-    "headers": [
-      {
-        "source": "main-*.@(css|js)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000,immutable"
-          }
-        ]
-      },
-      {
-        "source": "leaflet-*.@(css|js)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000,immutable"
-          }
-        ]
-      },
-      {
-        "source": "vendors~*.@(js)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000,immutable"
-          }
-        ]
-      },
-      {
-        "source": "workbox-*/*.js",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000,immutable"
-          }
-        ]
-      },
-      {
-        "source": "phantom-sans-v*.@(woff|woff2)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000,immutable"
-          }
-        ]
-      },
-      {
-        "source": "precache-manifest.*.js",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000,immutable"
-          }
-        ]
-      },
-      {
-        "source": "sw.js",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
+  ],
+  "routes": [
+    {
+      "src": "^/(main-.*)",
+      "dest": "/$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
       }
-    ]
-  }
+    },
+    {
+      "src": "^/(leaflet-.*)",
+      "dest": "/$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {
+      "src": "^/(vendors~.*)",
+      "dest": "/$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {
+      "src": "^/workbox-(.*)",
+      "dest": "/workbox-$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {
+      "src": "^/sw.js",
+      "dest": "/sw.js",
+      "headers": {
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "^/favicon.ico",
+      "dest": "/favicon.ico",
+      "headers": {
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "^/assets/fonts/(.*)",
+      "dest": "/assets/fonts/$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {
+      "src": "^/assets/images/marker.*",
+      "dest": "/assets/images/marker$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {
+      "src": "^/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "^/(precache-manifest.*.js)",
+      "dest": "/$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {"src": ".*", "dest": "/"}
+  ]
 }
