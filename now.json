@@ -39,6 +39,13 @@
       }
     },
     {
+      "src": "^/sw.js",
+      "dest": "/sw.js",
+      "headers": {
+        "cache-control": "no-cache"
+      }
+    },
+    {
       "src": "^/assets/fonts/(.*)",
       "dest": "/assets/fonts/$1",
       "headers": {
@@ -53,17 +60,14 @@
       }
     },
     {
+      "src": "^/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
       "src": "^/(precache-manifest.*.js)",
       "dest": "/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
-      }
-    },
-    {
-      "src": "sw.js",
-      "dest": "sw.js",
-      "headers": {
-        "cache-control": "no-cache"
       }
     },
     {"src": ".*", "dest": "/"}
