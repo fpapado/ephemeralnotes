@@ -91,7 +91,7 @@ viewHeader activePage =
     header [ class "navigation-header pv2 bg-color-lighter color-fg-faint bb lh-title" ]
         [ skipLink
         , nav [ class "navigation-container" ]
-            [ div [ class "flex items-center mw7 center" ]
+            [ div [ class "navigation-title-about flex items-center mw7" ]
                 [ a
                     [ Route.href Route.Home
                     , class "w-100 db f3 fw7 link color-accent tc navigation-home"
@@ -142,7 +142,7 @@ viewNavBar page =
                 , div [] [ text displayText ]
                 ]
     in
-    div [ class "navigation-bar w-100 bg-color-lighter lh-title" ]
+    div [ class "navigation-bar bg-color-lighter lh-title" ]
         [ div [ class "navigation-bar-flex" ]
             [ navLink Route.Home "Entries" Feather.clipboard
             , navLink Route.Map "Map" Feather.map

@@ -110,40 +110,56 @@ leaflet-map:not(:defined) {
   z-index: 9000;
   width: 100%;
 }
-main {
-  padding-top: 5rem;
-}
 /* Enhance from narrow -> wide screen */
 .navigation-container {
-  text-align: center;
   display: flex;
-  align-items: center;
   padding-left: 1rem;
   padding-right: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  overflow-x: auto;
+}
+/* Horizontal spacing without leftover space */
+.navigation-container > * + * {
+  margin-left: 1rem;
+}
+.navigation-title-about {
+  margin-left: initial;
+  margin-right: initial;
 }
 /* The bar items stick to the right */
 .navigation-bar-flex {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
 }
 /* Horizontal spacing without leftover space */
 .navigation-bar-flex > * + * {
-  margin-left: 2rem;
+  margin-left: 1rem;
+}
+/** Safe area for main (more predictable like this, than sticky) */
+main {
+  padding-top: 5rem;
 }
 
 @media screen and (min-height: 34rem) {
   .navigation-container {
     display: block;
   }
-  main {
-    padding-top: 4rem;
+  /* Reset left margin between secondary and title nav */
+  .navigation-container > * + * {
+    margin-left: initial;
+  }
+  .navigation-title-about {
+    margin-left: auto;
+    margin-right: auto;
   }
   .navigation-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     z-index: 9000;
+    width: 100%;
     border-color: var(--color-fg-faint);
     border-top-width: 1px;
     border-top-style: solid;
@@ -164,6 +180,10 @@ main {
     align-items: center;
     justify-content: space-around;
     justify-content: space-evenly;
+  }
+  /** Safe area for main (more predictable like this, than sticky) */
+  main {
+    padding-top: 4rem;
   }
   /* Set a safe area for the footer (and other content) */
   .footer {
