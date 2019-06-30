@@ -104,7 +104,6 @@ viewFaq =
             ]
         , div [ class "vs3" ]
             [ subHeading 3 [] [ text "Why \"ephemeral\"?" ]
-            , paragraph [] [ text "Ephemeral " ]
-            , paragraph [] [ text "The benefit of this approach is that you can access the app on most devices with a web browsers, including laptops, tablets, desktops etc." ]
+            , paragraph [] [ text "Ephemeral is one of those anglicised Greek words. It means \"lasting a short time, fleeting\". I was thinking a lot about memories of places when writing that. Also, I found the word a fun contrast to the temporary storage of entries in a browser." ]
             ]
         ]

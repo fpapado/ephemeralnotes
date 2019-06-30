@@ -182,7 +182,7 @@ main {
 }
 
 /** On even taller screens, the title + info header is sticky as well */
-@media screen and (min-height: 48rem) {
+@media screen and (min-height: 38rem) {
   .navigation-header {
     position: fixed;
     top: 0;
