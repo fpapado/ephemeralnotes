@@ -91,7 +91,7 @@ prompt attrs children =
 
 
 paragraph attrs children =
-    p (class "mv0 f4 lh-copy measure" :: attrs) children
+    p (class "mv0 f-paragraph f4-ns lh-copy measure" :: attrs) children
 
 
 paragraphSmall attrs children =

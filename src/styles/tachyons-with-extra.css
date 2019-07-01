@@ -1290,6 +1290,9 @@ img {
 .f4 {
   font-size: 1.25rem;
 }
+.f-paragraph {
+  font-size: 1.15rem;
+}
 .f5 {
   font-size: 1rem;
 }
@@ -2545,6 +2548,9 @@ img {
   .f4-ns {
     font-size: 1.25rem;
   }
+  .f-paragraph-ns {
+    font-size: 1.15rem;
+  }
   .f5-ns {
     font-size: 1rem;
   }
@@ -3784,6 +3790,9 @@ img {
   }
   .f4-l {
     font-size: 1.25rem;
+  }
+  .f-paragraph-l {
+    font-size: 1.15rem;
   }
   .f5-l {
     font-size: 1rem;
