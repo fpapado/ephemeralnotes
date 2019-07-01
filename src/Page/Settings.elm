@@ -64,7 +64,7 @@ viewContent darkMode =
                         , describedBy = Just darkModeDescriptionId
                         , mode = darkMode
                         }
-                    , paragraph
+                    , paragraphSmall
                         [ HA.id darkModeDescriptionId ]
                         [ text "Your preference will be saved and take precedence over system settings."
                         ]
