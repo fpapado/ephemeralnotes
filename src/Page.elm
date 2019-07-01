@@ -146,7 +146,7 @@ viewNavBar page =
                 , div [] [ text displayText ]
                 ]
     in
-    div [ class "navigation-bar bg-color-lighter lh-title" ]
+    div [ class "navigation-bar bg-color-lighter lh-solid" ]
         [ div [ class "navigation-bar-flex" ]
             [ navLink Route.Home "Entries" Feather.clipboard
             , navLink Route.Map "Map" Feather.map
