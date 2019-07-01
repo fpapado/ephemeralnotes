@@ -7,6 +7,7 @@ module Ui exposing
     , heading
     , notificationRegion
     , paragraph
+    , paragraphSmall
     , prompt
     , styledButton
     , styledButtonBlue
@@ -52,7 +53,7 @@ centeredContainerWide attrs children =
 
 
 styledButton attrs children =
-    button (class "pv2 ph3 button-reset focus-shadow br2 f5 f4-ns fw5" :: attrs) children
+    button (class "pv2 ph3 button-reset focus-shadow br2 f4 fw5" :: attrs) children
 
 
 styledButtonBlue isReadOnly attrs children =
@@ -82,7 +83,7 @@ comparable experience for screen reader users.
 
 -}
 notificationRegion attrs children =
-    div ([ HA.attribute "status" "role", HA.attribute "aria-live" "polite" ] ++ attrs) children
+    div ([ HA.attribute "role" "status", HA.attribute "aria-live" "polite" ] ++ attrs) children
 
 
 prompt attrs children =
@@ -90,7 +91,11 @@ prompt attrs children =
 
 
 paragraph attrs children =
-    p (class "mv0 f5 f4-ns lh-copy measure" :: attrs) children
+    p (class "mv0 f4 lh-copy measure" :: attrs) children
+
+
+paragraphSmall attrs children =
+    p (class "mv0 f5 lh-copy measure" :: attrs) children
 
 
 textbox attrs children =
