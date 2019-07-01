@@ -92,22 +92,24 @@ viewHeader activePage =
         [ skipLink
         , nav [ class "navigation-container" ]
             [ div [ class "navigation-title-about flex items-center mw7" ]
-                [ div [ class "w-100" ]
+                [ div [ class "w-100 navigation-title" ]
                     [ a
                         [ Route.href Route.Home
                         , class "f3 fw7 link color-accent tc navigation-home"
                         ]
                         [ text "Ephemeral" ]
                     ]
-                , a
-                    [ Route.href Route.About
-                    , classList
-                        [ ( "ml2 link lh-solid", True )
-                        , ( "color-fg", not (isActive activePage Route.About) )
-                        , ( "color-accent", isActive activePage Route.About )
+                , div [ class "navigation-about" ]
+                    [ a
+                        [ Route.href Route.About
+                        , classList
+                            [ ( "dib link lh-solid v-mid", True )
+                            , ( "color-fg", not (isActive activePage Route.About) )
+                            , ( "color-accent", isActive activePage Route.About )
+                            ]
                         ]
-                    ]
-                    [ Feather.info (Feather.Content { label = "Info" })
+                        [ Feather.info (Feather.Content { label = "Info" })
+                        ]
                     ]
                 ]
             , viewNavBar activePage
@@ -187,4 +189,4 @@ skipLink =
         [ href "#main"
         , class "pa3 tc near-white bg-blue skip-link"
         ]
-        [ text "skip to content" ]
+        [ text "Skip to content." ]

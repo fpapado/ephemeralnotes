@@ -106,9 +106,13 @@ leaflet-map:not(:defined) {
 .navigation-container > * + * {
   margin-left: 1rem;
 }
+/* Total pixel tweaking; set two columns, aligned start; Ephemeral | i */
 .navigation-title-about {
-  margin-left: initial;
-  margin-right: initial;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  justify-items: start;
+  align-items: center;
 }
 /* The bar items stick to the right */
 .navigation-bar-flex {
@@ -132,9 +136,22 @@ main {
   .navigation-container > * + * {
     margin-left: initial;
   }
+  /* Total pixel tweaking; set three columns; ... Ephemeral | i 
+    The result is that Ephemeral is "absolutely" centered in the container
+    and we still have a minimum gap between the items. Probably also doable with
+    flexbox, but I couldn't think of it...
+  */
   .navigation-title-about {
     margin-left: auto;
     margin-right: auto;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .navigation-title {
+    grid-column: 2/3;
+  }
+  .navigation-about {
+    grid-column: 3/4;
+    justify-self: end;
   }
   .navigation-bar {
     position: fixed;
