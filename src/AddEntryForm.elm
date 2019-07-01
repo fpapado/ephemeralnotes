@@ -315,12 +315,12 @@ view form_ =
             [ viewFormError
             , div [ class "vs2" ]
                 [ label
-                    [ class "db fw6 f5 f4-ns"
+                    [ class "db fw6 f-paragraph f4-ns"
                     , HA.for "entry-front"
                     ]
                     [ text "Word" ]
                 , input
-                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--color-fg color-fg br1 focus-shadow-faint"
+                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f-paragraph f4-ns ba bw1 b--color-fg color-fg br1 focus-shadow-faint"
                     , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-front"
@@ -334,12 +334,12 @@ view form_ =
                 ]
             , div [ class "vs2" ]
                 [ label
-                    [ class "db fw6 f5 f4-ns"
+                    [ class "db fw6 f-paragraph f4-ns"
                     , HA.for "entry-back"
                     ]
                     [ text "Translation" ]
                 , input
-                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f5 f4-ns ba bw1 b--color-fg color-fg br1 focus-shadow-faint"
+                    [ class "enhanced-input-text mw6 w-100 db pa2 fw4 f-paragraph f4-ns ba bw1 b--color-fg color-fg br1 focus-shadow-faint"
                     , class inputBgCls
                     , HA.type_ "text"
                     , HA.id "entry-back"

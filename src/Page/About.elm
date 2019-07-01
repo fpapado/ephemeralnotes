@@ -15,7 +15,7 @@ view =
 
 viewContent : Html msg
 viewContent =
-    div [ class "f4 lh-copy" ]
+    div [ class "f-paragraph f4-ns lh-copy" ]
         [ centeredContainer
             []
             [ div [ class "vs4 vs5-ns" ]

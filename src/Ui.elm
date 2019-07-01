@@ -106,7 +106,7 @@ buttonLink attrs children =
     a (class "db mw5 center pa3 button-link fw5 bg-blue br2 near-white hover-bg-light-blue hover-near-black focus-shadow" :: attrs) children
 
 
-{-| A progressively-enhanced, larger checkbox
+{-| A progressively-enhanced, larger heckbox
 -}
 checkbox : { id : String, name : String, isReadOnly : Bool } -> List (H.Attribute msg) -> String -> Html msg
 checkbox config attrs labelText =
@@ -118,7 +118,7 @@ checkbox config attrs labelText =
             else
                 ""
     in
-    div [ class <| "enhanced-checkbox-container f5 f4-ns lh-copy v-mid fw6 " ++ modifierCls ]
+    div [ class "enhanced-checkbox-container f-paragraph f4-ns lh-copy v-mid fw6", class modifierCls ]
         [ input
             ([ id config.id, name config.name, type_ "checkbox", class "enhanced-checkbox-input" ] ++ attrs)
             []

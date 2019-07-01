@@ -73,18 +73,6 @@ header,
   transition-timing-function: ease;
 }
 
-/** Static shell tricks */
-.shell-min-nav {
-  /* f5 * lh-title + svg height */
-  min-height: calc(1rem * 1.25 + 20px * 1.25);
-}
-/* f4 * lh-title + svg height */
-@media screen and (min-width: 30em) {
-  .shell-min-nav {
-    min-height: calc(1.25rem * 1.25 + 20px * 1.25);
-  }
-}
-
 /* Propagate height for leaflet map */
 .leaflet-map-wrapper {
   background: #ddd;
