@@ -1,7 +1,10 @@
 {
   "version": 2,
   "name": "ephemeral-v2",
-  "alias": "ephemeralnotes.app",
+  "alias": [
+    "ephemeralnotes.app",
+    "ephemeral-v2"
+  ],
   "builds": [
     {
       "src": "package.json",
