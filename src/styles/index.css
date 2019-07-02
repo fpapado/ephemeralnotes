@@ -144,7 +144,7 @@ main {
   .navigation-title-about {
     margin-left: auto;
     margin-right: auto;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr max-content 1fr;
   }
   .navigation-title {
     grid-column: 2/3;
