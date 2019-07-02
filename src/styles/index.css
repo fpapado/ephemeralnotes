@@ -110,7 +110,7 @@ leaflet-map:not(:defined) {
 .navigation-title-about {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: max-content 1fr;
   justify-items: start;
   align-items: center;
 }
