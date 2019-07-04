@@ -1,5 +1,5 @@
 /**
-  * Based on the work and research by Scott O' Hara
+  * Based on the work and research by Scott O' Hara, under the MIT License
   * https://github.com/scottaohara/a11y_styled_form_controls
   * https://github.com/scottaohara/a11y_styled_form_controls/blob/master/LICENSE
 */
@@ -19,6 +19,7 @@
 }
 
 .switch-toggle:focus {
+  /** We hide the focus styles on the button, because we delegate them below */
   outline: none;
 }
 
