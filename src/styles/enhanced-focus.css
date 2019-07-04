@@ -32,11 +32,13 @@
 }
 .focus-shadow:focus {
   /* Enhance outline that follows border */
-  outline: none;
+  /* Keep an outline for Windows High-Contrast Mode */
+  outline: 3px solid transparent;
   box-shadow: 0 0 0 3px var(--color-accent);
 }
 .focus-shadow-faint:focus {
   /* Enhance outline that follows border */
+  /* Keep an outline for Windows High-Contrast Mode */
   outline: none;
   box-shadow: 0 0 0 3px var(--color-accent-faint);
 }
