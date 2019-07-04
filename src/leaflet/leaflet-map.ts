@@ -22,6 +22,7 @@ const styleText = `
 .container {
   height: 32rem;
   background-color: var(--leaflet-map-bg) !important;
+  flex-grow: 1;
 }
 
 ${leafletStyleText}
@@ -115,7 +116,6 @@ class LeafletMap extends HTMLElement {
   }
 
   connectedCallback() {
-    this.$mapContainer.style.flexGrow = '1';
     this.upgradeProperty('defaultLatitude');
     this.upgradeProperty('defaultLongitude');
     this.upgradeProperty('defaultZoom');
@@ -165,6 +165,13 @@ class LeafletMap extends HTMLElement {
     this.observer.observe(this.shadowRoot!.host, {childList: true});
 
     this.setMapView();
+
+    // Set this so that the map gets re-computed with the "real" height after adding to the DOM
+    // Otherwise, it is assumed to be the container height of 32em.
+    // This is kinda hacky, but it works :)
+    setTimeout(() => {
+      this.map!.invalidateSize();
+    });
   }
 
   disconnectedCallback() {
@@ -237,17 +244,12 @@ class LeafletMap extends HTMLElement {
       this.defaultLongitude !== undefined &&
       this.defaultZoom !== undefined
     ) {
-      console.log(
-        this.defaultLatitude,
-        this.defaultLongitude,
-        this.defaultZoom
-      );
       this.map!.setView(
         [this.defaultLatitude, this.defaultLongitude],
         this.defaultZoom
       );
     }
-    // Finally, if no lat or lon provided, then show the world
+    // Finally, if no default lat or lon provided, then show the world
     else {
       this.map!.fitWorld();
     }
