@@ -16,11 +16,11 @@
 html {
   --color-bg: #f6fffe;
   --color-bg-lighter: #fff;
-  --color-fg: #111111;
-  --color-fg-faint: #aaaaaa;
+  --color-text: #111111;
+  --color-text-faint: #aaaaaa;
   --color-accent: #0769d3;
   --color-accent-faint: rgba(3, 102, 214, 0.5);
-  --map-bg: #dddddd;
+  --leaflet-map-bg: #dddddd;
   color-scheme: light dark;
   hyphens: auto;
 }
@@ -28,31 +28,31 @@ html {
 .dark-mode {
   --color-bg: #111717;
   --color-bg-lighter: #1b2029;
-  --color-fg: #f4f4f4;
-  --color-fg-faint: #666;
+  --color-text: #f4f4f4;
+  --color-text-faint: #666;
   --color-accent: #96ccff;
   --color-accent-faint: #96ccff;
-  --map-bg: var(--color-bg-lighter);
+  --leaflet-map-bg: var(--color-bg-lighter);
 }
 
 .b--color-faint {
-  border-color: var(--color-fg-faint);
+  border-color: var(--color-text-faint);
 }
 
-.b--color-fg {
-  border-color: var(--color-fg);
+.b--color-text {
+  border-color: var(--color-text);
 }
 
-.color-fg {
-  color: var(--color-fg);
+.color-text {
+  color: var(--color-text);
 }
 
 .color-bg {
   color: var(--color-bg);
 }
 
-.color-fg-faint {
-  color: var(--color-fg-faint);
+.color-text-faint {
+  color: var(--color-text-faint);
 }
 
 .color-accent {

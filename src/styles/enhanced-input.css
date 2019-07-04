@@ -75,7 +75,7 @@
   border: solid;
   border-width: 0 0 5px 5px;
   border-top-color: transparent;
-  color: var(--color-fg);
+  color: var(--color-text);
   opacity: 0;
   background: transparent;
 }

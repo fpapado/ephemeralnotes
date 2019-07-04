@@ -20,7 +20,7 @@ const styleText = `
 
 .container {
   height: 32rem;
-  background-color: var(--map-bg) !important;
+  background-color: var(--leaflet-map-bg) !important;
 }
 
 ${leafletStyleText}

@@ -83,12 +83,12 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
 
 
 viewShell children =
-    div [ class "min-vh-100 flex flex-column bg-color-bg color-fg f-phantomsans lh-copy elm-root" ] children
+    div [ class "min-vh-100 flex flex-column bg-color-bg color-text f-phantomsans lh-copy elm-root" ] children
 
 
 viewHeader : Page -> Html msg
 viewHeader activePage =
-    header [ class "navigation-header pv2 bg-color-lighter color-fg-faint bb lh-title" ]
+    header [ class "navigation-header pv2 bg-color-lighter color-text-faint bb lh-title" ]
         [ skipLink
         , nav [ class "navigation-container" ]
             [ div [ class "navigation-title-about flex items-center mw7" ]
@@ -104,7 +104,7 @@ viewHeader activePage =
                         [ Route.href Route.About
                         , classList
                             [ ( "dib link lh-solid v-mid", True )
-                            , ( "color-fg", not (isActive activePage Route.About) )
+                            , ( "color-text", not (isActive activePage Route.About) )
                             , ( "color-accent", isActive activePage Route.About )
                             ]
                         ]
@@ -136,7 +136,7 @@ viewNavBar page =
                 ([ Route.href route
                  , classList
                     [ ( "db f5 f4-ns link", True )
-                    , ( "color-fg", not isActivePage )
+                    , ( "color-text", not isActivePage )
                     , ( "color-accent", isActivePage )
                     ]
                  ]
