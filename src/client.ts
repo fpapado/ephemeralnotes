@@ -2,9 +2,10 @@
 import './styles/index.css';
 import {listenForWaitingSW} from './sw-utils';
 import {Elm} from './Main/index';
-import {getLocation, Result, Location, LocationError} from './Geolocation';
+import {getLocation, Location, LocationError} from './Geolocation';
 import * as Store from './Store';
 import * as DarkMode from './DarkMode';
+import {Result} from './Core';
 
 export async function runWith(Elm_: typeof Elm) {
   // TODO: Consider `await` to make the rest of the paints synchronous

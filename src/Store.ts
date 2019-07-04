@@ -3,7 +3,7 @@ export {handleSubMessage};
 import {openDB, DBSchema} from 'idb';
 import nanoid from 'nanoid';
 import {Elm} from './Main';
-import {Result, Result_Ok, Result_Error} from './Geolocation';
+import {Result, Result_Ok, Result_Error} from './Core';
 
 // FromElm
 // TODO: UpdateEntry Entry

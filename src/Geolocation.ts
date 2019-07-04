@@ -1,36 +1,24 @@
 /* Typed Geolocation acquisition and callback
  * Adapted for usage with Ports from https://github.com/elm-lang/geolocation
  * The encoding of tag/data for data structures is standard in this
- * code base, but there is nothing special about it.
+ * code base, but there is nothing otherwise special about it.
  */
 
-// TODO: Movev this to a module
-type Maybe<Data> = {
-  tag: 'Maybe';
-  data: {tag: 'Just'; data: Data} | {tag: 'Nothing'};
-};
-const Maybe_Nothing = (): Maybe<any> => ({
-  tag: 'Maybe',
-  data: {tag: 'Nothing'},
-});
-const Maybe_Just = <A>(data: A): Maybe<A> => ({
-  tag: 'Maybe',
-  data: {tag: 'Just', data},
-});
+export {Location, LocationError, getLocation};
 
-export type Result<Error, Data> =
-  | {tag: 'Ok'; data: Data}
-  | {tag: 'Err'; data: Error};
-export const Result_Ok = <A>(data: A): Result<any, A> => ({tag: 'Ok', data});
-export const Result_Error = <E>(data: E): Result<E, any> => ({
-  tag: 'Err',
-  data,
-});
+import {
+  Maybe,
+  Maybe_Nothing,
+  Maybe_Just,
+  Result,
+  Result_Ok,
+  Result_Error,
+} from './Core';
 
 // LOCATIONS
 
-export type Location = ReturnType<typeof toLocation>;
-export type LocationError = ReturnType<typeof toError>;
+type Location = ReturnType<typeof toLocation>;
+type LocationError = ReturnType<typeof toError>;
 
 function toLocation(rawPosition: Position) {
   var coords = rawPosition.coords;
@@ -91,7 +79,7 @@ const defaultOptions = {
 // GET LOCATION
 type LocationCallback = (data: Result<LocationError, Location>) => void;
 
-export function getLocation(cb: LocationCallback, opts = {}) {
+function getLocation(cb: LocationCallback, opts = {}) {
   const options = {...defaultOptions, opts};
 
   function onSuccess(rawPosition: Position) {
