@@ -40,8 +40,8 @@
       "compression": "gzip"
     }
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Fotis Papadogeorgopoulos <fotis@fpapado.com>",
+  "license": "MPL-2.0",
   "devDependencies": {
     "@types/node": "^11.13.0",
     "chokidar-cli": "^1.2.2",

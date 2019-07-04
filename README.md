@@ -31,6 +31,3 @@ Service workers are scaffolded with [workbox](https://developers.google.com/web/
 
 [Here is an intro to PWAs, by Google](https://developers.google.com/web/progressive-web-apps/).
 
-## License
-
-MIT © Fotis Papadogeorgopoulos
