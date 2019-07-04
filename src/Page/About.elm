@@ -68,8 +68,8 @@ viewFaq =
             ]
         , div [ class "vs3" ]
             [ subHeading 3 [] [ text "Can I donate to the development?" ]
-            , paragraph [] [ text "If you have used this app and found it useful, you can donate through " ]
-            , a [ href "https://www.buymeacoffee.com/isfotis", class "color-accent" ] [ text "Buy me a Coffee." ]
+            , paragraph [] [ text "If you have used this app and found it useful, you can " ]
+            , a [ href "https://ko-fi.com/isfotis", class "color-accent" ] [ text "donate through ko-fi." ]
             , paragraph []
                 [ text "To be fully transparent: I am partially compensated for my work through the "
                 , a [ href "https://spiceprogram.org/", class "color-accent" ] [ text "Chillicorn open source program" ]
