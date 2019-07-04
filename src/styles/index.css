@@ -3,14 +3,16 @@
 @import './enhanced-focus.css';
 @import './fonts.css';
 @import './animations.css';
-@import './tachyons-with-extra.css';
+@import './tachyons-with-extras.css';
 @import './vertical-spacing.css';
 @import './skip-link.css';
 @import './visually-hidden.css';
 @import './enhanced-input.css';
 @import './grid-entries.css';
 @import './switch-toggle.css';
+@import './navigation.css';
 
+/** TODO: move to :root selector, whenever critters supports it */
 html {
   --color-bg: #f6fffe;
   --color-bg-lighter: #fff;
@@ -71,131 +73,4 @@ header,
   transition-property: color, background-color, border-color;
   transition-duration: 0.4s;
   transition-timing-function: ease;
-}
-
-/* Propagate height for leaflet map */
-.leaflet-map-wrapper {
-  background: #ddd;
-}
-/* Hide leaflet map if not defined */
-leaflet-map:not(:defined) {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-}
-
-/* Flexible navigation region, depending on screen height.
-  * On tall screens, stick to the bottom
-  * On short screens, stay static at the top
-  * On tall and wide screens ?
-  * On tall and narrow screens?
-  * On short and wide screens?
-  * On short and narrow screens?
-*/
-/* Enhance from narrow -> wide screen */
-.navigation-container {
-  display: flex;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  text-align: center;
-  overflow-x: auto;
-}
-/* Horizontal spacing without leftover space */
-.navigation-container > * + * {
-  margin-left: 1rem;
-}
-/* Total pixel tweaking; set two columns, aligned start; Ephemeral | i */
-.navigation-title-about {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: max-content 1fr;
-  justify-items: start;
-  align-items: center;
-}
-/* The bar items stick to the right */
-.navigation-bar-flex {
-  display: flex;
-  align-items: center;
-}
-main {
-  padding-top: 1rem;
-}
-/* Horizontal spacing without leftover space */
-.navigation-bar-flex > * + * {
-  margin-left: 1rem;
-}
-
-/** On taller screens, the navigation becomes sticky bottom */
-@media screen and (min-height: 34rem) {
-  .navigation-container {
-    display: block;
-  }
-  /* Reset left margin between secondary and title nav */
-  .navigation-container > * + * {
-    margin-left: initial;
-  }
-  /* Total pixel tweaking; set three columns; ... Ephemeral | i 
-    The result is that Ephemeral is "absolutely" centered in the container
-    and we still have a minimum gap between the items. Probably also doable with
-    flexbox, but I couldn't think of it...
-  */
-  .navigation-title-about {
-    margin-left: auto;
-    margin-right: auto;
-    grid-template-columns: 1fr max-content 1fr;
-  }
-  .navigation-title {
-    grid-column: 2/3;
-  }
-  .navigation-about {
-    grid-column: 3/4;
-    justify-self: end;
-  }
-  .navigation-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: 9000;
-    width: 100%;
-    border-color: var(--color-fg-faint);
-    border-top-width: 1px;
-    border-top-style: solid;
-
-    padding: 0.5rem;
-    justify-content: center;
-  }
-  /* When sticking to the bottom, the bar items are spaced around, 
-   * or evenly if supported.
-   * The width is capped to a maximum;
-  */
-  .navigation-bar-flex {
-    width: 100%;
-    max-width: 24rem;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    justify-content: space-evenly;
-  }
-  /* Set a safe area for the footer (and other content) */
-  .footer {
-    margin-bottom: 4rem;
-  }
-}
-
-/** On even taller screens, the title + info header is sticky as well */
-@media screen and (min-height: 38rem) {
-  .navigation-header {
-    position: fixed;
-    top: 0;
-    z-index: 9000;
-    width: 100%;
-  }
-  /** Safe area for main (more predictable like this, than sticky) */
-  main {
-    padding-top: 4rem;
-  }
 }
