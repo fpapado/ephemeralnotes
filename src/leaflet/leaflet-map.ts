@@ -4,6 +4,7 @@ import L, {control} from 'leaflet';
 // doing import '' means that side-effects can be run
 // TODO: Fork the plugin and use a factory/constructor :)
 import 'leaflet.markercluster';
+import 'leaflet.featuregroup.subgroup';
 
 // This is done through webpack, where we use postcss to bundle the CSS
 // and lift the raw text in the module graph.
@@ -21,6 +22,7 @@ const styleText = `
 .container {
   height: 32rem;
   background-color: var(--leaflet-map-bg) !important;
+  flex-grow: 1;
 }
 
 ${leafletStyleText}
@@ -51,22 +53,34 @@ ${styleResult.text ? `<style>${styleResult.text}</style>` : ''}
 export type AddToLayerCb = (marker: L.Marker) => void;
 export type RemoveFromLayerCb = (marker: L.Marker) => void;
 
-type ObservedAttribute = 'latitude' | 'longitude' | 'zoom' | 'theme';
-type ReflectedAttribute = 'latitude' | 'longitude' | 'zoom';
-type Property = 'latitude' | 'longitude' | 'zoom' | 'theme';
+type ObservedAttribute =
+  | 'defaultLatitude'
+  | 'defaultLongitude'
+  | 'defaultZoom'
+  | 'theme';
+type ReflectedAttribute =
+  | 'defaultLatitude'
+  | 'defaultLongitude'
+  | 'defaultZoom';
+type Property =
+  | 'defaultLatitude'
+  | 'defaultLongitude'
+  | 'defaultZoom'
+  | 'theme';
 
 type Theme = 'dark' | 'light';
 
 class LeafletMap extends HTMLElement {
-  latitude?: number;
-  longitude?: number;
-  zoom?: number;
+  defaultLatitude?: number;
+  defaultLongitude?: number;
+  defaultZoom?: number;
   theme?: Theme;
   private $mapContainer: HTMLDivElement;
   private observer: MutationObserver;
   private map?: L.Map | null;
   private tileLayer?: L.TileLayer | null;
-  private markersLayer?: L.LayerGroup | null;
+  private markersLayerGroup?: L.LayerGroup | null;
+  private markersFeatureGroup?: L.FeatureGroup | null;
   private isConnectedForReal = false;
 
   constructor() {
@@ -90,7 +104,7 @@ class LeafletMap extends HTMLElement {
   }
 
   static get observedAttributes(): ObservedAttribute[] {
-    return ['latitude', 'longitude', 'zoom'];
+    return ['defaultLatitude', 'defaultLongitude', 'defaultZoom'];
   }
 
   childrenChangedCallback(mutations: MutationRecord[]) {
@@ -102,10 +116,9 @@ class LeafletMap extends HTMLElement {
   }
 
   connectedCallback() {
-    this.$mapContainer.style.flexGrow = '1';
-    this.upgradeProperty('latitude');
-    this.upgradeProperty('longitude');
-    this.upgradeProperty('zoom');
+    this.upgradeProperty('defaultLatitude');
+    this.upgradeProperty('defaultLongitude');
+    this.upgradeProperty('defaultZoom');
     this.upgradeProperty('theme');
 
     // Only actually parse the stylesheet when the first instance is connected.
@@ -127,11 +140,15 @@ class LeafletMap extends HTMLElement {
 
     this.tileLayer.addTo(this.map);
 
-    this.markersLayer = (L as any).markerClusterGroup();
-    this.map.addLayer(this.markersLayer!);
+    this.markersLayerGroup = (L as any).markerClusterGroup();
+    this.markersFeatureGroup = (L.featureGroup as any).subGroup(
+      this.markersLayerGroup
+    );
+
+    this.markersLayerGroup!.addTo(this.map!);
+    this.markersFeatureGroup!.addTo(this.map!);
 
     this.isConnectedForReal = true;
-    this.setMapView();
 
     // Handle any children that were already parsed before this
     // element upgraded, and pass the map to them
@@ -146,6 +163,15 @@ class LeafletMap extends HTMLElement {
     // upgraded.
     // Initialise observing
     this.observer.observe(this.shadowRoot!.host, {childList: true});
+
+    this.setMapView();
+
+    // Set this so that the map gets re-computed with the "real" height after adding to the DOM
+    // Otherwise, it is assumed to be the container height of 32em.
+    // This is kinda hacky, but it works :)
+    setTimeout(() => {
+      this.map!.invalidateSize();
+    });
   }
 
   disconnectedCallback() {
@@ -153,7 +179,8 @@ class LeafletMap extends HTMLElement {
     this.observer.disconnect();
     this.map!.remove();
     this.map = null;
-    this.markersLayer = null;
+    this.markersLayerGroup = null;
+    this.markersFeatureGroup = null;
   }
 
   attributeChangedCallback(name: ObservedAttribute, oldVal: any, newVal: any) {
@@ -162,7 +189,11 @@ class LeafletMap extends HTMLElement {
         this.tileLayer.setUrl(getTileUrl(newVal));
       }
     }
-    if (name === 'latitude' || name === 'longitude' || name === 'zoom') {
+    if (
+      name === 'defaultLatitude' ||
+      name === 'defaultLongitude' ||
+      name === 'defaultZoom'
+    ) {
       this[name] = parseFloat(newVal);
       if (this.isConnectedForReal) {
         this.setMapView();
@@ -185,13 +216,14 @@ class LeafletMap extends HTMLElement {
               (feature as any).addToLayerCb = (feature: L.Marker) => {
                 // NOTE: Could also do this.markersLayer.addLayer(feature)
                 // which one is more valid?
-                feature.addTo(this.markersLayer!);
+                feature.addTo(this.markersFeatureGroup!);
+                this.setMapView();
               };
               (feature as any).removeFromLayerCb = (feature: L.Marker) => {
                 // NOTE: Could also do this.markersLayer.addLayer(feature)
                 // which one is more valid?
                 // TODO: Types are meh
-                feature.removeFrom(this.markersLayer as any);
+                feature.removeFrom(this.markersFeatureGroup as any);
               };
             }
           });
@@ -201,10 +233,24 @@ class LeafletMap extends HTMLElement {
   }
 
   private setMapView() {
-    if (this.latitude && this.longitude && this.zoom) {
-      this.map!.setView([this.latitude, this.longitude], this.zoom);
-    } else {
-      // If no lat or lon provided, then show the world
+    // If we have features, fit the map around them
+    const features = this.markersFeatureGroup!.getLayers().length;
+    if (features !== 0) {
+      this.map!.fitBounds(this.markersFeatureGroup!.getBounds(), {maxZoom: 12});
+    }
+    // Otherwise, set to the defined lat,lng
+    else if (
+      this.defaultLatitude !== undefined &&
+      this.defaultLongitude !== undefined &&
+      this.defaultZoom !== undefined
+    ) {
+      this.map!.setView(
+        [this.defaultLatitude, this.defaultLongitude],
+        this.defaultZoom
+      );
+    }
+    // Finally, if no default lat or lon provided, then show the world
+    else {
       this.map!.fitWorld();
     }
   }
@@ -217,8 +263,14 @@ class LeafletMap extends HTMLElement {
       this[prop] = value as any;
     } else {
       const attr = this.getAttribute(prop);
-      if (prop === 'latitude' || prop === 'longitude' || prop === 'zoom') {
-        this[prop] = parseFloat(attr as any);
+      if (
+        prop === 'defaultLatitude' ||
+        prop === 'defaultLongitude' ||
+        prop === 'defaultZoom'
+      ) {
+        if (attr !== null) {
+          this[prop] = parseFloat(attr);
+        }
       } else {
         this[prop] = attr as any;
       }

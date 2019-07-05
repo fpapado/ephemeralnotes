@@ -57,9 +57,7 @@ viewMap attrs mode entryData =
     in
     div (attrs ++ [ class "leaflet-map-wrapper" ])
         [ Keyed.node "leaflet-map"
-            [ HA.attribute "latitude" "60.1699"
-            , HA.attribute "longitude" "24.9384"
-            , HA.attribute "zoom" "12"
+            [ HA.attribute "defaultZoom" "8"
             , HA.attribute "theme" (String.toLower <| DarkMode.modeToString mode)
             , class "flex flex-column flex-grow-1"
             ]
