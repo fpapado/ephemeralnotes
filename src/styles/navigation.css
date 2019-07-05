@@ -94,6 +94,8 @@ main {
       * All this runs a risk of "more" padding than needed, but it does have broader
       * support. See below for a more accurate version.
     */
+    /** Legacy const() syntax */
+    padding-bottom: calc(const(safe-area-inset-bottom, 0px) + 0.5rem);
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
     justify-content: center;
   }
