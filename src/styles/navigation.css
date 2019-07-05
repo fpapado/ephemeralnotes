@@ -82,6 +82,7 @@ main {
     border-top-style: solid;
 
     padding: 0.5rem;
+
     /** Progressively-enhance safe area insets
       * - If env() is supported, set padding-bottom to
       *   env(safe-area-inset-bottom) + a minimum bottom padding.
