@@ -82,15 +82,26 @@ main {
     border-top-style: solid;
 
     padding: 0.5rem;
+    /** Progressively-enhance safe area insets
+      * - If env() is supported, set padding-bottom to
+      *   env(safe-area-inset-bottom) + a minimum bottom padding.
+      * - If safe-area-inset-bottom is undefined, it is 0px
+      * - If env is not supported, this whole property is ignored, 
+      *   and the previous value (0.5rem) applies :tada:
+      *
+      * Extra note:
+      * All this runs a risk of "more" padding than needed, but it does have broader
+      * support. See below for a more accurate version.
+    */
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
     justify-content: center;
   }
   /* Progressively-enhance to use safe areas in iPhone X etc.
-   * Note: we need CSS math functions (max, here) to be supported, so
+   * Note: for this we need CSS math functions (max, here) to be supported, so
    * we can pick the larger padding bottom, among the minimum and the inset.
    * 
-   * This considers two cases:
-   *  - the user rotates the phone and the bottom safe area would be 0.
-   *  - safe-area-inset-bottom is supported, but is 0 (e.g. desktop Chrome)
+   * This considers one case, in addition to the above:
+   *  - safe-area-inset-bottom is supported, but is smaller than 0.5rem
    * 
    * Silver lining: min, max and env() are supported in the relevant iOS/Safari
    * versions, so this seems fine.
