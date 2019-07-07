@@ -27,6 +27,7 @@
 /* Total pixel tweaking; set two columns, aligned start; Ephemeral | i */
 .navigation-title-about {
   display: grid;
+  grid-gap: 1rem;
   gap: 1rem;
   grid-template-columns: max-content 1fr;
   justify-items: start;
@@ -93,15 +94,9 @@ main {
       * Extra note:
       * All this runs a risk of "more" padding than needed, but it does have broader
       * support. See below for a more accurate version.
-      *
-      * Further complication:
-      * iOS will report safe-area-inset-bottom as 0px if viewport-fit is not cover
-      * This seems like a bad idea, because then the bottom bar will overlap the homebar,
-      * even though inset-bottom could have helped avoid that. Thus, we set 1rem for the
-      * syntax understood only by iOS.
     */
     /** Legacy constant() (env()) syntax. */
-    padding-bottom: calc(constant(safe-area-inset-bottom, 0px) + 1rem);
+    padding-bottom: calc(constant(safe-area-inset-bottom, 0px) + 0.5rem);
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
     justify-content: center;
   }
@@ -110,7 +105,7 @@ main {
    * we can pick the larger padding bottom, among the minimum and the inset.
    * 
    * This considers one case, in addition to the above:
-   *  - safe-area-inset-bottom is supported, but is smaller than 0.5rem
+   *  - safe-area-inset-bottom is supported, and is > 0
    * 
    * Note: min, max and env() are supported in the relevant iOS/Safari
    * versions, so this seems fine. As mentioned above, this also allows us
@@ -120,7 +115,7 @@ main {
    */
   @supports (padding: max(0px)) {
     .navigation-bar {
-      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
     }
   }
   /* When sticking to the bottom, the bar items are spaced around, 
