@@ -187,6 +187,10 @@ viewContent entryData model =
                     , viewImport
                     , viewUploadData model.uploadData
                     ]
+                , section [ class "vs3 mw6" ]
+                    [ subHeading 2 [] [ text "Usage" ]
+                    , Html.node "storage-space" [] []
+                    ]
                 ]
             ]
         ]
