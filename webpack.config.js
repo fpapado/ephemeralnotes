@@ -54,10 +54,11 @@ module.exports = {
     }),
     new OptimizeCssAssetsPlugin({
       cssProcessor: cssnano,
-      cssProcessorOptions: {
-        discardComments: {
-          removeAll: true,
-        },
+      cssProcessorPluginOptions: {
+        // The mergeLonghand option is unsafe if we rely on the cascade for env() fallbacks,
+        // such as safe area insets for iPhone X
+        // @see https://github.com/cssnano/cssnano/issues/803
+        preset: ['default', {mergeLonghand: false}],
       },
       canPrint: false,
     }),
