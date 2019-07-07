@@ -10,15 +10,38 @@
   * On short and wide screens?
   * On short and narrow screens?
 */
+.navigation-header {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-top: calc(constant(safe-area-inset-top, 0px) + 0.5rem);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+}
+@supports (padding: max(0px)) {
+  .navigation-header {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}
+
 /* Enhance from narrow -> wide screen */
 .navigation-container {
   display: flex;
   padding-left: 1rem;
   padding-right: 1rem;
+  padding-left: calc(constant(safe-area-inset-left, 0px) + 1rem);
+  padding-left: calc(env(safe-area-inset-left, 0px) + 1rem);
+  padding-right: calc(constant(safe-area-inset-right, 0px) + 1rem);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 1rem);
   align-items: center;
   justify-content: space-between;
   text-align: center;
   overflow-x: auto;
+}
+/** If CSS math functions are supported, give more accurate padding */
+@supports (padding: max(0px)) {
+  .navigation-container {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
 }
 /* Horizontal spacing without leftover space */
 .navigation-container > * + * {
@@ -39,7 +62,22 @@
   align-items: center;
 }
 main {
-  padding-top: 1rem;
+  padding: 1rem;
+  /** Progressively-enhanced padding left/right/bottom, based on env/constant support */
+  padding-left: calc(constant(safe-area-inset-left, 0px) + 1rem);
+  padding-left: calc(env(safe-area-inset-left, 0px) + 1rem);
+  padding-right: calc(constant(safe-area-inset-right, 0px) + 1rem);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 1rem);
+  padding-bottom: calc(constant(safe-area-inset-bottom, 0px) + 1rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+}
+/** If CSS math functions are supported, give more accurate padding */
+@supports (padding: max(0px)) {
+  main {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
 }
 /* Horizontal spacing without leftover space */
 .navigation-bar-flex > * + * {
@@ -96,6 +134,10 @@ main {
       * support. See below for a more accurate version.
     */
     /** Legacy constant() (env()) syntax. */
+    padding-left: calc(constant(safe-area-inset-left, 0px) + 0.5rem);
+    padding-left: calc(env(safe-area-inset-left, 0px) + 0.5rem);
+    padding-right: calc(constant(safe-area-inset-right, 0px) + 0.5rem);
+    padding-right: calc(env(safe-area-inset-right, 0px) + 0.5rem);
     padding-bottom: calc(constant(safe-area-inset-bottom, 0px) + 0.5rem);
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
     justify-content: center;
@@ -116,6 +158,8 @@ main {
   @supports (padding: max(0px)) {
     .navigation-bar {
       padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+      padding-left: max(0.5rem, env(safe-area-inset-left));
+      padding-right: max(0.5rem, env(safe-area-inset-right));
     }
   }
   /* When sticking to the bottom, the bar items are spaced around, 
@@ -132,9 +176,11 @@ main {
     justify-content: space-around;
     justify-content: space-evenly;
   }
-  /* Set a safe area for the footer (and other content) */
-  .footer {
-    margin-bottom: 4rem;
+  /* Set a safe area for the footer (and other content), equal to 4rem (sticky) + inset-bottom */
+  main {
+    padding-bottom: 4rem;
+    padding-bottom: calc(constant(safe-area-inset-bottom, 0px) + 4rem);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4rem);
   }
 }
 
@@ -148,6 +194,10 @@ main {
   }
   /** Safe area for main (more predictable like this, than sticky) */
   main {
+    /* Enough area for the header */
     padding-top: 4rem;
+    /* Enough area for the header + safe-area */
+    padding-top: calc(constant(safe-area-inset-top, 0px) + 4rem);
+    padding-top: calc(env(safe-area-inset-top, 0px) + 4rem);
   }
 }

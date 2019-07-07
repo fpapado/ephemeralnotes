@@ -50,14 +50,14 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
                 -- When focusing, set tabindex to -1
                 Focusing ->
                     [ id "main"
-                    , class "ph3 pb3 flex flex-column flex-auto"
+                    , class "flex flex-column flex-auto"
                     , tabindex -1
                     ]
 
                 -- When the user tabs past, then the state should be set to FocusPastMain
                 FocusOnMain ->
                     [ id "main"
-                    , class "ph3 pb3 flex flex-column flex-auto"
+                    , class "flex flex-column flex-auto"
                     , tabindex -1
                     , onBlur onBlurredMain
                     ]
@@ -65,7 +65,7 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
                 -- In other cases, no need for focus attributes
                 _ ->
                     [ id "main"
-                    , class "ph3 pb3 flex flex-column flex-auto"
+                    , class "flex flex-column flex-auto"
                     ]
 
         viewMain =
@@ -76,7 +76,6 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
         [ viewShell
             [ viewHeader activePage
             , viewMain [ Html.map toOutMsg content ]
-            , viewFooter
             ]
         ]
     }
@@ -88,7 +87,7 @@ viewShell children =
 
 viewHeader : Page -> Html msg
 viewHeader activePage =
-    header [ class "navigation-header pv2 bg-color-lighter color-text-faint bb lh-title" ]
+    header [ class "navigation-header bg-color-lighter color-text-faint bb lh-title" ]
         [ skipLink
         , nav [ class "navigation-container" ]
             [ div [ class "navigation-title-about flex items-center mw7" ]
@@ -154,12 +153,6 @@ viewNavBar page =
             , navLink Route.Settings "Settings" Feather.gear
             ]
         ]
-
-
-viewFooter : Html msg
-viewFooter =
-    -- The footer sets a safe area for the fixed bottom navigation
-    div [ class "footer" ] []
 
 
 isActive : Page -> Route -> Bool
