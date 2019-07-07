@@ -229,23 +229,26 @@ class LeafletMap extends HTMLElement {
 
   private setMapView() {
     // If we have features, fit the map around them
-    const features = this.markersFeatureGroup!.getLayers().length;
-    if (features !== 0) {
+    if (
+      this.markersFeatureGroup &&
+      this.markersFeatureGroup.getLayers().length !== 0
+    ) {
       this.map!.fitBounds(this.markersFeatureGroup!.getBounds(), {maxZoom: 12});
     }
     // Otherwise, set to the defined lat,lng
     else if (
+      this.map &&
       this.defaultLatitude !== undefined &&
       this.defaultLongitude !== undefined &&
       this.defaultZoom !== undefined
     ) {
-      this.map!.setView(
+      this.map.setView(
         [this.defaultLatitude, this.defaultLongitude],
         this.defaultZoom
       );
     }
     // Finally, if no default lat or lon provided, then show the world
-    else {
+    else if (this.map) {
       this.map!.fitWorld();
     }
   }
