@@ -176,8 +176,8 @@ class LeafletMap extends HTMLElement {
     this.observer.disconnect();
     this.map!.remove();
     this.map = null;
-    this.markersLayerGroup = null;
     this.markersFeatureGroup = null;
+    this.markersLayerGroup = null;
   }
 
   attributeChangedCallback(name: ObservedAttribute, oldVal: any, newVal: any) {
@@ -215,7 +215,9 @@ class LeafletMap extends HTMLElement {
                 this.setMapView();
               };
               (feature as any).removeFromLayerCb = (feature: L.Marker) => {
-                this.markersFeatureGroup!.removeLayer(feature);
+                if (this.markersFeatureGroup) {
+                  this.markersFeatureGroup!.removeLayer(feature);
+                }
                 this.setMapView();
               };
             }
