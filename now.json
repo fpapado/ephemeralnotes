@@ -63,8 +63,8 @@
       }
     },
     {
-      "src": "^/assets/images/marker.*",
-      "dest": "/assets/images/marker$1",
+      "src": "^/assets/images/(.*)",
+      "dest": "/assets/images/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
