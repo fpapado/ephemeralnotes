@@ -1,5 +1,5 @@
 /**
-  * CSS to handle how the navigation behaves
+  * CSS to handle how the core page layout behaves
 */
 
 /* Flexible navigation region, depending on screen height.
@@ -8,7 +8,10 @@
   * On tall and wide screens ?
   * On tall and narrow screens?
   * On short and wide screens?
-  * On short and narrow screens?
+  * On short andnarrow screens?
+  *
+  * NOTE: we also adjust for safe-area-inset-dir, based on which component
+  * contributes to layout based on the above
 */
 .navigation-header {
   padding-top: 0.5rem;

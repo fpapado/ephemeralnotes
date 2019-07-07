@@ -10,7 +10,7 @@
 @import './enhanced-input.css';
 @import './grid-entries.css';
 @import './switch-toggle.css';
-@import './navigation.css';
+@import './Page.css';
 
 /** TODO: move to :root selector, whenever critters supports it */
 html {
