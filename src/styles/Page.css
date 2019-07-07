@@ -21,7 +21,7 @@
 }
 @supports (padding: max(0px)) {
   .navigation-header {
-    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-top: max(0.5rem, env(safe-area-inset-top));
   }
 }
 
