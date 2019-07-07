@@ -1,8 +1,7 @@
 import L, {control} from 'leaflet';
 
-// NOTE: This plugin assumes a global 'L' being available, because it is old-school cool
-// doing import '' means that side-effects can be run
-// TODO: Fork the plugin and use a factory/constructor :)
+// NOTE: Leaflet plugins assume a global 'L' being available.
+// `import ''` means that side-effects can be run, and attach to L.
 import 'leaflet.markercluster';
 import 'leaflet.featuregroup.subgroup';
 
@@ -80,7 +79,7 @@ class LeafletMap extends HTMLElement {
   private map?: L.Map | null;
   private tileLayer?: L.TileLayer | null;
   private markersLayerGroup?: L.LayerGroup | null;
-  private markersFeatureGroup?: L.FeatureGroup | null;
+  private markersFeatureGroup?: L.SubGroup | null;
   private isConnectedForReal = false;
 
   constructor() {
@@ -140,10 +139,8 @@ class LeafletMap extends HTMLElement {
 
     this.tileLayer.addTo(this.map);
 
-    this.markersLayerGroup = (L as any).markerClusterGroup();
-    this.markersFeatureGroup = (L.featureGroup as any).subGroup(
-      this.markersLayerGroup
-    );
+    this.markersLayerGroup = L.markerClusterGroup();
+    this.markersFeatureGroup = L.featureGroup.subGroup(this.markersLayerGroup);
 
     this.markersLayerGroup!.addTo(this.map!);
     this.markersFeatureGroup!.addTo(this.map!);
@@ -208,22 +205,18 @@ class LeafletMap extends HTMLElement {
       for (const feature of nodes) {
         // NOTE: We could make this more open, if we want to allow extensions
         if (feature.nodeName.toLowerCase() === 'leaflet-marker') {
-          // Wait till after the leaflet-marker element has been upgraded
+          // Wait until after the leaflet-marker element has been upgraded
           // and had a chance to run its connectedCallback.
           customElements.whenDefined('leaflet-marker').then(_ => {
             // TS hack...
             if (!(feature as any).addToLayerCb) {
               (feature as any).addToLayerCb = (feature: L.Marker) => {
-                // NOTE: Could also do this.markersLayer.addLayer(feature)
-                // which one is more valid?
                 feature.addTo(this.markersFeatureGroup!);
                 this.setMapView();
               };
               (feature as any).removeFromLayerCb = (feature: L.Marker) => {
-                // NOTE: Could also do this.markersLayer.addLayer(feature)
-                // which one is more valid?
-                // TODO: Types are meh
-                feature.removeFrom(this.markersFeatureGroup as any);
+                this.markersFeatureGroup!.removeLayer(feature);
+                this.setMapView();
               };
             }
           });
