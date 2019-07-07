@@ -26,6 +26,7 @@ workbox.routing.registerRoute(
       new workbox.expiration.Plugin({
         maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
         maxEntries: 30,
+        purgeOnQuotaError: true, // allow font caches to be purged to free space
       }),
     ],
   })
