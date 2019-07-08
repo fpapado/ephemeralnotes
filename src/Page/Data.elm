@@ -259,8 +259,9 @@ viewUploadData uploadData =
 
                 ValidationError error ->
                     div
-                        [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
-                        [ paragraph [ class "dark-red" ]
+                        [ class "vs3 pa3 near-black bg-washed-red ba bw1 br2 b--light-red" ]
+                        [ subSubHeading 3 [] [ text "There is a problem" ]
+                        , paragraph []
                             [ span [ class "v-mid" ]
                                 [ text "We could not import the file you specified, because its contents are different than what we expected. It might be possible to fix this by following the errors below and editing the file manually."
                                 ]
@@ -269,8 +270,9 @@ viewUploadData uploadData =
 
                 SavingError error ->
                     div
-                        [ class "vs3 pa3 bg-washed-red ba bw1 br2" ]
-                        [ paragraph [ class "dark-red" ]
+                        [ class "vs3 pa3 near-black bg-washed-red ba bw1 br2 b--light-red" ]
+                        [ subSubHeading 3 [] [ text "There is a problem" ]
+                        , paragraph []
                             [ span [ class "v-mid" ]
                                 [ text (HumanError.toString (humanRequestError error))
                                 ]
@@ -278,8 +280,8 @@ viewUploadData uploadData =
                         ]
 
                 SavingSuccess entries ->
-                    div [ class "vs3 pa3 bg-washed-green ba bw1 br2" ]
-                        [ paragraph [ class "dark-green" ]
+                    div [ class "vs3 pa3 near-black bg-washed-green ba bw1 br2 b--color-text" ]
+                        [ paragraph []
                             [ span [ class "v-mid mr2" ] [ Feather.checkCircle Feather.Decorative ]
                             , span [ class "v-mid" ]
                                 [ text "Successfully imported "
