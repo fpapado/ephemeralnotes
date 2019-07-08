@@ -87,7 +87,7 @@ notificationRegion attrs children =
 
 
 prompt attrs children =
-    div (class "pa3 flex flex-wrap justify-around items-center bg-color-bg color-text shadow-1 animated fadeInUp" :: attrs) children
+    div (class "pa3 flex flex-wrap justify-around items-center bg-color-lighter color-text shadow-1 animated fadeInUp" :: attrs) children
 
 
 paragraph attrs children =
