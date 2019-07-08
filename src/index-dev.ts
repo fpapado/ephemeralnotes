@@ -17,6 +17,13 @@ function init() {
     .catch(err => {
       console.error(err);
     });
+
+  // Define <storage-space>
+  import(/* webpackChunkName: "storage-space" */ './storage-space')
+    .then(storageSpace => storageSpace.define())
+    .catch(err => {
+      console.error(err);
+    });
 }
 
 init();
