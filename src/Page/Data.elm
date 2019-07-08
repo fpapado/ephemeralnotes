@@ -187,9 +187,9 @@ viewContent entryData model =
                     , viewImport
                     , viewUploadData model.uploadData
                     ]
-                , section [ class "vs3 mw6" ]
+                , section [ class "vs3" ]
                     [ subHeading 2 [] [ text "Usage" ]
-                    , Html.node "storage-space" [] []
+                    , viewUsage
                     ]
                 ]
             ]
@@ -310,6 +310,20 @@ viewUploadData uploadData =
             _ ->
                 text ""
         ]
+
+
+viewUsage : Html msg
+viewUsage =
+    div [ class "vs3" ]
+        [ div [ class "mw6" ] [ Html.node "storage-space" [] [] ]
+        , paragraph []
+            [ text "The storage limit varies per browser, and also depends on your system's free space. While word entries are quite small, this counter, if available, can give you an indication to export your data."
+            ]
+        ]
+
+
+
+-- UTILS
 
 
 humanRequestError : Store.RequestError -> HumanError
