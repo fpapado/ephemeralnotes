@@ -28,7 +28,7 @@ const styleText = `
 }
 `;
 
-// Import the local leaflet styles
+// Import the local styles
 // We use the ConstructableStyleSheet where supported
 // The ConstructableStyleSheet proposal allows sharing of styles
 // between different roots (including document and shadow roots).

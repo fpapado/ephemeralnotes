@@ -177,6 +177,7 @@ viewContent entryData model =
                     , paragraph []
                         [ text "Data is saved locally to your device, in the browser you are using. It is never transmitted to a server or remote location. We recommend that you export your data regularly, to keep them backed up. You can use the utilities below to import and export data between your devices."
                         ]
+                    , Html.node "persistent-storage-indicator" [] []
                     ]
                 , section [ class "vs3" ]
                     [ subHeading 2 [] [ text "Export" ]

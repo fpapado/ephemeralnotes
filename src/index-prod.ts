@@ -25,6 +25,15 @@ function init() {
     .catch(err => {
       console.error(err);
     });
+
+  // Define <persistent-storage-indicator>
+  import(
+    /* webpackChunkName: "persistent-storage-indicator" */ './persistent-storage-indicator'
+  )
+    .then(persistentStorage => persistentStorage.define())
+    .catch(err => {
+      console.error(err);
+    });
 }
 
 init();
