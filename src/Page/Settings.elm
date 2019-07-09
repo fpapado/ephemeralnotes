@@ -74,7 +74,7 @@ viewContent darkMode =
                 , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "System Information" ]
                     , div [ class "vs3" ]
-                        [ paragraphSmall [] [ Html.node "system-info" [] [] ]
+                        [ div [ class "mv0 f5 measure" ] [ Html.node "system-info" [] [] ]
                         ]
                     ]
                 ]

@@ -6,12 +6,16 @@ const styleText = `
   max-width: 100%;
 }
 ul {
-  list-style-type: none;
-  padding: 0;
+  padding-left: 1em;
   margin: 0;
 }
 ul > * + * {
   margin-top: 0.5rem;
+}
+@supports (font-variation-settings: normal) {
+  b {
+    font-variation-settings: 'wght' 700;
+  }
 }
 `;
 
@@ -24,7 +28,7 @@ const template = document.createElement('template');
 
 template.innerHTML = `
 ${styleResult.text ? `<style>${styleResult.text}</style>` : ''}
-<div class="container" id=${CONTAINER_ID}>
+<div id=${CONTAINER_ID}>
 </div>
 `;
 
@@ -82,7 +86,10 @@ class SytemInfo extends HTMLElement {
     this.$container.innerHTML = `
         <ul>
             ${info
-              .map(([term, data]) => `<li>${term}: ${data}</li>`)
+              .map(
+                ([term, data]) =>
+                  `<li><b class="term">${term}:</b> ${data}</li>`
+              )
               .join('\n')}
         </ul>
     `;
