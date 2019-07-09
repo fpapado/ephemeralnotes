@@ -1411,6 +1411,9 @@ img {
 .wb-all {
   word-break: break-all;
 }
+.pointer {
+  cursor: pointer;
+}
 @media screen and (min-width: 30em) {
   .ba-ns {
     border-style: solid;

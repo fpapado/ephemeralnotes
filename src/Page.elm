@@ -1,6 +1,7 @@
 module Page exposing (FocusState(..), Page(..), view)
 
 import Browser exposing (Document)
+import Browser.Navigation as Navigation
 import Html exposing (Html, a, button, div, footer, h1, header, i, img, li, main_, nav, p, span, text, ul)
 import Html.Attributes as HA exposing (class, classList, href, id, style, tabindex)
 import Html.Events exposing (onBlur, onClick)
@@ -40,8 +41,8 @@ focus it on transition.
 The "main" element handles the state of being focused or not, to toggle tabindex dynamically.
 
 -}
-view : { activePage : Page, focusState : FocusState, onBlurredMain : msg, toOutMsg : innerMsg -> msg } -> { title : String, content : Html innerMsg } -> Document msg
-view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
+view : { activePage : Page, focusState : FocusState, onBlurredMain : msg, onPressedBack : msg, toOutMsg : innerMsg -> msg } -> { title : String, content : Html innerMsg } -> Document msg
+view { activePage, focusState, onBlurredMain, onPressedBack, toOutMsg } { title, content } =
     let
         -- The main element that the caller must render
         -- We must dynamically set the tabindex, to avoid a critical but where it captures/steals focus
@@ -74,7 +75,7 @@ view { activePage, focusState, onBlurredMain, toOutMsg } { title, content } =
     { title = title ++ " | Ephemeral"
     , body =
         [ viewShell
-            [ viewHeader activePage
+            [ viewHeader activePage onPressedBack
             , viewMain [ Html.map toOutMsg content ]
             ]
         ]
@@ -85,13 +86,21 @@ viewShell children =
     div [ class "min-vh-100 flex flex-column bg-color-bg color-text f-phantomsans lh-copy elm-root" ] children
 
 
-viewHeader : Page -> Html msg
-viewHeader activePage =
+viewHeader : Page -> msg -> Html msg
+viewHeader activePage onPressedBack =
     header [ class "navigation-header bg-color-lighter color-text-faint bb lh-title" ]
         [ skipLink
         , nav [ class "navigation-container" ]
             [ div [ class "navigation-title-about flex items-center mw7" ]
-                [ div [ class "w-100 navigation-title" ]
+                [ div [ class "navigation-back-button" ]
+                    [ button
+                        [ class "button-reset lh-solid v-mid color-text focus-shadow pointer"
+                        , onClick onPressedBack
+                        ]
+                        [ Feather.arrowLeft (Feather.Content { label = "Previous page" })
+                        ]
+                    ]
+                , div [ class "w-100 navigation-title" ]
                     [ a
                         [ Route.href Route.Home
                         , class "f3 fw7 link color-accent tc navigation-home"

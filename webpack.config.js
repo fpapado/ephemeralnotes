@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const Critters = require('critters-webpack-plugin');
@@ -67,6 +68,11 @@ module.exports = {
       // both options are optional
       filename: ifNotProduction('[name].css', '[name]-[contenthash].css'),
       chunkFilename: ifNotProduction('[id].css', '[id]-[hash].css'),
+    }),
+    new webpack.DefinePlugin({
+      NOW_GITHUB_COMMIT_SHA: JSON.stringify(
+        (process.env.NOW_GITHUB_COMMIT_SHA || 'local').slice(0, 7)
+      ),
     }),
     // Inline critical css, preload fonts
     ifProduction(

@@ -56,17 +56,25 @@ viewContent darkMode =
     div []
         [ centeredContainer
             []
-            [ div [ class "vs4" ]
-                [ heading 1 [] [ text "Settings" ]
-                , div [ class "vs3 f4 measure" ]
-                    [ DarkMode.viewSwitch
-                        { onClick = ToggleDarkMode darkMode
-                        , describedBy = Just darkModeDescriptionId
-                        , mode = darkMode
-                        }
-                    , paragraphSmall
-                        [ HA.id darkModeDescriptionId ]
-                        [ text "Your preference will be saved and take precedence over system settings."
+            [ div [ class "vs4 vs5-ns" ]
+                [ div []
+                    [ heading 1 [] [ text "Settings" ]
+                    , div [ class "vs2 f4 measure" ]
+                        [ DarkMode.viewSwitch
+                            { onClick = ToggleDarkMode darkMode
+                            , describedBy = Just darkModeDescriptionId
+                            , mode = darkMode
+                            }
+                        , paragraphSmall
+                            [ HA.id darkModeDescriptionId ]
+                            [ text "Your preference will be saved and take precedence over system settings."
+                            ]
+                        ]
+                    ]
+                , div [ class "vs3" ]
+                    [ subHeading 2 [] [ text "System Information" ]
+                    , div [ class "vs3" ]
+                        [ div [ class "mv0 f5 measure" ] [ Html.node "system-info" [] [] ]
                         ]
                     ]
                 ]

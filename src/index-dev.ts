@@ -33,6 +33,13 @@ function init() {
     .catch(err => {
       console.error(err);
     });
+
+  // Define <system-info>
+  import(/* webpackChunkName: "system-info" */ './system-info')
+    .then(systemInfo => systemInfo.define())
+    .catch(err => {
+      console.error(err);
+    });
 }
 
 init();

@@ -66,11 +66,3 @@ html {
 .bg-color-lighter {
   background-color: var(--color-bg-lighter);
 }
-
-.elm-root,
-header,
-.navigation-bar {
-  transition-property: color, background-color, border-color;
-  transition-duration: 0.4s;
-  transition-timing-function: ease;
-}

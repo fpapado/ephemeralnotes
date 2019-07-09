@@ -13,9 +13,9 @@
   padding: 0.5em 0;
   position: relative;
   text-align: left;
-  transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out,
-    background-color 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
   width: 100%;
+  color: inherit;
 }
 
 .switch-toggle:focus {
