@@ -128,7 +128,14 @@ view model =
         viewPage page toMsg config =
             let
                 { title, body } =
-                    Page.view { activePage = page, focusState = model.focusState, onBlurredMain = FocusedPastMain, toOutMsg = toMsg } config
+                    Page.view
+                        { activePage = page
+                        , focusState = model.focusState
+                        , onBlurredMain = FocusedPastMain
+                        , onPressedBack = UserPressedBack
+                        , toOutMsg = toMsg
+                        }
+                        config
             in
             { title = title
             , body = body ++ globalPopups
@@ -171,6 +178,8 @@ type Msg
     | ChangedRoute (Maybe Route)
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
+      -- Back URL Handling
+    | UserPressedBack
       -- Focus handling
     | GotFocusResult (Result Dom.Error ())
     | FocusedPastMain
@@ -261,6 +270,9 @@ update msg model =
 
         ( FocusedPastMain, _ ) ->
             ( { model | focusState = FocusPastMain }, Cmd.none )
+
+        ( UserPressedBack, _ ) ->
+            ( model, Cmd.batch [ Nav.back model.navKey 1, focus "main" ] )
 
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) model
