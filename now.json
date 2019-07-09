@@ -1,10 +1,7 @@
 {
   "version": 2,
   "name": "ephemeral-v2",
-  "alias": [
-    "ephemeralnotes.app",
-    "ephemeral-v2"
-  ],
+  "alias": ["ephemeralnotes.app", "ephemeral-v2"],
   "builds": [
     {
       "src": "package.json",
@@ -14,28 +11,21 @@
   ],
   "routes": [
     {
-      "src": "^/(main-.*)",
+      "src": "^/sw.js",
+      "dest": "/sw.js",
+      "headers": {
+        "cache-control": "no-cache"
+      }
+    },
+    {
+      "src": "^/(.*.js)",
       "dest": "/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
       }
     },
     {
-      "src": "^/(leaflet-.*)",
-      "dest": "/$1",
-      "headers": {
-        "cache-control": "max-age=31536000,immutable"
-      }
-    },
-    {
-      "src": "^/(storage-.*)",
-      "dest": "/$1",
-      "headers": {
-        "cache-control": "max-age=31536000,immutable"
-      }
-    },
-    {
-      "src": "^/(vendors~.*)",
+      "src": "^/(.*.css)",
       "dest": "/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
@@ -46,20 +36,6 @@
       "dest": "/workbox-$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
-      }
-    },
-    {
-      "src": "^/sw.js",
-      "dest": "/sw.js",
-      "headers": {
-        "cache-control": "no-cache"
-      }
-    },
-    {
-      "src": "^/favicon.ico",
-      "dest": "/favicon.ico",
-      "headers": {
-        "cache-control": "no-cache"
       }
     },
     {
@@ -77,14 +53,21 @@
       }
     },
     {
+      "src": "^/assets/manifest.json",
+      "dest": "/assets/manifest.json",
+      "headers": {
+        "cache-control": "must-revalidate, max-age=3600"
+      }
+    },
+    {
       "src": "^/assets/(.*)",
       "dest": "/assets/$1"
     },
     {
-      "src": "^/(precache-manifest.*.js)",
-      "dest": "/$1",
+      "src": "^/favicon.ico",
+      "dest": "/favicon.ico",
       "headers": {
-        "cache-control": "max-age=31536000,immutable"
+        "cache-control": "no-cache"
       }
     },
     {"src": "^/robots.txt", "dest": "/robots.txt"},
