@@ -11,6 +11,13 @@
   ],
   "routes": [
     {
+      "src": "^/sw.js",
+      "dest": "/sw.js",
+      "headers": {
+        "cache-control": "no-cache"
+      }
+    },
+    {
       "src": "^/(.*.js)",
       "dest": "/$1",
       "headers": {
@@ -55,13 +62,6 @@
     {
       "src": "^/assets/(.*)",
       "dest": "/assets/$1"
-    },
-    {
-      "src": "^/sw.js",
-      "dest": "/sw.js",
-      "headers": {
-        "cache-control": "no-cache"
-      }
     },
     {
       "src": "^/favicon.ico",
