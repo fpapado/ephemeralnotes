@@ -14,6 +14,7 @@ import Json.Encode as JE
 import RemoteData exposing (RemoteData)
 import Route
 import Store
+import Store.Persistence as Persistence exposing (Persistence)
 import String.Transforms
 import Svg.Feather as Feather
 import Task exposing (Task)
@@ -177,7 +178,7 @@ viewContent entryData model =
                     , paragraph []
                         [ text "Data is saved locally to your device, in the browser you are using. It is never transmitted to a server or remote location. We recommend that you export your data regularly, to keep them backed up. You can use the utilities below to import and export data between your devices."
                         ]
-                    , Html.node "persistent-storage-indicator" [] []
+                    , Persistence.view Persistence.Persisted
                     ]
                 , section [ class "vs3" ]
                     [ subHeading 2 [] [ text "Export" ]
