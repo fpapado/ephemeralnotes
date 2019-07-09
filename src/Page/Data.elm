@@ -54,6 +54,7 @@ init =
 
 type alias Context =
     { entries : EntryData
+    , persistence : Maybe Persistence
     }
 
 
@@ -161,14 +162,14 @@ update msg model =
 
 
 view : Context -> Model -> { title : String, content : Html Msg }
-view { entries } model =
+view context model =
     { title = "Data"
-    , content = viewContent entries model
+    , content = viewContent context model
     }
 
 
-viewContent : EntryData -> Model -> Html Msg
-viewContent entryData model =
+viewContent : Context -> Model -> Html Msg
+viewContent { entries, persistence } model =
     div []
         [ centeredContainer
             []
@@ -178,11 +179,13 @@ viewContent entryData model =
                     , paragraph []
                         [ text "Data is saved locally to your device, in the browser you are using. It is never transmitted to a server or remote location. We recommend that you export your data regularly, to keep them backed up. You can use the utilities below to import and export data between your devices."
                         ]
-                    , Persistence.view Persistence.Persisted
+                    , -- When persistence is Maybe.Nothing, we haven't checked yet / are checking; no need to show anything.
+                      Maybe.map Persistence.view persistence
+                        |> Maybe.withDefault (text "")
                     ]
                 , section [ class "vs3" ]
                     [ subHeading 2 [] [ text "Export" ]
-                    , viewExport entryData
+                    , viewExport entries
                     ]
                 , section [ class "vs3" ]
                     [ subHeading 2 [] [ text "Import" ]

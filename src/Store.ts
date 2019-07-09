@@ -4,6 +4,7 @@ import {openDB, DBSchema} from 'idb';
 import nanoid from 'nanoid';
 import {Elm} from './Main';
 import {Result, Result_Ok, Result_Error} from './Core';
+import * as Persistence from './Store/Persistence';
 
 // FromElm
 // TODO: UpdateEntry Entry
@@ -34,13 +35,20 @@ const GotEntry = (data: Result<string, EntryToElm>) => ({
   data,
 });
 
+const GotPersistence = (data: Persistence.Persistence) => ({
+  tag: 'GotPersistence',
+  data,
+});
+
 // From Elm
 type PartialEntryFromElm = Omit<EntryV1, 'id'> & {schema_version: number};
 
 export type FromElm =
   | {tag: 'StoreEntry'; data: PartialEntryFromElm}
   | {tag: 'StoreBatchImportedEntries'; data: Array<EntryV1>}
-  | {tag: 'GetEntries'};
+  | {tag: 'GetEntries'}
+  | {tag: 'CheckPersistenceWithoutPrompt'}
+  | {tag: 'RequestPersistence'};
 
 /** Respond to a Store.FromElm message */
 async function handleSubMessage(
@@ -111,8 +119,18 @@ async function handleSubMessage(
       }
       return;
 
+    case 'CheckPersistenceWithoutPrompt':
+      const persistence = await Persistence.tryPersistWithoutPromptingUser();
+      sendToElm(GotPersistence(persistence));
+      return;
+
+    case 'RequestPersistence':
+      const persistence_ = await Persistence.tryPersistWithPrompt();
+      sendToElm(GotPersistence(persistence_));
+      return;
+
     default:
-      console.warn('Unknown message: ', msg);
+      assertUnreachable(msg);
       return;
   }
 }
@@ -207,3 +225,9 @@ async function openEntryDB() {
 
 // UTIL
 type Omit<Obj, Key> = Pick<Obj, Exclude<keyof Obj, Key>>;
+
+/** Used with TS to assert that switch statements are exhaustive. */
+function assertUnreachable(x: never): never;
+function assertUnreachable(x: string) {
+  console.warn('Unknown message: ', x);
+}

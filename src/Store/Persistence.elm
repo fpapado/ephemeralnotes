@@ -40,7 +40,7 @@ type Persistence
       -- The user or UA has denied the prompt (either as a result of a prompt now, or in the past).
     | Denied
       -- (Rare): We tried to persist but failed; internal error, perhaps disk I/O.
-    | PersistenceFailed
+    | Failed
 
 
 
@@ -62,8 +62,8 @@ toString persistence =
         Denied ->
             "Denied"
 
-        PersistenceFailed ->
-            "PersistenceFailed"
+        Failed ->
+            "Failed"
 
 
 decoder : JD.Decoder Persistence
@@ -84,8 +84,8 @@ decoder =
                     "Denied" ->
                         JD.succeed Denied
 
-                    "PersistenceFailed" ->
-                        JD.succeed PersistenceFailed
+                    "Failed" ->
+                        JD.succeed Failed
 
                     _ ->
                         JD.fail ("Did not expect tag " ++ tag)
@@ -110,7 +110,7 @@ view persistence =
                 Denied ->
                     "The permission to store entries permanently has been denied. The browser might clear them up, if storage space is running low. It is unlikely, but could happen. Take care to export your data if your storage space is running low."
 
-                PersistenceFailed ->
+                Failed ->
                     "We could not ensure that entries get stored permanently due to an internal error. Will try again."
 
                 ShouldPrompt ->

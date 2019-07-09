@@ -25,6 +25,7 @@ import Route exposing (Route)
 import ServiceWorker as SW
 import Set exposing (Set)
 import Store
+import Store.Persistence as Persistence exposing (Persistence)
 import Task
 import Time
 import Ui exposing (..)
@@ -43,6 +44,7 @@ type alias Model =
     , installPrompt : SW.InstallPrompt
     , entries : RemoteData String (List Entry)
     , darkMode : DarkMode.Mode
+    , persistence : Maybe Persistence
     }
 
 
@@ -106,10 +108,13 @@ init flagsValue url navKey =
                 , installPrompt = SW.installPromptNone
                 , entries = RemoteData.Loading
                 , darkMode = flags.initDarkMode
+                , persistence = Maybe.Nothing
                 }
     in
-    -- Return those, plus the Main init msg
-    ( modelWithPage, Cmd.batch [ Store.getEntries, cmdWithPage ] )
+    -- Return the page model and commands, as well as common "initial" commands
+    ( modelWithPage
+    , Cmd.batch [ Store.getEntries, Store.checkPersistenceWithoutPrompt, cmdWithPage ]
+    )
 
 
 
@@ -157,7 +162,7 @@ view model =
 
         Data dataModel ->
             -- Data does not have a model, but it does have a Msg
-            viewPage Page.Data GotDataMsg (Data.view { entries = model.entries } dataModel)
+            viewPage Page.Data GotDataMsg (Data.view { entries = model.entries, persistence = model.persistence } dataModel)
 
         Settings ->
             -- Data does not have a model, but it does have a Msg
@@ -300,6 +305,9 @@ update msg model =
 
                 Store.GotBatchImportedEntries num ->
                     ( model, Cmd.none )
+
+                Store.GotPersistence persistence ->
+                    ( { model | persistence = Maybe.Just persistence }, Cmd.none )
 
                 Store.BadMessage err ->
                     ( model, Log.error (JD.errorToString err) )
@@ -470,44 +478,6 @@ viewInstallPrompt installPrompt =
                     ]
             }
         ]
-
-
-{-| Merge two lists of entries, keeping only a single id, prioritising the first list. |
--}
-mergeEntryLists : List Entry -> List Entry -> List Entry
-mergeEntryLists list1 list2 =
-    let
-        rawMerged =
-            list1 ++ list2
-
-        initState =
-            ( [], Set.empty )
-
-        addIfNotSeen : Entry -> ( List Entry, Set String ) -> ( List Entry, Set String )
-        addIfNotSeen candidate ( listSoFar, seenIds ) =
-            let
-                -- Extract the id from the Entry, so we can compare it
-                -- TODO: Consider a tie-breaker with Version as well
-                id =
-                    case candidate of
-                        Entry.V1 entry ->
-                            Entry.Id.toString entry.id
-
-                haveSeenIdBefore =
-                    Set.member id seenIds
-            in
-            case haveSeenIdBefore of
-                -- If the id is in the ones we have seen, skip it
-                True ->
-                    ( listSoFar, seenIds )
-
-                -- If the id is not in the ones we have seen, add the item to the list
-                -- and the ids to the set
-                False ->
-                    ( candidate :: listSoFar, Set.insert id seenIds )
-    in
-    List.foldl addIfNotSeen initState rawMerged
-        |> Tuple.first
 
 
 
