@@ -71,8 +71,8 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       NOW_GITHUB_COMMIT_SHA: JSON.stringify(
-        process.env.NOW_GITHUB_COMMIT_SHA || 'local'
-      ).slice(0, 7),
+        (process.env.NOW_GITHUB_COMMIT_SHA || 'local').slice(0, 7)
+      ),
     }),
     // Inline critical css, preload fonts
     ifProduction(
