@@ -71,12 +71,17 @@ jsonMime =
 
 
 type Msg
-    = ClickedDownload (List Entry)
+    = -- Export
+      ClickedDownload (List Entry)
     | GotDownloadTime (List Entry) Time.Posix
+      -- Import
     | FileUploadRequested
     | FileSelected File
     | FileLoaded String
+      -- Subscription to store (for Import)
     | FromStore Store.ToElm
+      --
+    | RequestedPersistence
     | NoOp
 
 
@@ -153,6 +158,11 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        -- TODO: Consider changing a state to RequestingPersistence
+        -- TODO: Consider adding a listener for Store.GotPersistence here, to set RequestingPersistence
+        RequestedPersistence ->
+            ( model, Store.requestPersistence )
+
         NoOp ->
             ( model, Cmd.none )
 
@@ -177,10 +187,10 @@ viewContent { entries, persistence } model =
                 [ div [ class "vs3" ]
                     [ heading 1 [] [ text "Data" ]
                     , paragraph []
-                        [ text "Data is saved locally to your device, in the browser you are using. It is never transmitted to a server or remote location. We recommend that you export your data regularly, to keep them backed up. You can use the utilities below to import and export data between your devices."
+                        [ text "Data is stored locally to your device, in the browser. It is never transmitted to a server or remote location. You can use the utilities below to transfer data between your devices."
                         ]
                     , -- When persistence is Maybe.Nothing, we haven't checked yet / are checking; no need to show anything.
-                      Maybe.map Persistence.view persistence
+                      Maybe.map viewPersistence persistence
                         |> Maybe.withDefault (text "")
                     ]
                 , section [ class "vs3" ]
@@ -371,3 +381,55 @@ humanRequestError err =
             , summary = Just "This is possibly an error in the code. Please get in touch if you run into this!"
             , recovery = HumanError.Unrecoverable
             }
+
+
+{-| A curated view based on the persistence state. Tries to inform the user of the possiblities.
+It is in this module because it is closely related to what we want to communicate,
+but you could decide otherwise!
+-}
+viewPersistence : Persistence -> Html Msg
+viewPersistence persistence =
+    let
+        explanation =
+            case persistence of
+                Persistence.Unsupported ->
+                    "This browser might clear entries, if storage space is running low. It is unlikely, but it could happen. Take care to export your data if your device is low on free space."
+
+                Persistence.Denied ->
+                    "The permission to store entries permanently has been denied. The browser might clear them up, if storage space is running low. It is unlikely, but it could happen. Take care to export your data if your device is low on free space."
+
+                Persistence.Failed ->
+                    "We could not ensure that entries get stored permanently due to an internal error. Will try again."
+
+                Persistence.ShouldPrompt ->
+                    "This browser might clear entries, if storage space is running low. Please press the button below to give permission to store the entries permanently."
+
+                Persistence.Persisted ->
+                    "Entries will get stored permanently in this browser."
+    in
+    div [ class "vs2" ]
+        (case persistence of
+            Persistence.Persisted ->
+                [ paragraph [ class "status-indicator success" ]
+                    [ Feather.checkCircle Feather.Decorative
+                    , span [ class "ml2" ] [ text explanation ]
+                    ]
+                ]
+
+            _ ->
+                [ paragraph [ class "status-indicator warning" ]
+                    [ Feather.alertCircle Feather.Decorative
+                    , span [ class "ml2" ] [ text "Note" ]
+                    ]
+                , paragraph [] [ text explanation ]
+                , case persistence of
+                    Persistence.ShouldPrompt ->
+                        styledButtonBlue False
+                            [ onClick RequestedPersistence ]
+                            [ text "Persist data"
+                            ]
+
+                    _ ->
+                        text ""
+                ]
+        )

@@ -1,0 +1,9 @@
+.status-indicator {
+  line-height: 1.25;
+}
+.status-indicator svg {
+  vertical-align: middle;
+}
+.status-indicator > span {
+  vertical-align: middle;
+}
