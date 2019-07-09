@@ -35,6 +35,13 @@
       }
     },
     {
+      "src": "^/(system-.*)",
+      "dest": "/$1",
+      "headers": {
+        "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {
       "src": "^/(vendors~.*)",
       "dest": "/$1",
       "headers": {
