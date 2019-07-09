@@ -55,9 +55,12 @@
   display: grid;
   grid-gap: 1rem;
   gap: 1rem;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: 1fr max-content 1fr;
   justify-items: start;
   align-items: center;
+}
+.navigation-title-about svg {
+  vertical-align: middle;
 }
 /* The bar items stick to the right */
 .navigation-bar-flex {
@@ -96,7 +99,7 @@ main {
   .navigation-container > * + * {
     margin-left: initial;
   }
-  /* Total pixel tweaking; set three columns; ... Ephemeral | i 
+  /* Total pixel tweaking; set three columns: <- | Ephemeral | i 
     The result is that Ephemeral is "absolutely" centered in the container
     and we still have a minimum gap between the items. Probably also doable with
     flexbox, but I couldn't think of it...
@@ -104,13 +107,8 @@ main {
   .navigation-title-about {
     margin-left: auto;
     margin-right: auto;
-    grid-template-columns: 1fr max-content 1fr;
-  }
-  .navigation-title {
-    grid-column: 2/3;
   }
   .navigation-about {
-    grid-column: 3/4;
     justify-self: end;
   }
   .navigation-bar {
@@ -202,5 +200,17 @@ main {
     /* Enough area for the header + safe-area */
     padding-top: calc(constant(safe-area-inset-top, 0px) + 4rem);
     padding-top: calc(env(safe-area-inset-top, 0px) + 4rem);
+  }
+}
+
+/** Show the back-button in display-mode: standalone (i.e. when installed from Home Screen)
+  * TODO: Test with an iPhone and verify this matches correctly
+*/
+.navigation-back-button {
+  visibility: hidden;
+}
+@media all and (display-mode: standalone) {
+  .navigation-back-button {
+    visibility: visible;
   }
 }

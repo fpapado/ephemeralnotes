@@ -167,7 +167,7 @@ viewSwitch { onClick, describedBy, mode } =
     in
     div [ class "fw6 f4" ]
         [ button
-            [ class "switch-toggle color-text"
+            [ class "switch-toggle"
             , HA.attribute "aria-pressed" (boolToStringAttr isChecked)
             , HA.attribute "aria-describedby" (Maybe.withDefault "" describedBy)
             , HE.onClick onClick
