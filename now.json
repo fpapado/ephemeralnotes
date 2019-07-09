@@ -1,10 +1,7 @@
 {
   "version": 2,
   "name": "ephemeral-v2",
-  "alias": [
-    "ephemeralnotes.app",
-    "ephemeral-v2"
-  ],
+  "alias": ["ephemeralnotes.app", "ephemeral-v2"],
   "builds": [
     {
       "src": "package.json",
@@ -81,6 +78,13 @@
       "dest": "/assets/images/$1",
       "headers": {
         "cache-control": "max-age=31536000,immutable"
+      }
+    },
+    {
+      "src": "^/assets/manifest.json",
+      "dest": "/assets/manifest.json",
+      "headers": {
+        "cache-control": "must-revalidate, max-age=3600"
       }
     },
     {
