@@ -1,4 +1,4 @@
-workbox.precaching.precacheAndRoute(self.__precacheManifest || []);
+workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
 workbox.routing.registerNavigationRoute('/');
 
 // Listen for postMessage(), well, mesages

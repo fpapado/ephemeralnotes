@@ -92,7 +92,6 @@ module.exports = {
     ifProduction(
       new WorkboxPlugin.InjectManifest({
         swSrc: './src/sw.js',
-        importWorkboxFrom: 'local',
       })
     ),
     // Track bundle size
