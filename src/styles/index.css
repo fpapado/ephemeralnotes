@@ -10,6 +10,7 @@
 @import './enhanced-input.css';
 @import './grid-entries.css';
 @import './switch-toggle.css';
+@import './status-indicator.css';
 @import './Page.css';
 
 /** TODO: move to :root selector, whenever critters supports it */
@@ -20,6 +21,8 @@ html {
   --color-text-faint: #aaaaaa;
   --color-accent: #0769d3;
   --color-accent-faint: rgba(3, 102, 214, 0.5);
+  --color-success: #137752;
+  --color-warning: #a84400;
   --leaflet-map-bg: #dddddd;
   color-scheme: light dark;
   hyphens: auto;
@@ -32,6 +35,8 @@ html {
   --color-text-faint: #666;
   --color-accent: #96ccff;
   --color-accent-faint: #96ccff;
+  --color-success: #9eebcf;
+  --color-warning: #ef9c04;
   --leaflet-map-bg: var(--color-bg-lighter);
 }
 
@@ -65,4 +70,20 @@ html {
 
 .bg-color-lighter {
   background-color: var(--color-bg-lighter);
+}
+
+.success {
+  color: var(--color-success);
+}
+
+.bg-success {
+  background-color: var(--color-success);
+}
+
+.warning {
+  color: var(--color-warning);
+}
+
+.bg-warning {
+  background-color: var(--color-warning);
 }

@@ -28,7 +28,7 @@ const styleText = `
 }
 `;
 
-// Import the local leaflet styles
+// Import the local styles
 // We use the ConstructableStyleSheet where supported
 // The ConstructableStyleSheet proposal allows sharing of styles
 // between different roots (including document and shadow roots).
@@ -43,11 +43,13 @@ const DATA_ID = 'data';
 
 const template = document.createElement('template');
 
+// NOTE: Since the SVG has a textual alternative already (the caption),
+// we set aria-hidden="true" to hide it from Assistive Technologies
 template.innerHTML = `
 ${styleResult.text ? `<style>${styleResult.text}</style>` : ''}
 <div class="container">
     <div id="${CAPTION_ID}"></div>
-    <svg id="${SVG_ID}" class="svg-container" width="100%" height="65px" viewBox="0 0 1132 130">
+    <svg id="${SVG_ID}" class="svg-container" width="100%" height="65px" viewBox="0 0 1132 130" aria-hidden="true" focusable="false">
     <g class="bars">
         <rect class="bg" width="100%" height="50"></rect>
         <rect id="${DATA_ID}" class="data" height="50"></rect>

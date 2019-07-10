@@ -1,7 +1,9 @@
 port module Store exposing
     ( RequestError(..)
     , ToElm(..)
+    , checkPersistenceWithoutPrompt
     , getEntries
+    , requestPersistence
     , storeBatchImportedEntries
     , storeEntry
     , sub
@@ -11,6 +13,7 @@ import Entry.Entry as Entry exposing (Entry, EntryV1Partial)
 import Json.Decode as JD
 import Json.Encode as JE
 import Result.Decode
+import Store.Persistence as Persistence exposing (Persistence)
 
 
 type
@@ -21,6 +24,7 @@ type
     = GotEntries (List Entry)
     | GotBatchImportedEntries (Result RequestError Int)
     | GotEntry (Result String Entry)
+    | GotPersistence Persistence
     | BadMessage JD.Error
 
 
@@ -52,6 +56,8 @@ type FromElm
     = StoreEntry EntryV1Partial
     | StoreBatchImportedEntries (List Entry)
     | GetEntries
+    | CheckPersistenceWithoutPrompt
+    | RequestPersistence
 
 
 
@@ -78,6 +84,16 @@ storeEntry entry =
 storeBatchImportedEntries : List Entry -> Cmd msg
 storeBatchImportedEntries entries =
     send (StoreBatchImportedEntries entries)
+
+
+checkPersistenceWithoutPrompt : Cmd msg
+checkPersistenceWithoutPrompt =
+    send CheckPersistenceWithoutPrompt
+
+
+requestPersistence : Cmd msg
+requestPersistence =
+    send RequestPersistence
 
 
 
@@ -133,6 +149,18 @@ encodeFromElm data =
                 , ( "data", JE.object [] )
                 ]
 
+        CheckPersistenceWithoutPrompt ->
+            JE.object
+                [ ( "tag", JE.string "CheckPersistenceWithoutPrompt" )
+                , ( "data", JE.object [] )
+                ]
+
+        RequestPersistence ->
+            JE.object
+                [ ( "tag", JE.string "RequestPersistence" )
+                , ( "data", JE.object [] )
+                ]
+
 
 toElmDecoder : JD.Decoder ToElm
 toElmDecoder =
@@ -172,6 +200,10 @@ toElmInnerDecoder tag =
             -- GotEntry is a Result String Entry, so use the custom Result Decoder!
             JD.field "data" (Result.Decode.decoder JD.string Entry.decoder)
                 |> JD.map GotEntry
+
+        "GotPersistence" ->
+            JD.field "data" Persistence.decoder
+                |> JD.map GotPersistence
 
         _ ->
             JD.fail ("Unknown message: " ++ tag)
