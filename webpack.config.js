@@ -34,8 +34,8 @@ module.exports = {
   },
   output: {
     path: __dirname + '/dist',
-    chunkFilename: '[name]-[contenthash].js',
-    filename: ifProduction('[name]-[contenthash].js', '[name].js'),
+    chunkFilename: '[name].[contenthash].js',
+    filename: ifProduction('[name].[contenthash].js', '[name].js'),
     publicPath: '/',
   },
   plugins: removeEmpty([
@@ -66,8 +66,8 @@ module.exports = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: ifNotProduction('[name].css', '[name]-[contenthash].css'),
-      chunkFilename: ifNotProduction('[id].css', '[id]-[hash].css'),
+      filename: ifNotProduction('[name].css', '[name].[contenthash].css'),
+      chunkFilename: ifNotProduction('[id].css', '[id].[hash].css'),
     }),
     new webpack.DefinePlugin({
       NOW_GITHUB_COMMIT_SHA: JSON.stringify(
@@ -92,6 +92,8 @@ module.exports = {
     ifProduction(
       new WorkboxPlugin.InjectManifest({
         swSrc: './src/sw.js',
+        // matches [contenthash]
+        dontCacheBustURLsMatching: /\.[0-9a-f]{20}\./,
       })
     ),
     // Track bundle size
@@ -162,7 +164,9 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name]-[hash:20].[ext]',
+              // NOTE: [hash] in file-loader is [contenthash]
+              // We use :20 for compatibility with [contenthash]
+              name: '[name].[hash:20].[ext]',
               outputPath: 'assets/images',
               publicPath: 'assets/images',
             },
