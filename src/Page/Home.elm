@@ -68,6 +68,19 @@ viewContent context model =
     let
         formInput =
             Form.getInput model.form
+
+        userHasInteractedWithApp =
+            case context.entries of
+                RemoteData.Success entryList ->
+                    case List.length entryList of
+                        0 ->
+                            False
+
+                        _ ->
+                            True
+
+                _ ->
+                    True
     in
     div []
         [ Ui.centeredContainer
@@ -75,7 +88,11 @@ viewContent context model =
             [ div [ class "vs4 vs5-ns" ]
                 [ div [ class "vs3" ]
                     [ heading 1 [] [ text "Ephemeral" ]
-                    , About.viewPitch
+                    , if userHasInteractedWithApp then
+                        text ""
+
+                      else
+                        About.viewPitch
                     ]
                 , section [] [ Html.map FormMsg (Form.view model.form) ]
                 , section [ class "vs3 vs4-ns" ]
