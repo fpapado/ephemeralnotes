@@ -399,7 +399,7 @@ viewPersistence persistence =
                     "The permission to store entries permanently has been denied. The browser might clear them up, if storage space is running low. It is unlikely, but it could happen. Take care to export your data if your device is low on free space."
 
                 Persistence.Failed ->
-                    "We could not ensure that entries get stored permanently due to an internal error. Will try again."
+                    "We could not ensure that entries get stored permanently. This can happen if you only visited the app for the first time recently, and the browser does not trust it yet. Please try again later."
 
                 Persistence.ShouldPrompt ->
                     "This browser might clear entries, if storage space is running low. Please press the button below to give permission to store the entries permanently."

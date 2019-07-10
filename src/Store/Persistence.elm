@@ -32,7 +32,7 @@ type Persistence
     | Unsupported
       -- The user or UA has denied the prompt (either as a result of a prompt now, or in the past).
     | Denied
-      -- (Rare): We tried to persist but failed; internal error, perhaps disk I/O.
+      -- (Maybe Rare): We tried to persist but failed. This also seems to happen on Chrome when the UA rejects automatically...
     | Failed
 
 
