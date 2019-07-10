@@ -4,7 +4,11 @@ import * as strategies from 'workbox-strategies';
 import * as expiration from 'workbox-expiration';
 
 precaching.precacheAndRoute(self.__WB_MANIFEST);
-routing.registerNavigationRoute('/');
+workbox.routing.registerNavigationRoute(
+  // Assuming '/index.html' has been precached,
+  // look up its corresponding cache key.
+  workbox.precaching.getCacheKeyForURL('/index.html')
+);
 
 // Listen for postMessage(), well, mesages
 // One of interest is 'SkipWaiting', to instruct the SW to skip waiting directly
