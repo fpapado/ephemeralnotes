@@ -72,10 +72,10 @@ jsonMime =
 
 type Msg
     = -- Export
-      ClickedDownload (List Entry)
+      ClickedExport (List Entry)
     | GotDownloadTime (List Entry) Time.Posix
       -- Import
-    | FileUploadRequested
+    | FileImportRequested
     | FileSelected File
     | FileLoaded String
       -- Subscription to store (for Import)
@@ -100,11 +100,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- Import/Export
-        ClickedDownload entries ->
+        ClickedExport entries ->
             -- Get the time, then save
             ( model, Task.perform (GotDownloadTime entries) Time.now )
 
-        FileUploadRequested ->
+        FileImportRequested ->
             ( model, requestFile )
 
         FileSelected file ->
@@ -221,7 +221,7 @@ viewExport entryData =
         (case entryData of
             RemoteData.Success entries ->
                 [ styledButtonBlue False
-                    [ onClick (ClickedDownload entries) ]
+                    [ onClick (ClickedExport entries) ]
                     [ text "Export Entries" ]
                 , details [ class "vs3 f4" ]
                     [ summary []
@@ -259,7 +259,7 @@ requestFile =
 -}
 viewImport : Html Msg
 viewImport =
-    div [ class "vs3" ] [ styledButtonBlue False [ onClick FileUploadRequested ] [ text "Import" ] ]
+    div [ class "vs3" ] [ styledButtonBlue False [ onClick FileImportRequested ] [ text "Import" ] ]
 
 
 viewUploadData : UploadData -> Html msg
