@@ -227,7 +227,6 @@ update msg model =
                         formResult =
                             entryRes
                                 |> Result.map (\entry -> ())
-                                |> Result.mapError (\err -> ())
 
                         ( newForm, cmd ) =
                             Form.update (Form.GotSaveResult formResult) model.form

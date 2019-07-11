@@ -40,7 +40,7 @@ type Msg
     | PressedSave
     | GotTime Time.Posix
     | GotLocation (RemoteData Geo.Error L.LatLon)
-    | GotSaveResult (Result () ())
+    | GotSaveResult (Result Store.RequestError ())
     | NoOp
 
 
@@ -54,7 +54,7 @@ type State
 
 type Error
     = GeolocationError Geo.Error
-    | SavingError
+    | SavingError Store.RequestError
 
 
 type alias Input =
@@ -136,7 +136,11 @@ update msg form =
                             -- to WaitingForLocation or short-circuit to WaitingForSave
                             case form.input.saveLocation of
                                 True ->
-                                    ( { form | time = RemoteData.succeed time, location = RemoteData.Loading, state = WaitingForLocation }
+                                    ( { form
+                                        | time = RemoteData.succeed time
+                                        , location = RemoteData.Loading
+                                        , state = WaitingForLocation
+                                      }
                                     , Geo.getLocation
                                     )
 
@@ -202,14 +206,16 @@ update msg form =
 
                 GotSaveResult res ->
                     case form.state of
+                        -- We only care about "Got Save Result" messages if we are waiting for one!
                         WaitingForSave ->
                             case res of
-                                -- Reset the form
+                                -- All is well; reset the form.
                                 Ok () ->
                                     ( { form | input = emptyInput, state = Editing }, Cmd.none )
 
-                                Err () ->
-                                    ( { form | state = EditingWithError SavingError }
+                                -- Things went wrong, update the state and focus the error summary
+                                Err err ->
+                                    ( { form | state = EditingWithError (SavingError err) }
                                     , focusErrorSummaryAndForget
                                     )
 
@@ -303,11 +309,12 @@ view form_ =
 
         viewFormError =
             case form_.state of
+                -- TODO: Add a "viewSuccess" here as well!
                 EditingWithError err ->
                     viewError err
 
                 _ ->
-                    div [] []
+                    text ""
     in
     form [ class "vs3 vs4-ns", HE.onSubmit (noOpIfReadOnly PressedSave), HA.autocomplete False ]
         [ subHeading 2 [ class "decor" ] [ text "Add Entry" ]
@@ -377,19 +384,47 @@ viewError error =
         headingId =
             "addEntryFrom-error-heading"
 
-        humanText =
+        errorExplanation =
             case error of
                 GeolocationError Geo.PermissionDenied ->
-                    "We do not have permission to read your location. Perhaps there is a setting in your browser, a pop-up window, or your phone's top menu? For now, you can save the note without a location, using the checkbox below."
+                    text "We do not have permission to read your location. Perhaps there is a setting in your browser, a pop-up window, or your phone's top menu? For now, you can save the note without a location, using the checkbox below."
 
                 GeolocationError Geo.PositionUnavailable ->
-                    "We could not acquire your location. For now, you can save the note without a location, using the checkbox below."
+                    text "We could not acquire your location. For now, you can save the note without a location, using the checkbox below."
 
                 GeolocationError Geo.Timeout ->
-                    "It took us to long to acquire your location. This can happen sometimes. For now, you can save the note without a location, using the checkbox below."
+                    text "It took us to long to acquire your location. This can happen sometimes. For now, you can save the note without a location, using the checkbox below."
 
-                SavingError ->
-                    "We could not save the note locally. This is likely a problem in the code."
+                -- NOTE: for requestError, there are three main cases:
+                --  - QuotaExceeded (the important one)
+                --  - UnaccountedError (we messed up somewhere, probably)
+                --  - Any other RequestError variant (either internal, or a version mismatch, but I don't know if either is actionable)
+                SavingError requestError ->
+                    case requestError of
+                        Store.QuotaExceededError ->
+                            -- TODO: Link to entries page here
+                            div [ class "vs3" ]
+                                [ paragraph [] [ text "We could not save the note locally, because the storage space allocated to this application has run out. This can happen if your device is low on free space." ]
+                                , paragraph [] [ text "There are two common options to solve this: " ]
+                                , ul [ class "vs2 pl4" ]
+                                    [ li [] [ text "Free up space on your device." ]
+                                    , li []
+                                        [ a [ href "/data", class "near-black" ] [ text "Export your entries" ]
+                                        , text " and then clear the site data."
+                                        ]
+                                    ]
+                                , paragraph []
+                                    [ text "The "
+                                    , a [ href "/data", class "near-black" ] [ text "Data page" ]
+                                    , text " has more guidance on data usage and export options."
+                                    ]
+                                ]
+
+                        Store.UnaccountedError ->
+                            text "We could not save the location locally, because of an unexpected error. This is possibly an error in the code. Please get in touch if you run into this!"
+
+                        _ ->
+                            text "We could not save the note locally, because of an internal error. It could be temporary, so you can try again later. If the error persists, please get in touch."
     in
     div
         [ HA.tabindex -1
@@ -399,5 +434,5 @@ viewError error =
         , class "vs2 pa3 bg-washed-red near-black ba bw1 br2 b--light-red focus-shadow-faint"
         ]
         [ subSubHeading 3 [ HA.id headingId ] [ text "There is a problem" ]
-        , paragraph [] [ text humanText ]
+        , paragraph [] [ errorExplanation ]
         ]
