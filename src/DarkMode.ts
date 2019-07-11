@@ -31,7 +31,7 @@ async function handleSubMessage(
   msg: FromElm
 ) {
   if (!msg.tag) {
-    console.error('No tag for msg', msg);
+    console.warn('No tag for msg', msg);
     return;
   }
 

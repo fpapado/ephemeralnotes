@@ -80,7 +80,7 @@ export async function runWith(Elm_: typeof Elm) {
       let msg = unkMsg as SWFromElm;
 
       if (!msg.tag) {
-        console.error('No tag for msg', msg);
+        console.warn('No tag for msg', msg);
         return;
       }
 
@@ -139,7 +139,7 @@ export async function runWith(Elm_: typeof Elm) {
   app.ports.geolocationFromElm.subscribe(unkMsg => {
     let msg = unkMsg as GeolocationFromElm;
     if (!msg.tag) {
-      console.error('No tag for msg', msg);
+      console.warn('No tag for msg', msg);
       return;
     }
 
