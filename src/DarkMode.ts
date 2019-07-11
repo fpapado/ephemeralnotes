@@ -94,7 +94,12 @@ function persistUserModePreference(mode: Mode) {
 }
 
 async function getUserModePreference() {
-  return idbKeyval.get<string | undefined>(STORE_KEY);
+  try {
+    const preference = await idbKeyval.get<string | undefined>(STORE_KEY);
+    return preference;
+  } catch (err) {
+    console.warn('Error in getUserModePreference', err);
+  }
 }
 
 async function setInitialDarkMode() {

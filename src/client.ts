@@ -8,8 +8,7 @@ import * as DarkMode from './DarkMode';
 import {Result} from './Core';
 
 export async function runWith(Elm_: typeof Elm) {
-  // TODO: Consider `await` to make the rest of the paints synchronous
-  // Perhaps we could use it to pass to Elm?
+  // Get the initial flags for starting the Elm app
   const initialDarkMode = await DarkMode.setInitialDarkMode();
 
   // Start Elm app
@@ -17,6 +16,7 @@ export async function runWith(Elm_: typeof Elm) {
 
   // PORTS
 
+  // TODO: Move these to ServiceWorker.ts
   // TO ELM
   const UpdateAvailable = {
     tag: 'UpdateAvailable',
@@ -128,6 +128,7 @@ export async function runWith(Elm_: typeof Elm) {
   }
 
   // GEOLOCATION <-> ELM
+  // TODO: Move these to Geolocation.ts
   const GotLocationMsg = (data: Result<LocationError, Location>) => ({
     tag: 'GotLocation',
     data,
