@@ -31,7 +31,7 @@ async function handleSubMessage(
   msg: FromElm
 ) {
   if (!msg.tag) {
-    console.error('No tag for msg', msg);
+    console.warn('No tag for msg', msg);
     return;
   }
 
@@ -94,7 +94,12 @@ function persistUserModePreference(mode: Mode) {
 }
 
 async function getUserModePreference() {
-  return idbKeyval.get<string | undefined>(STORE_KEY);
+  try {
+    const preference = await idbKeyval.get<string | undefined>(STORE_KEY);
+    return preference;
+  } catch (err) {
+    console.warn('Error in getUserModePreference', err);
+  }
 }
 
 async function setInitialDarkMode() {

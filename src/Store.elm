@@ -18,20 +18,18 @@ import Store.Persistence as Persistence exposing (Persistence)
 
 type
     ToElm
-    -- TODO: Intead of unwrapping to DecodingError, make GotEntries Result JD.Error (List Entry)
-    -- And then DecodingError would become an explicit UnknownMsg
     -- TODO: Probably have to associate an ID here, so we know whether GotEntries is in response to init, or a form, or import
+    -- TODO: Handle failure case for GotEntries
     = GotEntries (List Entry)
     | GotBatchImportedEntries (Result RequestError Int)
-    | GotEntry (Result String Entry)
+    | GotEntry (Result RequestError Entry)
     | GotPersistence Persistence
     | BadMessage JD.Error
 
 
-
--- @see https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest/error
-
-
+{-| An IndexedDB error
+@see <https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest/error>
+-}
 type RequestError
     = -- If you abort the transaction, then all requests still in progress receive this error.
       AbortError
@@ -47,6 +45,9 @@ type RequestError
     | UnknownError
       -- If you try to open a database with a version lower than the one it already has.
     | VersionError
+      -- This can happen in the request, if we could not write to the database.
+      -- Probably browser related (mainly, that I've seen, Firefox Private Browsing)
+    | InvalidStateError
       -- An error we (as developers) have not accounted for.
       -- Possibly, the propagation of errors failed and we ended up wihout err.name.
     | UnaccountedError
@@ -178,27 +179,18 @@ toElmInnerDecoder tag =
         "GotBatchImportedEntries" ->
             -- @example {tag: "GotBatchImportedEntries", data: {tag: "Err", data: "UnknownError"}}
             JD.field "data"
-                (JD.field "tag" JD.string
-                    |> JD.andThen
-                        (\tag_ ->
-                            -- TODO: Write a more generic Result encoder/decoder
-                            case tag_ of
-                                "Err" ->
-                                    JD.field "data" (JD.string |> JD.andThen requestErrorDecoder)
-                                        |> JD.map (GotBatchImportedEntries << Err)
-
-                                "Ok" ->
-                                    JD.field "data" JD.int
-                                        |> JD.map (GotBatchImportedEntries << Ok)
-
-                                _ ->
-                                    JD.fail ("Unknown tag when decoding result: " ++ tag_)
-                        )
+                (Result.Decode.decoder
+                    (JD.string |> JD.andThen requestErrorDecoder)
+                    JD.int
                 )
+                |> JD.map GotBatchImportedEntries
 
         "GotEntry" ->
-            -- GotEntry is a Result String Entry, so use the custom Result Decoder!
-            JD.field "data" (Result.Decode.decoder JD.string Entry.decoder)
+            JD.field "data"
+                (Result.Decode.decoder
+                    (JD.string |> JD.andThen requestErrorDecoder)
+                    Entry.decoder
+                )
                 |> JD.map GotEntry
 
         "GotPersistence" ->
@@ -226,6 +218,9 @@ requestErrorDecoder tag =
 
         "VersionError" ->
             JD.succeed VersionError
+
+        "InvalidStateError" ->
+            JD.succeed InvalidStateError
 
         "UnaccountedError" ->
             JD.succeed UnaccountedError

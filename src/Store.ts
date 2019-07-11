@@ -15,6 +15,42 @@ import * as Persistence from './Store/Persistence';
 
 type EntryToElm = EntryV1 & {schema_version: number};
 
+/**
+ * A representation of IndexedDB's DOMException error names,
+ * as well as an extra 'UnaccountedError'
+ * @see <https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest/error>
+ */
+type RequestError =
+  | 'AbortError'
+  | 'ConstraintError'
+  | 'QuotaExceededError'
+  | 'UnknownError'
+  | 'VersionError'
+  | 'InvalidStateError'
+  // This one means it's on us!
+  | 'UnaccountedError';
+
+const knownRequestErrors: Array<RequestError> = [
+  'AbortError',
+  'ConstraintError',
+  'QuotaExceededError',
+  'UnknownError',
+  'VersionError',
+  'InvalidStateError',
+];
+
+function requestErrorFromUnknown(err: unknown): RequestError {
+  if (
+    err &&
+    err instanceof DOMException &&
+    knownRequestErrors.includes(err.name as any)
+  ) {
+    return err.name as RequestError;
+  } else {
+    return 'UnaccountedError';
+  }
+}
+
 // To Elm type constructors
 
 const GotEntries = (data: EntryToElm[]) => ({
@@ -22,15 +58,12 @@ const GotEntries = (data: EntryToElm[]) => ({
   data,
 });
 
-const GotBatchImportedEntries = (
-  // TODO: Write a more accurate union type for IDBRequest
-  data: Result<DOMException['name'], number>
-) => ({
+const GotBatchImportedEntries = (data: Result<RequestError, number>) => ({
   tag: 'GotBatchImportedEntries',
   data,
 });
 
-const GotEntry = (data: Result<string, EntryToElm>) => ({
+const GotEntry = (data: Result<RequestError, EntryToElm>) => ({
   tag: 'GotEntry',
   data,
 });
@@ -56,7 +89,7 @@ async function handleSubMessage(
   msg: FromElm
 ) {
   if (!msg.tag) {
-    console.error('No tag for msg', msg);
+    console.warn('No tag for msg', msg);
     return;
   }
 
@@ -64,33 +97,43 @@ async function handleSubMessage(
     console.log('From Elm: ', msg);
   }
 
+  // NOTE: We use async/await in all of these to avoid swallowing errors,
+  // and having a consistent interface between errors that throw and those that return.
+  // https://github.com/jakearchibald/idb/#promises--throwing
   switch (msg.tag) {
     case 'StoreEntry':
-      storeAndGetPartialEntry(msg.data)
-        .then(entry => {
-          if (entry) {
-            const entryToElm = {...entry, schema_version: 1};
-            sendToElm(GotEntry(Result_Ok(entryToElm)));
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          sendToElm(GotEntry(Result_Error(err.toString)));
-        });
+      try {
+        const storedEntry = await storeAndGetPartialEntry(msg.data);
+        if (storedEntry) {
+          const entryToElm = {...storedEntry, schema_version: 1};
+          sendToElm(GotEntry(Result_Ok(entryToElm)));
+        } else {
+          // If the entry does not exist... something tricky is happening.
+          sendToElm(GotEntry(Result_Error('UnaccountedError')));
+        }
+      } catch (err) {
+        const reqErr = requestErrorFromUnknown(err);
+        console.error('Error in storeAndGetPartialEntry', reqErr);
+        // Inform Elm that an error happened
+        sendToElm(GotEntry(Result_Error(reqErr)));
+      }
       return;
 
     case 'GetEntries':
-      getEntries().then(entries => {
-        const entriesToElm = entries.map(entry => ({
+      // TODO: Handle error case here
+      try {
+        const dbEntries = await getEntries();
+        const entriesToElm = dbEntries.map(entry => ({
           ...entry,
           schema_version: 1,
         }));
         sendToElm(GotEntries(entriesToElm));
-      });
+      } catch (err) {
+        console.error('TODO: handle error in GotEntries', err);
+      }
       return;
 
     case 'StoreBatchImportedEntries':
-      // TODO: Should we be wrapping all the ports in try/catch? :thinking:
       try {
         const importNum = await storeBatchEntries(msg.data);
 
@@ -106,16 +149,10 @@ async function handleSubMessage(
           sendToElm(GotEntries(entriesToElm));
         });
       } catch (err) {
-        console.error(
-          'Error in StoreBatchImportedEntries:',
-          err && err instanceof DOMException ? err.name : 'UnaccountedError'
-        );
+        const reqErr = requestErrorFromUnknown(err);
+        console.error('Error in StoreBatchImportedEntries', reqErr);
         // Inform Elm that an error happened
-        sendToElm(
-          GotBatchImportedEntries(
-            Result_Error(err ? err.name : 'UnaccountedError')
-          )
-        );
+        sendToElm(GotBatchImportedEntries(Result_Error(reqErr)));
       }
       return;
 
@@ -175,6 +212,7 @@ async function getEntry(key: string) {
 
 async function getEntries() {
   const db = await openEntryDB();
+  // TODO: Try/catch, error, Result
   return db.getAllFromIndex(ENTRY_STORE_NAME, Index.Time);
 }
 

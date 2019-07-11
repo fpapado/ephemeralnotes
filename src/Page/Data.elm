@@ -59,7 +59,7 @@ type alias Context =
 
 
 type alias EntryData =
-    RemoteData String (List Entry)
+    RemoteData Store.RequestError (List Entry)
 
 
 jsonMime =
@@ -72,10 +72,10 @@ jsonMime =
 
 type Msg
     = -- Export
-      ClickedDownload (List Entry)
+      ClickedExport (List Entry)
     | GotDownloadTime (List Entry) Time.Posix
       -- Import
-    | FileUploadRequested
+    | FileImportRequested
     | FileSelected File
     | FileLoaded String
       -- Subscription to store (for Import)
@@ -100,11 +100,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- Import/Export
-        ClickedDownload entries ->
+        ClickedExport entries ->
             -- Get the time, then save
             ( model, Task.perform (GotDownloadTime entries) Time.now )
 
-        FileUploadRequested ->
+        FileImportRequested ->
             ( model, requestFile )
 
         FileSelected file ->
@@ -221,21 +221,21 @@ viewExport entryData =
         (case entryData of
             RemoteData.Success entries ->
                 [ styledButtonBlue False
-                    [ onClick (ClickedDownload entries) ]
+                    [ onClick (ClickedExport entries) ]
                     [ text "Export Entries" ]
                 , details [ class "vs3 f4" ]
                     [ summary []
                         [ text "About the export format" ]
                     , paragraph
                         []
-                        [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. You can also use this file to import data into this application on another device." ]
+                        [ text "The file will be exported in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. You can also use this file to import data into this application on another device." ]
                     ]
                 ]
 
             _ ->
                 [ styledButtonBlue True
                     [ onClick <| NoOp ]
-                    [ text "Download Entries" ]
+                    [ text "Export Entries" ]
                 , paragraph [ class "measure" ] [ text "We have not loaded the entries yet, so we cannot save them." ]
                 ]
         )
@@ -259,7 +259,7 @@ requestFile =
 -}
 viewImport : Html Msg
 viewImport =
-    div [ class "vs3" ] [ styledButtonBlue False [ onClick FileUploadRequested ] [ text "Import" ] ]
+    div [ class "vs3" ] [ styledButtonBlue False [ onClick FileImportRequested ] [ text "Import" ] ]
 
 
 viewUploadData : UploadData -> Html msg
@@ -374,6 +374,12 @@ humanRequestError err =
             { expectation = HumanError.Expected
             , summary = Just "The import process failed for an unknown reason, and we could not get more details about it."
             , recovery = HumanError.Recoverable HumanError.TryAgain
+            }
+
+        Store.InvalidStateError ->
+            { expectation = HumanError.Expected
+            , summary = Just "The import failed because it is impossible to write to the local store. This is likely the browser not providing access to write. This can happen in some Private Mode sessions. If this error persists, please get in touch."
+            , recovery = HumanError.Unrecoverable
             }
 
         Store.UnaccountedError ->

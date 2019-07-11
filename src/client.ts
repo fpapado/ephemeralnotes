@@ -8,8 +8,7 @@ import * as DarkMode from './DarkMode';
 import {Result} from './Core';
 
 export async function runWith(Elm_: typeof Elm) {
-  // TODO: Consider `await` to make the rest of the paints synchronous
-  // Perhaps we could use it to pass to Elm?
+  // Get the initial flags for starting the Elm app
   const initialDarkMode = await DarkMode.setInitialDarkMode();
 
   // Start Elm app
@@ -17,6 +16,7 @@ export async function runWith(Elm_: typeof Elm) {
 
   // PORTS
 
+  // TODO: Move these to ServiceWorker.ts
   // TO ELM
   const UpdateAvailable = {
     tag: 'UpdateAvailable',
@@ -80,7 +80,7 @@ export async function runWith(Elm_: typeof Elm) {
       let msg = unkMsg as SWFromElm;
 
       if (!msg.tag) {
-        console.error('No tag for msg', msg);
+        console.warn('No tag for msg', msg);
         return;
       }
 
@@ -128,6 +128,7 @@ export async function runWith(Elm_: typeof Elm) {
   }
 
   // GEOLOCATION <-> ELM
+  // TODO: Move these to Geolocation.ts
   const GotLocationMsg = (data: Result<LocationError, Location>) => ({
     tag: 'GotLocation',
     data,
@@ -138,7 +139,7 @@ export async function runWith(Elm_: typeof Elm) {
   app.ports.geolocationFromElm.subscribe(unkMsg => {
     let msg = unkMsg as GeolocationFromElm;
     if (!msg.tag) {
-      console.error('No tag for msg', msg);
+      console.warn('No tag for msg', msg);
       return;
     }
 
@@ -163,7 +164,12 @@ export async function runWith(Elm_: typeof Elm) {
   // Store <-> Elm
   app.ports.storeFromElm.subscribe(unkMsg => {
     let msg = unkMsg as Store.FromElm;
-    Store.handleSubMessage(app.ports.storeToElm.send, msg);
+    Store.handleSubMessage(app.ports.storeToElm.send, msg).catch(err => {
+      console.error(
+        'Unhandled error from Store.handleSubMessage. This should be impossible, but here we are.',
+        err
+      );
+    });
   });
 
   // DarkMode <-> Elm
