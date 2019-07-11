@@ -32,7 +32,7 @@ viewContent =
 
 
 viewPitch =
-    paragraph [ class "measure" ] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. It works offline and everything is stored locally, on your device." ]
+    paragraph [] [ text "Ephemeral is a web app for writing down words and their translations, as you encounter them. It works offline and everything is stored locally, on your device." ]
 
 
 viewAddToHomeScreen =
@@ -41,7 +41,7 @@ viewAddToHomeScreen =
             []
             [ text "Add to Home Screen" ]
         , paragraph
-            [ class "measure" ]
+            []
             [ text "You can add Ephemeral to your home screen for quicker access and standalone use. It will always be available offline through your web browser." ]
         ]
 
