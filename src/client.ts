@@ -163,7 +163,12 @@ export async function runWith(Elm_: typeof Elm) {
   // Store <-> Elm
   app.ports.storeFromElm.subscribe(unkMsg => {
     let msg = unkMsg as Store.FromElm;
-    Store.handleSubMessage(app.ports.storeToElm.send, msg);
+    Store.handleSubMessage(app.ports.storeToElm.send, msg).catch(err => {
+      console.error(
+        'Unhandled error from Store.handleSubMessage. This should be impossible, but here we are.',
+        err
+      );
+    });
   });
 
   // DarkMode <-> Elm

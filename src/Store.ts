@@ -95,39 +95,43 @@ async function handleSubMessage(
     console.log('From Elm: ', msg);
   }
 
+  // NOTE: We use async/await in all of these to avoid swallowing errors,
+  // and having a consistent interface between errors that throw and those that return.
+  // https://github.com/jakearchibald/idb/#promises--throwing
   switch (msg.tag) {
     case 'StoreEntry':
-      storeAndGetPartialEntry(msg.data)
-        .then(entry => {
-          if (entry) {
-            const entryToElm = {...entry, schema_version: 1};
-            sendToElm(GotEntry(Result_Ok(entryToElm)));
-          }
-        })
-        .catch(err => {
-          const reqErr = requestErrorFromUnknown(err);
-          console.error('Error in storeAndGetPartialEntry', reqErr);
-          // Inform Elm that an error happened
-          sendToElm(GotEntry(Result_Error(reqErr)));
-        });
+      try {
+        const storedEntry = await storeAndGetPartialEntry(msg.data);
+        if (storedEntry) {
+          const entryToElm = {...storedEntry, schema_version: 1};
+          sendToElm(GotEntry(Result_Ok(entryToElm)));
+        } else {
+          // If the entry does not exist... something tricky is happening.
+          sendToElm(GotEntry(Result_Error('UnaccountedError')));
+        }
+      } catch (err) {
+        const reqErr = requestErrorFromUnknown(err);
+        console.error('Error in storeAndGetPartialEntry', reqErr);
+        // Inform Elm that an error happened
+        sendToElm(GotEntry(Result_Error(reqErr)));
+      }
       return;
 
     case 'GetEntries':
       // TODO: Handle error case here
-      getEntries().then(entries => {
-        const entriesToElm = entries.map(entry => ({
+      try {
+        const dbEntries = await getEntries();
+        const entriesToElm = dbEntries.map(entry => ({
           ...entry,
           schema_version: 1,
         }));
         sendToElm(GotEntries(entriesToElm));
-      });
+      } catch (err) {
+        console.error('Unaccounted error in GotEntries', err);
+      }
       return;
 
     case 'StoreBatchImportedEntries':
-      // TODO: Should we be wrapping all the ports in try/catch? :thinking:
-      // NOTE: This can throw, so we try/catch to normalize, isntead of splitting
-      // .catch and catch {}
-      // https://github.com/jakearchibald/idb/#promises--throwing
       try {
         const importNum = await storeBatchEntries(msg.data);
 
