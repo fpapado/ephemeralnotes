@@ -400,6 +400,10 @@ viewError error =
                 --  - UnaccountedError (we messed up somewhere, probably)
                 --  - Any other RequestError variant (either internal, or a version mismatch, but I don't know if either is actionable)
                 SavingError requestError ->
+                    let
+                        internalError =
+                            text "We could not save the note locally, because of an internal error. It could be temporary, so you can try again later. If the error persists, please get in touch."
+                    in
                     case requestError of
                         Store.QuotaExceededError ->
                             -- TODO: Link to entries page here
@@ -420,11 +424,23 @@ viewError error =
                                     ]
                                 ]
 
+                        Store.InvalidStateError ->
+                            text "It is impossible to write to the local store. This is likely the browser not providing access to write. This can happen in some Private Mode sessions. If this error persists, please get in touch."
+
                         Store.UnaccountedError ->
                             text "We could not save the location locally, because of an unexpected error. This is possibly an error in the code. Please get in touch if you run into this!"
 
-                        _ ->
-                            text "We could not save the note locally, because of an internal error. It could be temporary, so you can try again later. If the error persists, please get in touch."
+                        Store.UnknownError ->
+                            internalError
+
+                        Store.VersionError ->
+                            internalError
+
+                        Store.AbortError ->
+                            internalError
+
+                        Store.ConstraintError ->
+                            internalError
     in
     div
         [ HA.tabindex -1

@@ -376,6 +376,12 @@ humanRequestError err =
             , recovery = HumanError.Recoverable HumanError.TryAgain
             }
 
+        Store.InvalidStateError ->
+            { expectation = HumanError.Expected
+            , summary = Just "The import failed because it is impossible to write to the local store. This is likely the browser not providing access to write. This can happen in some Private Mode sessions. If this error persists, please get in touch."
+            , recovery = HumanError.Unrecoverable
+            }
+
         Store.UnaccountedError ->
             { expectation = HumanError.Unexpected
             , summary = Just "This is possibly an error in the code. Please get in touch if you run into this!"

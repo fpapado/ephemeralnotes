@@ -26,6 +26,7 @@ type RequestError =
   | 'QuotaExceededError'
   | 'UnknownError'
   | 'VersionError'
+  | 'InvalidStateError'
   // This one means it's on us!
   | 'UnaccountedError';
 
@@ -35,6 +36,7 @@ const knownRequestErrors: Array<RequestError> = [
   'QuotaExceededError',
   'UnknownError',
   'VersionError',
+  'InvalidStateError',
 ];
 
 function requestErrorFromUnknown(err: unknown): RequestError {

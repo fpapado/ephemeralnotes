@@ -45,6 +45,9 @@ type RequestError
     | UnknownError
       -- If you try to open a database with a version lower than the one it already has.
     | VersionError
+      -- This can happen in the request, if we could not write to the database.
+      -- Probably browser related (mainly, that I've seen, Firefox Private Browsing)
+    | InvalidStateError
       -- An error we (as developers) have not accounted for.
       -- Possibly, the propagation of errors failed and we ended up wihout err.name.
     | UnaccountedError
@@ -215,6 +218,9 @@ requestErrorDecoder tag =
 
         "VersionError" ->
             JD.succeed VersionError
+
+        "InvalidStateError" ->
+            JD.succeed InvalidStateError
 
         "UnaccountedError" ->
             JD.succeed UnaccountedError
