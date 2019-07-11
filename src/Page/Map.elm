@@ -9,6 +9,7 @@ import Html.Events as HE exposing (onClick)
 import Html.Keyed as Keyed
 import Location as L
 import RemoteData exposing (RemoteData)
+import Store
 import Ui exposing (centeredContainerWide, heading, paragraph)
 
 
@@ -19,7 +20,7 @@ type alias Context =
 
 
 type alias EntryData =
-    RemoteData String (List Entry)
+    RemoteData Store.RequestError (List Entry)
 
 
 view : Context -> { title : String, content : Html msg }

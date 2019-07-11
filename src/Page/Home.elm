@@ -43,7 +43,7 @@ type alias Model =
 
 
 type alias Context =
-    { entries : RemoteData String (List Entry)
+    { entries : RemoteData Store.RequestError (List Entry)
     }
 
 
@@ -105,7 +105,7 @@ viewContent context model =
         ]
 
 
-viewEntries : RemoteData String (List Entry) -> ( String, String ) -> Html Msg
+viewEntries : RemoteData Store.RequestError (List Entry) -> ( String, String ) -> Html Msg
 viewEntries entryData entryTuple =
     case entryData of
         RemoteData.NotAsked ->
@@ -115,11 +115,11 @@ viewEntries entryData entryTuple =
             paragraph [ class "animated fadeIn delay h5" ] [ text "Loading entries..." ]
 
         RemoteData.Failure err ->
+            -- NOTE: We could try to expose more data here, but it doesn't seem too actionable.
+            -- This is a "get" request from a transaction, which mostly fails in "internal error" ways,
+            -- rather than, say, QuotaExceeded, which is actionable.
             div []
-                [ paragraph [] [ text "Error getting entries" ]
-                , pre []
-                    [ text err
-                    ]
+                [ paragraph [] [ text "We could not fetch the entries. This is likely temporary. Please try again later." ]
                 ]
 
         RemoteData.Success entries ->

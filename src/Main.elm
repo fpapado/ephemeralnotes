@@ -42,7 +42,7 @@ type alias Model =
     , focusState : Page.FocusState
     , swUpdate : SW.SwUpdate
     , installPrompt : SW.InstallPrompt
-    , entries : RemoteData String (List Entry)
+    , entries : RemoteData Store.RequestError (List Entry)
     , darkMode : DarkMode.Mode
     , persistence : Maybe Persistence
     }

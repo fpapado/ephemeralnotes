@@ -15,6 +15,40 @@ import * as Persistence from './Store/Persistence';
 
 type EntryToElm = EntryV1 & {schema_version: number};
 
+/**
+ * A representation of IndexedDB's DOMException error names,
+ * as well as an extra 'UnaccountedError'
+ * @see <https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest/error>
+ */
+type RequestError =
+  | 'AbortError'
+  | 'ConstraintError'
+  | 'QuotaExceededError'
+  | 'UnknownError'
+  | 'VersionError'
+  // This one means it's on us!
+  | 'UnaccountedError';
+
+const knownRequestErrors: Array<RequestError> = [
+  'AbortError',
+  'ConstraintError',
+  'QuotaExceededError',
+  'UnknownError',
+  'VersionError',
+];
+
+function requestErrorFromUnknown(err: unknown): RequestError {
+  if (
+    err &&
+    err instanceof DOMException &&
+    knownRequestErrors.includes(err.name as any)
+  ) {
+    return err.name as RequestError;
+  } else {
+    return 'UnaccountedError';
+  }
+}
+
 // To Elm type constructors
 
 const GotEntries = (data: EntryToElm[]) => ({
@@ -22,15 +56,12 @@ const GotEntries = (data: EntryToElm[]) => ({
   data,
 });
 
-const GotBatchImportedEntries = (
-  // TODO: Write a more accurate union type for IDBRequest
-  data: Result<DOMException['name'], number>
-) => ({
+const GotBatchImportedEntries = (data: Result<RequestError, number>) => ({
   tag: 'GotBatchImportedEntries',
   data,
 });
 
-const GotEntry = (data: Result<string, EntryToElm>) => ({
+const GotEntry = (data: Result<RequestError, EntryToElm>) => ({
   tag: 'GotEntry',
   data,
 });
@@ -74,12 +105,15 @@ async function handleSubMessage(
           }
         })
         .catch(err => {
-          console.error(err);
-          sendToElm(GotEntry(Result_Error(err.toString)));
+          const reqErr = requestErrorFromUnknown(err);
+          console.error('Error in storeAndGetPartialEntry', reqErr);
+          // Inform Elm that an error happened
+          sendToElm(GotEntry(Result_Error(reqErr)));
         });
       return;
 
     case 'GetEntries':
+      // TODO: Handle error case here
       getEntries().then(entries => {
         const entriesToElm = entries.map(entry => ({
           ...entry,
@@ -91,6 +125,9 @@ async function handleSubMessage(
 
     case 'StoreBatchImportedEntries':
       // TODO: Should we be wrapping all the ports in try/catch? :thinking:
+      // NOTE: This can throw, so we try/catch to normalize, isntead of splitting
+      // .catch and catch {}
+      // https://github.com/jakearchibald/idb/#promises--throwing
       try {
         const importNum = await storeBatchEntries(msg.data);
 
@@ -106,16 +143,10 @@ async function handleSubMessage(
           sendToElm(GotEntries(entriesToElm));
         });
       } catch (err) {
-        console.error(
-          'Error in StoreBatchImportedEntries:',
-          err && err instanceof DOMException ? err.name : 'UnaccountedError'
-        );
+        const reqErr = requestErrorFromUnknown(err);
+        console.error('Error in StoreBatchImportedEntries', reqErr);
         // Inform Elm that an error happened
-        sendToElm(
-          GotBatchImportedEntries(
-            Result_Error(err ? err.name : 'UnaccountedError')
-          )
-        );
+        sendToElm(GotBatchImportedEntries(Result_Error(reqErr)));
       }
       return;
 
@@ -175,6 +206,7 @@ async function getEntry(key: string) {
 
 async function getEntries() {
   const db = await openEntryDB();
+  // TODO: Try/catch, error, Result
   return db.getAllFromIndex(ENTRY_STORE_NAME, Index.Time);
 }
 

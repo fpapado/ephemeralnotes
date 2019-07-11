@@ -59,7 +59,7 @@ type alias Context =
 
 
 type alias EntryData =
-    RemoteData String (List Entry)
+    RemoteData Store.RequestError (List Entry)
 
 
 jsonMime =
@@ -228,14 +228,14 @@ viewExport entryData =
                         [ text "About the export format" ]
                     , paragraph
                         []
-                        [ text "The file will be downloaded in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. You can also use this file to import data into this application on another device." ]
+                        [ text "The file will be exported in the JSON format. You can use this file to process your data in different ways, such as creating flash cards. You can also use this file to import data into this application on another device." ]
                     ]
                 ]
 
             _ ->
                 [ styledButtonBlue True
                     [ onClick <| NoOp ]
-                    [ text "Download Entries" ]
+                    [ text "Export Entries" ]
                 , paragraph [ class "measure" ] [ text "We have not loaded the entries yet, so we cannot save them." ]
                 ]
         )
