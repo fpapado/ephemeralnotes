@@ -87,3 +87,7 @@ html {
 .bg-warning {
   background-color: var(--color-warning);
 }
+
+leaflet-map {
+  contain: layout paint;
+}

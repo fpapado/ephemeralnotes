@@ -22,6 +22,7 @@ const styleText = `
   height: 32rem;
   background-color: var(--leaflet-map-bg) !important;
   flex-grow: 1;
+  contain: layout paint;
 }
 
 ${leafletStyleText}
@@ -81,6 +82,7 @@ class LeafletMap extends HTMLElement {
   private markersLayerGroup?: L.LayerGroup | null;
   private markersFeatureGroup?: L.SubGroup | null;
   private isConnectedForReal = false;
+  private hasSetInitialView = false;
 
   constructor() {
     super();
@@ -97,9 +99,15 @@ class LeafletMap extends HTMLElement {
     ) as HTMLDivElement;
 
     // Set up a mutation observer
+    // We need this to observe changes to the children list
     this.observer = new MutationObserver(
       this.childrenChangedCallback.bind(this)
     );
+
+    // Bind methods
+    this.setInitialViewOnce = this.setInitialViewOnce.bind(this);
+    this.setMapView = this.setMapView.bind(this);
+    this._updateFeaturesFor = this._updateFeaturesFor.bind(this);
   }
 
   static get observedAttributes(): ObservedAttribute[] {
@@ -112,6 +120,12 @@ class LeafletMap extends HTMLElement {
         this._updateFeaturesFor(mutation.addedNodes);
       }
     });
+    // If we have not set the initial view already, then do so
+    // This helps us batch the view setting after we know the list of children!
+    // NOTE: There is a race condition here (intentional).
+    // We either set the view from the agregate or children, or
+    // we set it to fit world
+    this.setInitialViewOnce();
   }
 
   connectedCallback() {
@@ -161,14 +175,14 @@ class LeafletMap extends HTMLElement {
     // Initialise observing
     this.observer.observe(this.shadowRoot!.host, {childList: true});
 
-    this.setMapView();
+    this.setInitialViewOnce();
 
     // Set this so that the map gets re-computed with the "real" height after adding to the DOM
     // Otherwise, it is assumed to be the container height of 32em.
     // This is kinda hacky, but it works :)
-    setTimeout(() => {
-      this.map!.invalidateSize();
-    });
+    // setTimeout(() => {
+    // this.map!.invalidateSize();
+    // });
   }
 
   disconnectedCallback() {
@@ -212,13 +226,11 @@ class LeafletMap extends HTMLElement {
             if (!(feature as any).addToLayerCb) {
               (feature as any).addToLayerCb = (feature: L.Marker) => {
                 feature.addTo(this.markersFeatureGroup!);
-                this.setMapView();
               };
               (feature as any).removeFromLayerCb = (feature: L.Marker) => {
                 if (this.markersFeatureGroup) {
                   this.markersFeatureGroup!.removeLayer(feature);
                 }
-                this.setMapView();
               };
             }
           });
@@ -227,12 +239,21 @@ class LeafletMap extends HTMLElement {
     }
   }
 
+  private setInitialViewOnce() {
+    if (!this.hasSetInitialView) {
+      this.setMapView();
+      this.hasSetInitialView = true;
+    }
+  }
+
   private setMapView() {
     // If we have features, fit the map around them
+    console.count('setMapView');
     if (
       this.markersFeatureGroup &&
       this.markersFeatureGroup.getLayers().length !== 0
     ) {
+      // console.log('Will fit bounds');
       this.map!.fitBounds(this.markersFeatureGroup!.getBounds(), {maxZoom: 12});
     }
     // Otherwise, set to the defined lat,lng
@@ -242,6 +263,7 @@ class LeafletMap extends HTMLElement {
       this.defaultLongitude !== undefined &&
       this.defaultZoom !== undefined
     ) {
+      // console.log('Will fit lat/long');
       this.map.setView(
         [this.defaultLatitude, this.defaultLongitude],
         this.defaultZoom
@@ -249,6 +271,7 @@ class LeafletMap extends HTMLElement {
     }
     // Finally, if no default lat or lon provided, then show the world
     else if (this.map) {
+      // console.log('Will fit world');
       this.map!.fitWorld();
     }
   }
