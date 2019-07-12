@@ -235,12 +235,16 @@ changeRouteTo maybeRoute model =
             ( { model | page = About }, Cmd.none )
 
 
-{-| Deferred focus after a setTimeout, to allow the rendering to settle
-TODO: Test this with Process.sleep 0 - 200ms
+{-| Set focus to an element, after a setTimeout, to allow the rendering to settle
+This is important for triggering some Screen Reader announcements correctly,
+and might also help with not invalidating browser layout.
+NOTE: This is not necessarily the best strategy, and other ways of communicating
+page loads to Assistive Technology users could be considered.
 -}
 focus : String -> Cmd Msg
 focus id =
-    Dom.focus id
+    Process.sleep 100
+        |> Task.andThen (\() -> Dom.focus id)
         |> Task.attempt GotFocusResult
 
 
