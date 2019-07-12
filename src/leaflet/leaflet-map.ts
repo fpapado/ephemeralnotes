@@ -248,7 +248,7 @@ class LeafletMap extends HTMLElement {
 
   private setMapView() {
     // If we have features, fit the map around them
-    console.count('setMapView');
+    // console.count('setMapView');
     if (
       this.markersFeatureGroup &&
       this.markersFeatureGroup.getLayers().length !== 0
