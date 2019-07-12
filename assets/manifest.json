@@ -8,7 +8,6 @@
   "short_name": "Ephemeral",
   "theme_color": "#ffffff",
   "description": "Ephemeral is an app for writing down words and their translations, as you encounter them.",
-  "orientation": "any",
   "background_color": "#a6cbda",
   "related_applications": [],
   "prefer_related_applications": false,
