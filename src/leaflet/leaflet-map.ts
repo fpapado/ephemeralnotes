@@ -5,6 +5,8 @@ import L, {control} from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet.featuregroup.subgroup';
 
+import debounce from 'lodash.debounce';
+
 // This is done through webpack, where we use postcss to bundle the CSS
 // and lift the raw text in the module graph.
 // @see webpack.donfig.js
@@ -19,9 +21,9 @@ const styleText = `
 }
 
 .container {
-  height: 32rem;
+  height: 80vh;
   background-color: var(--leaflet-map-bg) !important;
-  flex-grow: 1;
+  contain: layout paint;
 }
 
 ${leafletStyleText}
@@ -47,6 +49,12 @@ ${styleResult.text ? `<style>${styleResult.text}</style>` : ''}
 <div class="container" id="${CONTAINER_ID}"></div>
 `;
 
+// The deadline by which the initial call to setView must complete
+// This allows the component to collect children before setting the view
+// It is an almost-made-up-number, mostly based on layout metrics (60-80ms)
+// I think anything under 400ms should work well
+const INITIAL_VIEW_SET_DEADLINE = 200;
+
 // Type that chidren must implement in order to get added to the layer
 // Might change in the future (see note about Events below)
 export type AddToLayerCb = (marker: L.Marker) => void;
@@ -57,10 +65,7 @@ type ObservedAttribute =
   | 'defaultLongitude'
   | 'defaultZoom'
   | 'theme';
-type ReflectedAttribute =
-  | 'defaultLatitude'
-  | 'defaultLongitude'
-  | 'defaultZoom';
+
 type Property =
   | 'defaultLatitude'
   | 'defaultLongitude'
@@ -81,6 +86,7 @@ class LeafletMap extends HTMLElement {
   private markersLayerGroup?: L.LayerGroup | null;
   private markersFeatureGroup?: L.SubGroup | null;
   private isConnectedForReal = false;
+  private hasSetInitialView = false;
 
   constructor() {
     super();
@@ -97,9 +103,15 @@ class LeafletMap extends HTMLElement {
     ) as HTMLDivElement;
 
     // Set up a mutation observer
+    // We need this to observe changes to the children list
     this.observer = new MutationObserver(
       this.childrenChangedCallback.bind(this)
     );
+
+    // Bind methods
+    this.setInitialViewOnce = this.setInitialViewOnce.bind(this);
+    this.setMapView = this.setMapView.bind(this);
+    this._updateFeaturesFor = this._updateFeaturesFor.bind(this);
   }
 
   static get observedAttributes(): ObservedAttribute[] {
@@ -127,16 +139,32 @@ class LeafletMap extends HTMLElement {
 
     this.map = L.map(this.$mapContainer, {
       bounceAtZoomLimits: true,
+      // Do not include the default zoom; we customise it below
       zoomControl: false,
-    });
-    this.map.addControl(control.zoom({position: 'bottomright'}));
-    this.tileLayer = L.tileLayer(getTileUrl(this.theme), {
-      attribution:
-        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-      // id: 'stamen.toner',
-      maxZoom: 17,
+      // Do not include the default attribution; we customise it below
+      attributionControl: false,
     });
 
+    // Add a custom attribution control
+    // We do this because the default control only shows the 'Leaflet' prefix, before the tile layer's view
+    // has loaded. This is not ideal, because we `setView` in a deferred way. Thus, it leads to a flash
+    // of content and a small re-layout.
+    // It is not a big deal if the attribution is always visible (probably preferable anyway),
+    // so we enforce that by including the atttribution in the prefix
+    this.map.addControl(
+      control.attribution({
+        position: 'bottomright',
+        prefix:
+          '<a href="https://leafletjs.com">Leaflet</a> | Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+      })
+    );
+    // Add the zoom controls to the bottom right; this should come after the attribution
+    this.map.addControl(control.zoom({position: 'bottomright'}));
+
+    // Add the tile layer to the map
+    this.tileLayer = L.tileLayer(getTileUrl(this.theme), {
+      maxZoom: 17,
+    });
     this.tileLayer.addTo(this.map);
 
     this.markersLayerGroup = L.markerClusterGroup();
@@ -158,17 +186,10 @@ class LeafletMap extends HTMLElement {
     // We do this because the MutationObserver will not fire if
     // the children were already parsed before the element was
     // upgraded.
-    // Initialise observing
     this.observer.observe(this.shadowRoot!.host, {childList: true});
 
-    this.setMapView();
-
-    // Set this so that the map gets re-computed with the "real" height after adding to the DOM
-    // Otherwise, it is assumed to be the container height of 32em.
-    // This is kinda hacky, but it works :)
-    setTimeout(() => {
-      this.map!.invalidateSize();
-    });
+    // Start the deadline for the setInitialView being called with defaults or children
+    this.setInitialViewOnce();
   }
 
   disconnectedCallback() {
@@ -212,13 +233,12 @@ class LeafletMap extends HTMLElement {
             if (!(feature as any).addToLayerCb) {
               (feature as any).addToLayerCb = (feature: L.Marker) => {
                 feature.addTo(this.markersFeatureGroup!);
-                this.setMapView();
+                this.setInitialViewOnce();
               };
               (feature as any).removeFromLayerCb = (feature: L.Marker) => {
                 if (this.markersFeatureGroup) {
                   this.markersFeatureGroup!.removeLayer(feature);
                 }
-                this.setMapView();
               };
             }
           });
@@ -227,13 +247,29 @@ class LeafletMap extends HTMLElement {
     }
   }
 
+  private setInitialViewOnce = debounce(() => {
+    // If we have not set the initial view already, then do so
+    // This helps us batch the view setting after we know the list of children!
+    // NOTE: There is a race condition here (intentional).
+    // We either set the view from the agregate or children, or the defaults
+    // We debounce the calls to ensure only the last one in the deadline is called
+    if (!this.hasSetInitialView) {
+      this.setMapView();
+      this.hasSetInitialView = true;
+    }
+  }, INITIAL_VIEW_SET_DEADLINE);
+
   private setMapView() {
     // If we have features, fit the map around them
+    // console.count('setMapView');
     if (
       this.markersFeatureGroup &&
       this.markersFeatureGroup.getLayers().length !== 0
     ) {
-      this.map!.fitBounds(this.markersFeatureGroup!.getBounds(), {maxZoom: 12});
+      // console.log('Will fit bounds');
+      this.map!.fitBounds(this.markersFeatureGroup!.getBounds(), {
+        maxZoom: 12,
+      });
     }
     // Otherwise, set to the defined lat,lng
     else if (
@@ -242,6 +278,7 @@ class LeafletMap extends HTMLElement {
       this.defaultLongitude !== undefined &&
       this.defaultZoom !== undefined
     ) {
+      // console.log('Will fit lat/long');
       this.map.setView(
         [this.defaultLatitude, this.defaultLongitude],
         this.defaultZoom
@@ -249,6 +286,7 @@ class LeafletMap extends HTMLElement {
     }
     // Finally, if no default lat or lon provided, then show the world
     else if (this.map) {
+      // console.log('Will fit world');
       this.map!.fitWorld();
     }
   }

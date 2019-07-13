@@ -43,6 +43,7 @@
   "author": "Fotis Papadogeorgopoulos <fotis@fpapado.com>",
   "license": "MPL-2.0",
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.6",
     "@types/node": "^12.0.12",
     "chokidar-cli": "^1.2.2",
     "critters-webpack-plugin": "^2.3.0",
@@ -83,6 +84,7 @@
     "leaflet": "^1.5.1",
     "leaflet.featuregroup.subgroup": "^1.0.2",
     "leaflet.markercluster": "^1.4.1",
+    "lodash.debounce": "^4.0.8",
     "nanoid": "^2.0.3",
     "pretty-bytes": "^5.2.0",
     "script-ext-html-webpack-plugin": "^2.1.3"

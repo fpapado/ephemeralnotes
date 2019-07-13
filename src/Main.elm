@@ -26,7 +26,7 @@ import ServiceWorker as SW
 import Set exposing (Set)
 import Store
 import Store.Persistence as Persistence exposing (Persistence)
-import Task
+import Task exposing (Task)
 import Time
 import Ui exposing (..)
 import Url exposing (Url)
@@ -235,12 +235,25 @@ changeRouteTo maybeRoute model =
             ( { model | page = About }, Cmd.none )
 
 
-{-| Deferred focus after a setTimeout, to allow the rendering to settle
-TODO: Test this with Process.sleep 0 - 200ms
+{-| Set focus to an element, after a setTimeout, to allow the rendering to settle
+This is important for triggering some Screen Reader announcements correctly,
+and might also help with not invalidating browser layout.
+NOTE: This is not necessarily the best strategy, and other ways of communicating
+page loads to Assistive Technology users could be considered.
 -}
-focus : String -> Cmd Msg
-focus id =
-    Dom.focus id
+delayedFocus : String -> Task Dom.Error ()
+delayedFocus id =
+    Process.sleep 100
+        |> Task.andThen (\() -> Dom.focus id)
+
+
+scrollTopAndFocusMain : Cmd Msg
+scrollTopAndFocusMain =
+    -- NOTE: It is important that we Dom.setViewport *before* the delayed focus
+    -- This allows setViewport to piggyback on the frist animation frame (rAF), before
+    -- the macro task (setTimeout) of Process.sleep, and the second rAF of Dom.focus
+    Dom.setViewport 0 0
+        |> Task.andThen (\() -> delayedFocus "main")
         |> Task.attempt GotFocusResult
 
 
@@ -255,7 +268,10 @@ update msg model =
             case urlRequest of
                 Browser.Internal url ->
                     ( { model | focusState = Focusing }
-                    , Cmd.batch [ Nav.pushUrl model.navKey (Url.toString url), focus "main" ]
+                    , Cmd.batch
+                        [ Nav.pushUrl model.navKey (Url.toString url)
+                        , scrollTopAndFocusMain
+                        ]
                     )
 
                 Browser.External href ->
@@ -277,7 +293,12 @@ update msg model =
             ( { model | focusState = FocusPastMain }, Cmd.none )
 
         ( UserPressedBack, _ ) ->
-            ( model, Cmd.batch [ Nav.back model.navKey 1, focus "main" ] )
+            ( model
+            , Cmd.batch
+                [ Nav.back model.navKey 1
+                , scrollTopAndFocusMain
+                ]
+            )
 
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) model
