@@ -243,7 +243,7 @@ page loads to Assistive Technology users could be considered.
 -}
 delayedFocus : String -> Task Dom.Error ()
 delayedFocus id =
-    Process.sleep 200
+    Process.sleep 100
         |> Task.andThen (\() -> Dom.focus id)
 
 
