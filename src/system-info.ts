@@ -61,21 +61,17 @@ class SytemInfo extends HTMLElement {
   }
 
   private _getInfo(): InfoTuple[] {
-    const supportsStorage = 'storage' in navigator;
+    const supportsStorage = 'storage' in navigator ? 'yes' : 'no';
     const UA = window.navigator.userAgent;
     const standaloneMode = window.matchMedia('(display-mode: standalone)')
       .matches
       ? 'yes'
       : 'no';
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const supportsCustomElements = 'customElements' in window;
+    const supportsCustomElements = 'customElements' in window ? 'yes' : 'no';
 
     return [
       ['Version', NOW_GITHUB_COMMIT_SHA],
       ['Standalone Mode', standaloneMode],
-      ['Screen Width', screenWidth],
-      ['Screen Height', screenHeight],
       ['Supports custom elements', supportsCustomElements],
       ['Supports StorageManager', supportsStorage],
       ['UA', UA],

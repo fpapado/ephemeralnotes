@@ -91,3 +91,7 @@ html {
 leaflet-map {
   contain: layout paint;
 }
+
+system-info {
+  contain: layout paint;
+}
