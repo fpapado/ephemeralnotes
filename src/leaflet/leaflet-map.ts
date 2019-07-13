@@ -5,6 +5,8 @@ import L, {control} from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet.featuregroup.subgroup';
 
+import debounce from 'lodash.debounce';
+
 // This is done through webpack, where we use postcss to bundle the CSS
 // and lift the raw text in the module graph.
 // @see webpack.donfig.js
@@ -48,6 +50,12 @@ ${styleResult.text ? `<style>${styleResult.text}</style>` : ''}
 <div class="container" id="${CONTAINER_ID}"></div>
 `;
 
+// The deadline by which the initial call to setView must complete
+// This allows the component to collect children before setting the view
+// It is an almost-made-up-number, mostly based on layout metrics (60-80ms)
+// I think anything under 400ms should work well
+const INITIAL_VIEW_SET_DEADLINE = 200;
+
 // Type that chidren must implement in order to get added to the layer
 // Might change in the future (see note about Events below)
 export type AddToLayerCb = (marker: L.Marker) => void;
@@ -58,10 +66,7 @@ type ObservedAttribute =
   | 'defaultLongitude'
   | 'defaultZoom'
   | 'theme';
-type ReflectedAttribute =
-  | 'defaultLatitude'
-  | 'defaultLongitude'
-  | 'defaultZoom';
+
 type Property =
   | 'defaultLatitude'
   | 'defaultLongitude'
@@ -120,12 +125,6 @@ class LeafletMap extends HTMLElement {
         this._updateFeaturesFor(mutation.addedNodes);
       }
     });
-    // If we have not set the initial view already, then do so
-    // This helps us batch the view setting after we know the list of children!
-    // NOTE: There is a race condition here (intentional).
-    // We either set the view from the agregate or children, or
-    // we set it to fit world
-    this.setInitialViewOnce();
   }
 
   connectedCallback() {
@@ -172,17 +171,10 @@ class LeafletMap extends HTMLElement {
     // We do this because the MutationObserver will not fire if
     // the children were already parsed before the element was
     // upgraded.
-    // Initialise observing
     this.observer.observe(this.shadowRoot!.host, {childList: true});
 
+    // Start the deadline for the setInitialView being called with defaults or children
     this.setInitialViewOnce();
-
-    // Set this so that the map gets re-computed with the "real" height after adding to the DOM
-    // Otherwise, it is assumed to be the container height of 32em.
-    // This is kinda hacky, but it works :)
-    // setTimeout(() => {
-    // this.map!.invalidateSize();
-    // });
   }
 
   disconnectedCallback() {
@@ -226,6 +218,7 @@ class LeafletMap extends HTMLElement {
             if (!(feature as any).addToLayerCb) {
               (feature as any).addToLayerCb = (feature: L.Marker) => {
                 feature.addTo(this.markersFeatureGroup!);
+                this.setInitialViewOnce();
               };
               (feature as any).removeFromLayerCb = (feature: L.Marker) => {
                 if (this.markersFeatureGroup) {
@@ -239,12 +232,17 @@ class LeafletMap extends HTMLElement {
     }
   }
 
-  private setInitialViewOnce() {
+  private setInitialViewOnce = debounce(() => {
+    // If we have not set the initial view already, then do so
+    // This helps us batch the view setting after we know the list of children!
+    // NOTE: There is a race condition here (intentional).
+    // We either set the view from the agregate or children, or the defaults
+    // We debounce the calls to ensure only the last one in the deadline is called
     if (!this.hasSetInitialView) {
       this.setMapView();
       this.hasSetInitialView = true;
     }
-  }
+  }, INITIAL_VIEW_SET_DEADLINE);
 
   private setMapView() {
     // If we have features, fit the map around them
