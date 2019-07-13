@@ -33,9 +33,9 @@ view context =
 viewContent : Context -> Html msg
 viewContent { entries, darkMode } =
     centeredContainerWide
-        [ class "w-100 flex flex-column flex-grow-1" ]
+        [ class "w-100 ht-100" ]
         [ heading 1 [ class "visually-hidden" ] [ text "Map" ]
-        , viewMap [ class "flex flex-column flex-grow-1" ] darkMode entries
+        , viewMap [ class "ht-100" ] darkMode entries
         ]
 
 
@@ -60,7 +60,7 @@ viewMap attrs mode entryData =
         [ Keyed.node "leaflet-map"
             [ HA.attribute "defaultZoom" "8"
             , HA.attribute "theme" (String.toLower <| DarkMode.modeToString mode)
-            , class "flex flex-column flex-grow-1"
+            , class "ht-100"
             ]
             markerNodes
         ]

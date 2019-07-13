@@ -51,14 +51,12 @@ view { activePage, focusState, onBlurredMain, onPressedBack, toOutMsg } { title,
                 -- When focusing, set tabindex to -1
                 Focusing ->
                     [ id "main"
-                    , class "flex flex-column flex-auto"
                     , tabindex -1
                     ]
 
                 -- When the user tabs past, then the state should be set to FocusPastMain
                 FocusOnMain ->
                     [ id "main"
-                    , class "flex flex-column flex-auto"
                     , tabindex -1
                     , onBlur onBlurredMain
                     ]
@@ -66,7 +64,6 @@ view { activePage, focusState, onBlurredMain, onPressedBack, toOutMsg } { title,
                 -- In other cases, no need for focus attributes
                 _ ->
                     [ id "main"
-                    , class "flex flex-column flex-auto"
                     ]
 
         viewMain =
@@ -83,7 +80,7 @@ view { activePage, focusState, onBlurredMain, onPressedBack, toOutMsg } { title,
 
 
 viewShell children =
-    div [ class "min-vh-100 flex flex-column bg-color-bg color-text f-phantomsans lh-copy elm-root" ] children
+    div [ class "min-vh-100 bg-color-bg color-text f-phantomsans lh-copy elm-root" ] children
 
 
 viewHeader : Page -> msg -> Html msg

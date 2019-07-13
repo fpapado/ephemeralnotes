@@ -21,9 +21,8 @@ const styleText = `
 }
 
 .container {
-  height: 32rem;
+  height: 80vh;
   background-color: var(--leaflet-map-bg) !important;
-  flex-grow: 1;
   contain: layout paint;
 }
 

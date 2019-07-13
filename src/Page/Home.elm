@@ -151,7 +151,7 @@ viewEntryKeyed ambiguousEntry =
     case ambiguousEntry of
         Entry.V1 entry ->
             ( Entry.Id.toString entry.id
-            , li [ class "flex flex-column pa3 br2 bg-color-lighter color-text ba bw1 b--color-faint shadow-4" ]
+            , li [ class "pa3 br2 bg-color-lighter color-text ba bw1 b--color-faint shadow-4" ]
                 [ div [ class "vs2 mb3" ]
                     [ paragraph [ class "fw6" ] [ text entry.front ]
                     , paragraph [] [ text entry.back ]
