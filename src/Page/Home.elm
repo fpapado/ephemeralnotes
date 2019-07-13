@@ -94,12 +94,12 @@ viewContent context model =
                       else
                         About.viewPitch
                     ]
-                , section [] [ Html.map FormMsg (Form.view model.form) ]
-                , section [ class "vs3 vs4-ns" ]
+                , div [] [ Html.map FormMsg (Form.view model.form) ]
+                , div [ class "vs3 vs4-ns" ]
                     [ subHeading 2 [] [ text "Entries" ]
                     , viewEntries context.entries ( formInput.front, formInput.back )
                     ]
-                , section [] [ About.viewAddToHomeScreen ]
+                , div [] [ About.viewAddToHomeScreen ]
                 ]
             ]
         ]

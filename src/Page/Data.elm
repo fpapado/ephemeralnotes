@@ -193,16 +193,16 @@ viewContent { entries, persistence } model =
                       Maybe.map viewPersistence persistence
                         |> Maybe.withDefault (text "")
                     ]
-                , section [ class "vs3" ]
+                , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "Export" ]
                     , viewExport entries
                     ]
-                , section [ class "vs3" ]
+                , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "Import" ]
                     , viewImport
                     , viewUploadData model.uploadData
                     ]
-                , section [ class "vs3" ]
+                , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "Usage" ]
                     , viewUsage
                     ]
