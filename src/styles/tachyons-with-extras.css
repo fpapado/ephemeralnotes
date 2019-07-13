@@ -755,6 +755,10 @@ img {
 .hover-near-black:hover {
   color: #111;
 }
+.hover-near-white:focus,
+.hover-near-white:hover {
+  color: #f4f4f4;
+}
 .hover-light-blue:focus,
 .hover-light-blue:hover {
   color: #96ccff;
@@ -762,6 +766,10 @@ img {
 .hover-bg-light-blue:focus,
 .hover-bg-light-blue:hover {
   background-color: #96ccff;
+}
+.hover-bg-dark-gray:focus,
+.hover-bg-dark-gray:hover {
+  background-color: #999;
 }
 .pa0 {
   padding: 0;

@@ -8,9 +8,10 @@ module Ui exposing
     , notificationRegion
     , paragraph
     , paragraphSmall
+    , primaryActionButton
     , prompt
+    , secondaryActionButton
     , styledButton
-    , styledButtonBlue
     , subHeading
     , subSubHeading
     , textbox
@@ -53,10 +54,10 @@ centeredContainerWide attrs children =
 
 
 styledButton attrs children =
-    button (class "pv2 ph3 button-reset focus-shadow br2 f4 fw5" :: attrs) children
+    button (class "pv2 ph3 button-reset focus-shadow br2 f-paragraph fw5" :: attrs) children
 
 
-styledButtonBlue isReadOnly attrs children =
+primaryActionButton isReadOnly attrs children =
     let
         cls =
             if isReadOnly then
@@ -68,8 +69,20 @@ styledButtonBlue isReadOnly attrs children =
     styledButton (class cls :: attrs) children
 
 
+secondaryActionButton isReadOnly attrs children =
+    let
+        cls =
+            if isReadOnly then
+                "bg-light-gray near-black"
+
+            else
+                "bg-light-gray near-black hover-bg-dark-gray hover-near-white"
+    in
+    styledButton (class cls :: attrs) children
+
+
 calloutContainer attrs children =
-    div (class "fixed bottom-0 left-0 w-100 br1" :: attrs)
+    div (class "fixed bottom-0 left-0 w-100" :: attrs)
         [ div [ class "mw6 center" ] children
         ]
 
@@ -87,7 +100,7 @@ notificationRegion attrs children =
 
 
 prompt attrs children =
-    div (class "pa3 flex flex-wrap justify-around items-center bg-color-lighter color-text shadow-1 animated fadeInUp" :: attrs) children
+    div (class "pa3 flex flex-wrap justify-around items-center bg-color-lighter color-text br1 shadow-1 animated fadeInUp" :: attrs) children
 
 
 paragraph attrs children =

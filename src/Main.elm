@@ -459,41 +459,77 @@ subscriptions model =
 
 viewUpdatePrompt : SW.SwUpdate -> Html Msg
 viewUpdatePrompt swUpdate =
-    notificationRegion []
+    let
+        headingId =
+            "update-prompt-heading"
+    in
+    div []
         [ SW.viewSwUpdate swUpdate
-            { none = div [] []
+            { none = text ""
             , available =
                 calloutContainer [ class "z-9999" ]
-                    [ prompt [ class "na2" ]
-                        [ div [ class "measure ma2" ]
-                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "A new version is available. You can reload now to get it." ]
+                    [ prompt
+                        [ HA.attribute "role" "dialog"
+                        , HA.attribute "aria-live" "polite"
+                        , HA.attribute "aria-labelledby" headingId
+                        ]
+                        [ div [ class "measure mb2" ]
+                            [ h2
+                                [ HA.id headingId
+                                , class "mv0 f-paragraph fw6 lh-title tc measure"
+                                ]
+                                [ text "A new version is available. You can reload now to get it." ]
                             ]
-                        , div [ class "ma2 flex" ]
-                            [ styledButtonBlue False [ onClick AcceptUpdate, class "mr2" ] [ text "Reload" ]
-                            , styledButtonBlue False [ onClick DeferUpdate ] [ text "Later" ]
+                        , div [ class "flex" ]
+                            [ primaryActionButton
+                                False
+                                [ onClick AcceptUpdate, class "mr2 fw6" ]
+                                [ text "Reload" ]
+                            , secondaryActionButton
+                                False
+                                [ onClick DeferUpdate ]
+                                [ text "Later" ]
                             ]
                         ]
                     ]
-            , accepted = div [] []
-            , deferred = div [] []
+            , accepted = text ""
+            , deferred = text ""
             }
         ]
 
 
 viewInstallPrompt : SW.InstallPrompt -> Html Msg
 viewInstallPrompt installPrompt =
-    notificationRegion []
+    let
+        headingId =
+            "install-prompt-heading"
+    in
+    div []
         [ SW.viewInstallPrompt installPrompt
-            { none = div [] []
+            { none = text ""
             , available =
                 calloutContainer [ class "z-9999" ]
-                    [ prompt [ class "na2" ]
-                        [ div [ class "measure ma2" ]
-                            [ h2 [ class "mv0 f5 fw4 lh-title" ] [ text "Add Ephemeral to your home screen?" ]
+                    [ prompt
+                        [ HA.attribute "role" "dialog"
+                        , HA.attribute "aria-live" "polite"
+                        , HA.attribute "aria-labelledby" headingId
+                        ]
+                        [ div [ class "measure mb2" ]
+                            [ h2
+                                [ HA.id headingId
+                                , class "mv0 f-paragraph fw6 lh-title tc"
+                                ]
+                                [ text "Add Ephemeral to your home screen?" ]
                             ]
-                        , div [ class "ma2 flex" ]
-                            [ styledButtonBlue False [ onClick AcceptInstallPrompt, class "mr2" ] [ text "Add" ]
-                            , styledButtonBlue False [ onClick DeferInstallPrompt ] [ text "Dismiss" ]
+                        , div [ class "flex" ]
+                            [ primaryActionButton
+                                False
+                                [ onClick AcceptInstallPrompt, class "mr2" ]
+                                [ text "Add" ]
+                            , secondaryActionButton
+                                False
+                                [ onClick DeferInstallPrompt ]
+                                [ text "Dismiss" ]
                             ]
                         ]
                     ]

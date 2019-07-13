@@ -193,16 +193,16 @@ viewContent { entries, persistence } model =
                       Maybe.map viewPersistence persistence
                         |> Maybe.withDefault (text "")
                     ]
-                , section [ class "vs3" ]
+                , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "Export" ]
                     , viewExport entries
                     ]
-                , section [ class "vs3" ]
+                , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "Import" ]
                     , viewImport
                     , viewUploadData model.uploadData
                     ]
-                , section [ class "vs3" ]
+                , div [ class "vs3" ]
                     [ subHeading 2 [] [ text "Usage" ]
                     , viewUsage
                     ]
@@ -220,7 +220,7 @@ viewExport entryData =
     div [ class "vs3" ]
         (case entryData of
             RemoteData.Success entries ->
-                [ styledButtonBlue False
+                [ primaryActionButton False
                     [ onClick (ClickedExport entries) ]
                     [ text "Export Entries" ]
                 , details [ class "vs3 f4" ]
@@ -233,7 +233,7 @@ viewExport entryData =
                 ]
 
             _ ->
-                [ styledButtonBlue True
+                [ primaryActionButton True
                     [ onClick <| NoOp ]
                     [ text "Export Entries" ]
                 , paragraph [ class "measure" ] [ text "We have not loaded the entries yet, so we cannot save them." ]
@@ -259,7 +259,7 @@ requestFile =
 -}
 viewImport : Html Msg
 viewImport =
-    div [ class "vs3" ] [ styledButtonBlue False [ onClick FileImportRequested ] [ text "Import" ] ]
+    div [ class "vs3" ] [ primaryActionButton False [ onClick FileImportRequested ] [ text "Import" ] ]
 
 
 viewUploadData : UploadData -> Html msg
@@ -430,7 +430,7 @@ viewPersistence persistence =
                 , paragraph [] [ text explanation ]
                 , case persistence of
                     Persistence.ShouldPrompt ->
-                        styledButtonBlue False
+                        primaryActionButton False
                             [ onClick RequestedPersistence ]
                             [ text "Persist data"
                             ]
