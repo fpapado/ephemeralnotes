@@ -366,7 +366,7 @@ view form_ =
                     ]
                     "Save location"
                 ]
-            , styledButtonBlue areFieldsReadOnly
+            , primaryActionButton areFieldsReadOnly
                 [ class "w-100" ]
                 [ text buttonText
                 ]
