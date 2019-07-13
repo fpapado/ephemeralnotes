@@ -267,7 +267,9 @@ class LeafletMap extends HTMLElement {
       this.markersFeatureGroup.getLayers().length !== 0
     ) {
       // console.log('Will fit bounds');
-      this.map!.fitBounds(this.markersFeatureGroup!.getBounds(), {maxZoom: 12});
+      this.map!.fitBounds(this.markersFeatureGroup!.getBounds(), {
+        maxZoom: 12,
+      });
     }
     // Otherwise, set to the defined lat,lng
     else if (

@@ -12,15 +12,15 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  width: 44px !important;
-  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
   line-height: 1 !important;
 }
 
-/* Propagate height for leaflet map */
 .leaflet-map-wrapper {
   background: #ddd;
 }
+
 /* Hide leaflet map if not defined */
 leaflet-map:not(:defined) {
   display: none;
