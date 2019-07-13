@@ -140,16 +140,32 @@ class LeafletMap extends HTMLElement {
 
     this.map = L.map(this.$mapContainer, {
       bounceAtZoomLimits: true,
+      // Do not include the default zoom; we customise it below
       zoomControl: false,
-    });
-    this.map.addControl(control.zoom({position: 'bottomright'}));
-    this.tileLayer = L.tileLayer(getTileUrl(this.theme), {
-      attribution:
-        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-      // id: 'stamen.toner',
-      maxZoom: 17,
+      // Do not include the default attribution; we customise it below
+      attributionControl: false,
     });
 
+    // Add a custom attribution control
+    // We do this because the default control only shows the 'Leaflet' prefix, before the tile layer's view
+    // has loaded. This is not ideal, because we `setView` in a deferred way. Thus, it leads to a flash
+    // of content and a small re-layout.
+    // It is not a big deal if the attribution is always visible (probably preferable anyway),
+    // so we enforce that by including the atttribution in the prefix
+    this.map.addControl(
+      control.attribution({
+        position: 'bottomright',
+        prefix:
+          '<a href="https://leafletjs.com">Leaflet</a> | Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+      })
+    );
+    // Add the zoom controls to the bottom right; this should come after the attribution
+    this.map.addControl(control.zoom({position: 'bottomright'}));
+
+    // Add the tile layer to the map
+    this.tileLayer = L.tileLayer(getTileUrl(this.theme), {
+      maxZoom: 17,
+    });
     this.tileLayer.addTo(this.map);
 
     this.markersLayerGroup = L.markerClusterGroup();
