@@ -459,15 +459,25 @@ subscriptions model =
 
 viewUpdatePrompt : SW.SwUpdate -> Html Msg
 viewUpdatePrompt swUpdate =
-    notificationRegion []
+    let
+        headingId =
+            "update-prompt-heading"
+    in
+    div []
         [ SW.viewSwUpdate swUpdate
             { none = text ""
             , available =
                 calloutContainer [ class "z-9999" ]
-                    [ prompt []
+                    [ prompt
+                        [ HA.attribute "role" "dialog"
+                        , HA.attribute "aria-live" "polite"
+                        , HA.attribute "aria-labelledby" headingId
+                        ]
                         [ div [ class "measure mb2" ]
                             [ h2
-                                [ class "mv0 f-paragraph fw6 lh-title tc measure" ]
+                                [ HA.id headingId
+                                , class "mv0 f-paragraph fw6 lh-title tc measure"
+                                ]
                                 [ text "A new version is available. You can reload now to get it." ]
                             ]
                         , div [ class "flex" ]
@@ -490,15 +500,25 @@ viewUpdatePrompt swUpdate =
 
 viewInstallPrompt : SW.InstallPrompt -> Html Msg
 viewInstallPrompt installPrompt =
-    notificationRegion []
+    let
+        headingId =
+            "install-prompt-heading"
+    in
+    div []
         [ SW.viewInstallPrompt installPrompt
             { none = text ""
             , available =
                 calloutContainer [ class "z-9999" ]
-                    [ prompt []
+                    [ prompt
+                        [ HA.attribute "role" "dialog"
+                        , HA.attribute "aria-live" "polite"
+                        , HA.attribute "aria-labelledby" headingId
+                        ]
                         [ div [ class "measure mb2" ]
                             [ h2
-                                [ class "mv0 f-paragraph fw6 lh-title tc" ]
+                                [ HA.id headingId
+                                , class "mv0 f-paragraph fw6 lh-title tc"
+                                ]
                                 [ text "Add Ephemeral to your home screen?" ]
                             ]
                         , div [ class "flex" ]
