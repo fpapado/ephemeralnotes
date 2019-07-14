@@ -33,6 +33,49 @@ The app works offline and all data is stored locally to your device.
 
 ## Principles
 
+The following principles guide the project.
+Each feature or change should be evaluated against them.
+
+### Data ownership
+
+The application should avoid storing data in a remote location.
+The user notes (including time and location) should stay on the local device.
+It is up to the user to export them and share them however they want.
+
+Note that this has implications for the architecture; many server-side solutions are not possible. That fact shouls be communicated to the user.
+
+### Accessibility
+
+People use the web in different ways, and we should acommodate them.
+
+The Web Content Accessibility Guidelines 2.1 ([WCAG 2.1](https://www.w3.org/TR/WCAG21/)) cover a number of criteria to consider when putting things online. We should strive for level AA, or even AAA.
+
+In practice, this means evaluating the markup that we put on the page, validating our assumptions about interactions, and ensuring that states are communicated correctly. Where such choices are made, we should document the reasoning and share references.
+
+### Performance
+
+Not everyone has expensive, fast devices.
+In fact, [as a trend, it appears that computing has gotten cheaper, not faster](https://infrequently.org/2017/10/can-you-afford-it-real-world-web-performance-budgets/).
+A median device can still run slow if overloaded with Javascript.
+We should aim to deliver the experience in the amount of JS needed, and no more.
+
+This has implications for the choice of technology, feature set and testing.
+For example, Elm allows us to have very small and perfomant bundles.
+Similarly, using Web Components and ports for more specialized APIs (maps, storage persistence) allow us to use tested implementations, without rolling our own potentially heavy and unreliable ones.
+
+### Don't give up on the user
+
+An application that works locally can fail in many ways. We should inform the user why things failed, whether it is expected, and whether they can do anything about it (even if it means trying again later!).
+
+For example, Geolocation can fail, data can get corrupted, the user might change the contents, or a service worker might be waiting to update. We should be honest about those possibilities, and architect the code in a way that will prompt us to communicate these to the user.
+
+### Document why
+
+This is partially covered by the above.
+Where code is concerned, we should strive to document why a certain decision was made.
+
+Was a certain CSS order needed to progressively enhance features? Did we elect a specific markup pattern to expose features to Assistive Technologies? Were there compromises or assumptions in any of them? These are the kind of things we should document.
+
 ## Development
 
 If you want more information on the setup, [check out the docs/build.md](docs/build.md) file.
