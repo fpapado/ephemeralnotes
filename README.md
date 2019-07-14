@@ -41,11 +41,11 @@ The application should avoid storing data in a remote location.
 The user notes (including time and location) should stay on the local device.
 It is up to the user to export them and share them however they want.
 
-Note that this has implications for the architecture; many server-side solutions are not possible. That fact shouls be communicated to the user.
+Note that this has implications for the architecture; many server-side solutions are not possible. That fact should be communicated to the user.
 
 ### Accessibility
 
-People use the web in different ways, and we should acommodate them.
+People use the web in different ways, and we should accommodate them.
 
 The Web Content Accessibility Guidelines 2.1 ([WCAG 2.1](https://www.w3.org/TR/WCAG21/)) cover a number of criteria to consider when putting things online. We should strive for level AA, or even AAA.
 
@@ -121,14 +121,14 @@ npm install -g now
 now dev
 ```
 
-This can be usefull if you want to debug the full server round-trips, as well as the Service Worker caching.
+This can be useful if you want to debug the full server round-trips, as well as the Service Worker caching.
 
 ## List of Technologies Used
 
 If you are interested in contributing, you will see many of the following terms and libraries.
 We introduce them here to establish a common starting point.
 
-[Elm](https://elm-lang.org/) is a delightful language for reliable webapps.
+[Elm](https://elm-lang.org/) is a delightful language for reliable web apps.
 We use it for the core UI and data architecture.
 Elm enables us to express our interface as a function of data.
 It also helps us handle error cases in the code, in a way that is resilient and can be expressed to the user in an actionable way.
@@ -158,7 +158,7 @@ They are :
 
 - The Core Elm Application (imported statically)
 - The Leaflet Web Component (imported dynamically)
-- Information UI components (importe dynamically)
+- Information UI components (imported dynamically)
 
 ### The Core Elm Application and Ports
 
@@ -195,14 +195,14 @@ Ports are used to communicate with JS. There are a few things that we handle wit
 - Geolocation
 - Handling notifications of Service Worker updates and Installation
 
-These are ususally in paired TypeScript and Elm modules. Thus, we have `Store.elm`/`Store.ts`, `DarkMode.elm`/`DarkMode.ts` and so on.
+These are usually in paired TypeScript and Elm modules. Thus, we have `Store.elm`/`Store.ts`, `DarkMode.elm`/`DarkMode.ts` and so on.
 
 An important decision here, is that each module has only two ports, `fromElm` and `toElm`.
 This enforces all the data to pass through a common interface, and makes it clear that there are no request/response relationships between Elm and JS. Something in JS/TS could fail to respond altogether, and we should be prepared for it.
 
 For each pair, then:
 
-- An Elm module, say `Store.elm`, establishes funtions to send messages to JS (`FromElm`). It also establishes messages it can process from JS (`ToElm`).
+- An Elm module, say `Store.elm`, establishes functions to send messages to JS (`FromElm`). It also establishes messages it can process from JS (`ToElm`).
 - Each Typescript module, say `Store.ts`, then has a `handleSubMessage` function. It can do arbitrary things with the message, such as going to the database, or just logging to the console. It gets passed a `sendToElm` function, that it can use to send a `ToElm` message.
 - On the Elm module, any Page (or Main) that wants to use messages from JS, declares it in the `sub` (subscription) function.
 
