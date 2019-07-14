@@ -77,7 +77,7 @@ Was a certain CSS order needed to progressively enhance features? Did we elect a
 
 ## Development
 
-To start, you will need to [install Node.js](TODO) and [npm](). Node is a runtime for Javascript that works outside of the browser. NPM allows us to install packages (shared libraries) for Node. Both of them are used to set up development tooling.
+To start, you will need to [install Node.js](https://nodejs.org/en/download/). Node is a runtime for Javascript that works outside of the browser. Node comes with `npm`, which allows us to install packages. Both of them are used to set up development tooling.
 
 Then, in a terminal:
 
@@ -156,7 +156,7 @@ The application has the entry point `index-dev.ts` or `index-prod.ts`, depending
 The index is responsible for importing the parts of the application.
 They are :
 
-- The Core Elm Application (imported statically)
+- The Core Elm Application and Ports (imported statically)
 - The Leaflet Web Component (imported dynamically)
 - Information UI components (imported dynamically)
 
@@ -204,7 +204,7 @@ For each pair, then:
 
 - An Elm module, say `Store.elm`, establishes functions to send messages to JS (`FromElm`). It also establishes messages it can process from JS (`ToElm`).
 - Each Typescript module, say `Store.ts`, then has a `handleSubMessage` function. It can do arbitrary things with the message, such as going to the database, or just logging to the console. It gets passed a `sendToElm` function, that it can use to send a `ToElm` message.
-- On the Elm module, any Page (or Main) that wants to use messages from JS, declares it in the `sub` (subscription) function.
+- On the Elm module, any Page (or Main) that wants to use messages from JS, declares it in the `subscriptions` function.
 
 This approach has a little bit more typing, and encoding/decoding.
 However, given the [Principles](#principles) outlined above, creating a more strict boundary seems important for a resilient application.
@@ -248,6 +248,8 @@ If you want to see the small mess of setting this up, check out `src/leaflet/lea
 If you are interested in contributing, please [consult CONTRIBUTING.md](/CONTRIBUTING.md) for how to do so. That document covers topics such as opening issues, creating PRs, running tests, as well as the principles and code of conduct.
 
 ## Code of Conduct
+
+This project has a [Code of Conduct](/CODE_OF_CONDUCT.md). By contributing you agree to abide by it.
 
 ## License
 

@@ -17,7 +17,7 @@ Please also read the [Principles section of README.md](/README.md#principles). I
 
 ## Opening Issues
 
-Before getting to development or PRs, it is preferable to [open an issue](/issues).
+Before getting to development or PRs, it is preferable to [open an issue](https://github.com/fpapado/ephemeralnotes/issues/new/choose).
 This makes it easier to coordinate work, and also to make sure that no efforts are wasted on something that might not get merged.
 
 There are two templates, one for Feature Requests and one for Bugs.
