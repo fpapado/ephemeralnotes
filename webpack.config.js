@@ -131,13 +131,17 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
+          // Load into <style> in dev, or <link href> in production
           ifNotProduction(
             {loader: 'style-loader'},
             {
               loader: MiniCssExtractPlugin.loader,
             }
           ),
-          'css-loader',
+          // CSS -> Webpack's Representation of the world
+          {loader: 'css-loader', options: {importLoaders: 1}},
+          // CSS -> Postprocessed CSS
+          'postcss-loader',
         ],
         // Exclude leaflet.css; we include only a reference to it
         exclude: /leaflet\.css/,
@@ -149,7 +153,8 @@ module.exports = {
           // This is because we want to reference the leaflet css style inside of the web component
           // whereas webpack (css-loader + extractText) assumes top-level styles.
           // With top-level styles, we would need to use a <link>. We could do that with file-loader,
-          // but it leads to a flash of unstyled text. So we must either inline the <style> or use the constructable stylesheets API
+          // but it leads to a flash of unstyled text. So we must either inline the <style> or use the constructable stylesheets API.
+          // Either of thos need the text content of the styles, and thus here we are!
           {loader: 'postcss-loader'},
         ],
         // Include a reference to leaflet.css, hashed, but do not touch it otherwise
