@@ -24,6 +24,7 @@ html {
   --color-success: #137752;
   --color-warning: #a84400;
   --leaflet-map-bg: #dddddd;
+  --leaflet-map-height: 80vh;
   color-scheme: light dark;
   hyphens: auto;
 }

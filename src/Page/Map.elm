@@ -35,7 +35,7 @@ viewContent { entries, darkMode } =
     centeredContainerWide
         [ class "w-100 ht-100" ]
         [ heading 1 [ class "visually-hidden" ] [ text "Map" ]
-        , viewMap [ class "ht-100" ] darkMode entries
+        , viewMap [] darkMode entries
         ]
 
 
@@ -60,7 +60,6 @@ viewMap attrs mode entryData =
         [ Keyed.node "leaflet-map"
             [ HA.attribute "defaultZoom" "8"
             , HA.attribute "theme" (String.toLower <| DarkMode.modeToString mode)
-            , class "ht-100"
             ]
             markerNodes
         ]

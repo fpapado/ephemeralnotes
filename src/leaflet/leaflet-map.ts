@@ -20,13 +20,13 @@ const styleText = `
   max-width: 100%;
 }
 
-.container {
-  height: 80vh;
-  background-color: var(--leaflet-map-bg) !important;
-  contain: layout paint;
-}
-
 ${leafletStyleText}
+
+.container {
+  height: var(--leaflet-map-height);
+  background-color: var(--leaflet-map-bg);
+  contain: strict;
+}
 `;
 
 // TODO: Use the lazy init version with connectedCallback
