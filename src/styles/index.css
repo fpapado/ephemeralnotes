@@ -13,8 +13,7 @@
 @import './status-indicator.css';
 @import './Page.css';
 
-/** TODO: move to :root selector, whenever critters supports it */
-html {
+:root {
   --color-bg: #f6fffe;
   --color-bg-lighter: #fff;
   --color-text: #111111;
